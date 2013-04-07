@@ -1,5 +1,6 @@
 //depend "chem"
 
+var Chem = window.Chem;
 var Vec2d = Chem.Vec2d;
 
 Chem.onReady(function () {
@@ -27,7 +28,7 @@ Chem.onReady(function () {
         }
 
         // apply forward and backward thrust with up and down arrow keys
-        var thrust = new Vec2d(Math.cos(ship.rotation), Math.sin(ship.rotation));
+        var thrust = new Vec2d(Math.cos(ship.rotation - Math.PI / 2), Math.sin(ship.rotation - Math.PI / 2));
         if (engine.buttonState(Chem.Button.Key_Up)) {
             ship_vel.add(thrust.scaled(thrust_amt * dx));
         }

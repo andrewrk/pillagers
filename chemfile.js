@@ -22,6 +22,8 @@ exports.spritesheet = {
       // animation name.
       frames: "explosion"
     },
-    ship: {}
+    ship: {
+      loop: true
+    }
   }
 };
