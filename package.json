@@ -1,0 +1,18 @@
+{
+  "name": "superpowerless",
+  "version": "0.0.0",
+  "private": true,
+  "description": "game with superpowerless",
+  "main": "chemfile.js",
+  "dependencies": {
+    "chem": "~0.2.7"
+  },
+  "scripts": {
+    "dev": "npm install && chem dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@bitbucket.org/superjoe/superpowerless.git"
+  },
+  "license": "BSD"
+}
