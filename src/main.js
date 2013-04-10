@@ -15,6 +15,7 @@ Chem.onReady(function () {
   var ship_vel = v();
   var rotation_speed = Math.PI * 0.04;
   var thrust_amt = 0.1;
+  engine.setSize(v(1067, 600));
   engine.on('update', function (dt, dx) {
     ship.pos.add(ship_vel);
 
