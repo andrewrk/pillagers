@@ -1,50 +1,35 @@
 //depend "chem"
+//depend "ship"
 var Chem = window.Chem
   , v = Chem.Vec2d
+  , SS = window.SS
+  , Ship = SS.Ship
 
 Chem.onReady(function () {
   var canvas = document.getElementById("game");
   var engine = new Chem.Engine(canvas);
+  var physicsObjects = {};
   var batch = new Chem.Batch();
   var boom = new Chem.Sound('sfx/boom.ogg');
-  var ship = new Chem.Sprite('ship', {
-    batch: batch,
-    pos: v(200, 200),
-    rotation: Math.PI / 2
-  });
-  var ship_vel = v();
-  var rotation_speed = Math.PI * 0.04;
-  var thrust_amt = 0.1;
+  var ship = new Ship();
+  batch.add(ship.sprite);
+  physicsObjects[ship.id] = ship;
   engine.setSize(v(1067, 600));
   engine.on('update', function (dt, dx) {
-    ship.pos.add(ship_vel);
+    for (var id in physicsObjects) {
+      var obj = physicsObjects[id];
+      obj.update(dt, dx);
+    }
 
     // rotate the ship with left and right arrow keys
-    if (engine.buttonState(Chem.Button.Key_Left)) {
-        ship.rotation -= rotation_speed * dx;
-    }
-    if (engine.buttonState(Chem.Button.Key_Right)) {
-        ship.rotation += rotation_speed * dx;
-    }
+    ship.rotateInput = 0;
+    if (engine.buttonState(Chem.Button.Key_Left)) ship.rotateInput -= 1;
+    if (engine.buttonState(Chem.Button.Key_Right)) ship.rotateInput += 1;
 
     // apply forward and backward thrust with up and down arrow keys
-    var thrust = v(Math.cos(ship.rotation - Math.PI / 2), Math.sin(ship.rotation - Math.PI / 2));
-    if (engine.buttonState(Chem.Button.Key_Up)) {
-      ship_vel.add(thrust.scaled(thrust_amt * dx));
-    }
-    if (engine.buttonState(Chem.Button.Key_Down)) {
-      ship_vel.sub(thrust.scaled(thrust_amt * dx));
-    }
-
-    // press space to blow yourself up
-    if (engine.buttonJustPressed(Chem.Button.Key_Space)) {
-      boom.play();
-      ship.setAnimationName('boom');
-      ship.setFrameIndex(0);
-      ship.on('animation_end', function() {
-        ship.delete();
-      });
-    }
+    ship.thrustInput = 0;
+    if (engine.buttonState(Chem.Button.Key_Up)) ship.thrustInput += 1;
+    if (engine.buttonState(Chem.Button.Key_Down)) ship.thrustInput -= 1;
   });
   engine.on('draw', function (context) {
     // clear canvas to black
