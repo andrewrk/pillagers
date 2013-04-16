@@ -1,35 +1,66 @@
 //depend "chem"
 //depend "ship"
+//depend "ship_ai"
+//depend "bullet"
 var Chem = window.Chem
   , v = Chem.Vec2d
   , SS = window.SS
   , Ship = SS.Ship
+  , ShipAi = SS.ShipAi
+  , BULLET_SPEED = 10
 
 Chem.onReady(function () {
   var canvas = document.getElementById("game");
   var engine = new Chem.Engine(canvas);
-  var physicsObjects = {};
-  var batch = new Chem.Batch();
-  var boom = new Chem.Sound('sfx/boom.ogg');
-  var ship = new Ship();
-  batch.add(ship.sprite);
-  physicsObjects[ship.id] = ship;
   engine.setSize(v(1067, 600));
+
+  var state = new State(engine);
+
+  // add ship on the left
+  state.createShip(0, v(200, 200));
+  state.createShip(1, v(500, 200));
+
   engine.on('update', function (dt, dx) {
-    for (var id in physicsObjects) {
-      var obj = physicsObjects[id];
-      obj.update(dt, dx);
+    var id;
+    for (id in state.physicsObjects) {
+      var obj = state.physicsObjects[id];
+      obj.update(dt, dx, state);
     }
 
-    // rotate the ship with left and right arrow keys
-    ship.rotateInput = 0;
-    if (engine.buttonState(Chem.Button.Key_Left)) ship.rotateInput -= 1;
-    if (engine.buttonState(Chem.Button.Key_Right)) ship.rotateInput += 1;
+    for (id in state.aiObjects) {
+      var ai = state.aiObjects[id];
+      if (state.manualOverride === ai.id) {
+        var ship = ai.ship;
+        // rotate the ship with left and right arrow keys
+        ship.rotateInput = 0;
+        if (engine.buttonState(Chem.Button.Key_Left)) ship.rotateInput -= 1;
+        if (engine.buttonState(Chem.Button.Key_Right)) ship.rotateInput += 1;
 
-    // apply forward and backward thrust with up and down arrow keys
-    ship.thrustInput = 0;
-    if (engine.buttonState(Chem.Button.Key_Up)) ship.thrustInput += 1;
-    if (engine.buttonState(Chem.Button.Key_Down)) ship.thrustInput -= 1;
+        // apply forward and backward thrust with up and down arrow keys
+        ship.thrustInput = 0;
+        if (engine.buttonState(Chem.Button.Key_Up)) ship.thrustInput += 1;
+        if (engine.buttonState(Chem.Button.Key_Down)) ship.thrustInput -= 1;
+
+        ship.shootInput = engine.buttonState(Chem.Button.Key_Space) ? 1 : 0;
+      } else {
+        ai.update(dt, dx, state);
+      }
+    }
+  });
+  engine.on('buttondown', function(button) {
+    if (button === Chem.Button.Mouse_Left) {
+      // manual override ship
+      var aiShip = clickedAiShip(engine.mouse_pos);
+      if (aiShip) {
+        state.beginManualOverride(aiShip);
+      } else {
+        state.endManualOverride();
+      }
+    } else if (button === Chem.Button.Mouse_Right) {
+      // place ship
+      var team = engine.buttonState(Chem.Button.Key_2) ? 1 : 0;
+      state.createShip(team, engine.mouse_pos.clone());
+    }
   });
   engine.on('draw', function (context) {
     // clear canvas to black
@@ -37,7 +68,7 @@ Chem.onReady(function () {
     context.fillRect(0, 0, engine.size.x, engine.size.y);
 
     // draw all sprites in batch
-    engine.draw(batch);
+    engine.draw(state.batch);
 
     // draw a little fps counter in the corner
     context.fillStyle = '#ffffff'
@@ -45,4 +76,69 @@ Chem.onReady(function () {
   });
   engine.start();
   canvas.focus();
+
+  function clickedAiShip(pos) {
+    for (var id in state.aiObjects) {
+      var ai = state.aiObjects[id];
+      if (ai.ship.pos.distanceTo(pos) < 25) {
+        return ai;
+      }
+    }
+    return null;
+  }
 });
+
+function State(engine) {
+  this.physicsObjects = {};
+  this.aiObjects = {};
+  this.manualOverride = null;
+  this.engine = engine;
+  this.batch = new Chem.Batch();
+}
+
+State.prototype.beginManualOverride = function(ai) {
+  assert(ai.id);
+  this.manualOverride = ai.id;
+}
+
+State.prototype.endManualOverride = function() {
+  this.manualOverride = null;
+}
+
+State.prototype.addPhysicsObject = function(o) {
+  assert(o.id);
+  this.physicsObjects[o.id] = o;
+};
+
+State.prototype.deletePhysicsObject = function(o) {
+  assert(o.id);
+  delete this.physicsObjects[o.id];
+}
+
+State.prototype.addAiObject = function(o) {
+  assert(o.id);
+  this.aiObjects[o.id] = o;
+};
+
+State.prototype.createShip = function(team, pos) {
+  var ship = new Ship({team: team, pos: pos});
+  this.batch.add(ship.sprite);
+  this.addPhysicsObject(ship);
+  var shipAi = new ShipAi(ship);
+  this.addAiObject(shipAi);
+};
+
+State.prototype.createBullet = function(pos, dir, team) {
+  var vel = dir.scaled(BULLET_SPEED);
+  var bullet = new SS.Bullet(pos, vel, team);
+  this.batch.add(bullet.sprite);
+  this.addPhysicsObject(bullet);
+};
+
+State.prototype.isOffscreen = function(pos) {
+  return (pos.x < 0 || pos.x > this.engine.size.x || pos.y < 0 || pos.y > this.engine.size.y);
+};
+
+function assert(value) {
+  if (!value) throw new Error("Assertion Failure: " + value);
+}

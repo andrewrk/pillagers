@@ -24,6 +24,7 @@ exports.spritesheet = {
     },
     ship: {
       loop: true
-    }
+    },
+    bullet: {}
   }
 };
