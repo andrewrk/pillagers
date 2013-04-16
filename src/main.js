@@ -1,6 +1,7 @@
 //depend "chem"
 //depend "ship"
 //depend "ship_ai"
+//depend "explosion"
 //depend "bullet"
 var Chem = window.Chem
   , v = Chem.Vec2d
@@ -70,6 +71,10 @@ Chem.onReady(function () {
 
     // draw all sprites in batch
     engine.draw(state.batch);
+    for (var id in state.aiObjects) {
+      var ai = state.aiObjects[id];
+      ai.draw(context);
+    }
 
     // draw a little fps counter in the corner
     context.fillStyle = '#ffffff'
@@ -127,6 +132,23 @@ State.prototype.createShip = function(team, pos) {
   this.addPhysicsObject(ship);
   var shipAi = new ShipAi(ship);
   this.addAiObject(shipAi);
+};
+
+State.prototype.deleteShip = function(ai) {
+  delete this.aiObjects[ai.id];
+  delete this.physicsObjects[ai.ship.id];
+  ai.delete();
+};
+
+State.prototype.createExplosion = function(pos, vel) {
+  var explosion = new SS.Explosion(pos, vel);
+  this.addPhysicsObject(explosion);
+  this.batch.add(explosion.sprite);
+};
+
+State.prototype.deleteExplosion = function(explosion) {
+  delete this.physicsObjects[explosion.id];
+  explosion.delete();
 };
 
 State.prototype.createBullet = function(pos, dir, team) {

@@ -10,6 +10,7 @@ SS.Ship = Ship;
 var ROTATION_SPEED = Math.PI * 0.03;
 var THRUST_AMT = 0.1;
 var RECHARGE_AMT = 0.20;
+var BULLET_DAMAGE = 0.1;
 
 function Ship(o) {
   o = o || {};
@@ -23,6 +24,7 @@ function Ship(o) {
   this.shootInput = 0;
   this.recharge = 0;
   this.team = o.team == null ? 0 : o.team;
+  this.health = o.health || 1;
 }
 
 Ship.ROTATION_SPEED = ROTATION_SPEED;
@@ -58,8 +60,17 @@ Ship.prototype.update = function(dt, dx, state) {
   if (this.shootInput && this.recharge <= 0) {
     this.recharge = RECHARGE_AMT;
     // create projectile
-    state.createBullet(this.pos.clone(), unitFromAngle(this.rotation), this.team);
+    var unit = unitFromAngle(this.rotation);
+    state.createBullet(this.pos.plus(unit.scaled(20)), unit, this.team);
   }
+};
+
+Ship.prototype.hit = function(state) {
+  this.health -= BULLET_DAMAGE;
+};
+
+Ship.prototype.delete = function() {
+  this.sprite.delete();
 };
 
 function unitFromAngle(angle) {

@@ -17,11 +17,25 @@ function Bullet(pos, vel, team) {
   this.sprite = new Chem.Sprite('bullet');
 }
 
+Bullet.prototype.delete = function(state) {
+  this.sprite.delete();
+  state.deletePhysicsObject(this);
+};
+
 Bullet.prototype.update = function (dt, dx, state) {
   this.pos.add(this.vel);
   this.sprite.pos = this.pos;
   if (state.isOffscreen(this.pos)) {
-    this.sprite.delete();
-    state.deletePhysicsObject(this);
+    this.delete(state);
+    return;
+  }
+  // collision detection with ships
+  for (var id in state.aiObjects) {
+    var ai = state.aiObjects[id];
+    if (ai.ship.pos.distanceTo(this.pos) < 18) {
+      this.delete(state);
+      ai.hit(state);
+      return;
+    }
   }
 }
