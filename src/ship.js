@@ -7,7 +7,7 @@ var SS = window.SS
 
 SS.Ship = Ship;
 
-var ROTATION_SPEED = Math.PI * 0.04;
+var ROTATION_SPEED = Math.PI * 0.03;
 var THRUST_AMT = 0.1;
 var RECHARGE_AMT = 0.20;
 
@@ -25,6 +25,8 @@ function Ship(o) {
   this.team = o.team == null ? 0 : o.team;
 }
 
+Ship.ROTATION_SPEED = ROTATION_SPEED;
+
 Ship.prototype.setThrustInput = function(value) {
   assert(Math.abs(value) <= 1);
   if (this.thrustInput === value) return;
@@ -35,6 +37,12 @@ Ship.prototype.setThrustInput = function(value) {
   }
   this.sprite.setFrameIndex(0);
   this.thrustInput = value;
+};
+
+Ship.prototype.setRotateInput = function(value) {
+  this.rotateInput = value;
+  if (this.rotateInput > 1) this.rotateInput = 1;
+  if (this.rotateInput < -1) this.rotateInput = -1;
 };
 
 Ship.prototype.update = function(dt, dx, state) {

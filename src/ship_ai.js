@@ -1,5 +1,6 @@
 //depend "chem"
 //depend "uuid"
+//depend "ship"
 
 var SS = window.SS
   , Chem = window.Chem
@@ -24,13 +25,12 @@ ShipAi.prototype.update = function (dt, dx, state) {
   var targetAngle = this.target.ship.pos.minus(this.ship.pos).angle();
   var delta = targetAngle - this.ship.rotation;
   var goodShot = Math.abs(delta) < Math.PI / 10;
-  var reallyGoodShot = Math.abs(delta) < Math.PI / 20;
 
   // shoot at target
   this.ship.shootInput = goodShot ? 1 : 0;
 
   // aim at target
-  this.ship.rotateInput = reallyGoodShot ? 0 : sign(delta);
+  this.ship.setRotateInput(delta / SS.Ship.ROTATION_SPEED);
 }
 
 ShipAi.prototype.chooseTarget = function(state) {
