@@ -17,14 +17,25 @@ function Ship(o) {
   this.pos = o.pos || v();
   this.rotation = o.rotation == null ? Math.PI / 2 : o.rotation;
   this.id = createId();
-  var spriteName = o.spriteName || 'ship';
-  this.sprite = new Chem.Sprite(spriteName);
+  this.sprite = new Chem.Sprite('ship_still');
   this.thrustInput = 0;
   this.rotateInput = 0;
   this.shootInput = 0;
   this.recharge = 0;
   this.team = o.team == null ? 0 : o.team;
 }
+
+Ship.prototype.setThrustInput = function(value) {
+  assert(Math.abs(value) <= 1);
+  if (this.thrustInput === value) return;
+  if (value === 0) {
+    this.sprite.setAnimationName('ship_decel');
+  } else {
+    this.sprite.setAnimationName('ship_accel');
+  }
+  this.sprite.setFrameIndex(0);
+  this.thrustInput = value;
+};
 
 Ship.prototype.update = function(dt, dx, state) {
   this.pos.add(this.vel.scaled(dx));
@@ -45,4 +56,8 @@ Ship.prototype.update = function(dt, dx, state) {
 
 function unitFromAngle(angle) {
   return v(Math.cos(angle), Math.sin(angle));
+}
+
+function assert(value) {
+  if (!value) throw new Error("Assertion Failure: " + value);
 }

@@ -37,9 +37,10 @@ Chem.onReady(function () {
         if (engine.buttonState(Chem.Button.Key_Right)) ship.rotateInput += 1;
 
         // apply forward and backward thrust with up and down arrow keys
-        ship.thrustInput = 0;
-        if (engine.buttonState(Chem.Button.Key_Up)) ship.thrustInput += 1;
-        if (engine.buttonState(Chem.Button.Key_Down)) ship.thrustInput -= 1;
+        var thrust = 0;
+        if (engine.buttonState(Chem.Button.Key_Up)) thrust += 1;
+        if (engine.buttonState(Chem.Button.Key_Down)) thrust -= 1;
+        ship.setThrustInput(thrust);
 
         ship.shootInput = engine.buttonState(Chem.Button.Key_Space) ? 1 : 0;
       } else {

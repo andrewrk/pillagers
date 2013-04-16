@@ -22,8 +22,24 @@ exports.spritesheet = {
       // animation name.
       frames: "explosion"
     },
-    ship: {
-      loop: true
+    ship_still: {
+      frames: ["ship/01.png"],
+    },
+    ship_accel: {
+      frames: [
+        "ship/01.png",
+        "ship/02.png",
+        "ship/03.png",
+        "ship/04.png",
+      ],
+    },
+    ship_decel: {
+      frames: [
+        "ship/04.png",
+        "ship/03.png",
+        "ship/02.png",
+        "ship/01.png",
+      ],
     },
     bullet: {}
   }
