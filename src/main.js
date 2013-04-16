@@ -16,12 +16,63 @@ Chem.onReady(function () {
   engine.setSize(v(1067, 600));
 
   var state = new State(engine);
+  var paused = false;
 
   // add ship on the left
   state.createShip(0, v(200, 200));
   state.createShip(1, v(500, 200));
 
-  engine.on('update', function (dt, dx) {
+  engine.on('update', onUpdate);
+  
+  engine.on('buttondown', function(button) {
+    if (button === Chem.Button.Mouse_Left) {
+      // manual override ship
+      var aiShip = clickedAiShip(engine.mouse_pos);
+      if (aiShip) {
+        state.beginManualOverride(aiShip);
+      } else {
+        state.endManualOverride();
+      }
+    } else if (button === Chem.Button.Mouse_Right) {
+      // place ship
+      var team = engine.buttonState(Chem.Button.Key_2) ? 1 : 0;
+      state.createShip(team, engine.mouse_pos.clone());
+    } else if (button === Chem.Button.Key_P) {
+      paused = !paused;
+      if (paused) {
+        engine.removeListener('update', onUpdate);
+      } else {
+        engine.on('update', onUpdate);
+      }
+    }
+  });
+  engine.on('draw', function (context) {
+    // clear canvas to black
+    context.fillStyle = '#000000'
+    context.fillRect(0, 0, engine.size.x, engine.size.y);
+
+    // draw all sprites in batch
+    engine.draw(state.batch);
+    for (var id in state.aiObjects) {
+      var ai = state.aiObjects[id];
+      ai.draw(context);
+    }
+
+    if (paused) {
+      context.fillStyle = '#ffffff';
+      context.font = "20pt monospace";
+      context.fillText("PAUSED", engine.size.x / 2, engine.size.y / 2);
+    }
+
+    // draw a little fps counter in the corner
+    context.fillStyle = '#ffffff'
+    context.font = "12pt monospace";
+    engine.drawFps();
+  });
+  engine.start();
+  canvas.focus();
+
+  function onUpdate (dt, dx) {
     var id;
     for (id in state.physicsObjects) {
       var obj = state.physicsObjects[id];
@@ -48,40 +99,7 @@ Chem.onReady(function () {
         ai.update(dt, dx, state);
       }
     }
-  });
-  engine.on('buttondown', function(button) {
-    if (button === Chem.Button.Mouse_Left) {
-      // manual override ship
-      var aiShip = clickedAiShip(engine.mouse_pos);
-      if (aiShip) {
-        state.beginManualOverride(aiShip);
-      } else {
-        state.endManualOverride();
-      }
-    } else if (button === Chem.Button.Mouse_Right) {
-      // place ship
-      var team = engine.buttonState(Chem.Button.Key_2) ? 1 : 0;
-      state.createShip(team, engine.mouse_pos.clone());
-    }
-  });
-  engine.on('draw', function (context) {
-    // clear canvas to black
-    context.fillStyle = '#000000'
-    context.fillRect(0, 0, engine.size.x, engine.size.y);
-
-    // draw all sprites in batch
-    engine.draw(state.batch);
-    for (var id in state.aiObjects) {
-      var ai = state.aiObjects[id];
-      ai.draw(context);
-    }
-
-    // draw a little fps counter in the corner
-    context.fillStyle = '#ffffff'
-    engine.drawFps();
-  });
-  engine.start();
-  canvas.focus();
+  }
 
   function clickedAiShip(pos) {
     for (var id in state.aiObjects) {
