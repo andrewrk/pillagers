@@ -11,6 +11,7 @@ var ROTATION_SPEED = Math.PI * 0.03;
 var THRUST_AMT = 0.1;
 var RECHARGE_AMT = 0.20;
 var BULLET_DAMAGE = 0.1;
+var BULLET_SPEED = 10;
 
 function Ship(o) {
   o = o || {};
@@ -61,7 +62,8 @@ Ship.prototype.update = function(dt, dx, state) {
     this.recharge = RECHARGE_AMT;
     // create projectile
     var unit = unitFromAngle(this.rotation);
-    state.createBullet(this.pos.plus(unit.scaled(20)), unit, this.team);
+    var vel = unit.scaled(BULLET_SPEED).add(this.vel);
+    state.createBullet(this.pos.plus(unit.scaled(20)), vel, this.team);
   }
 };
 

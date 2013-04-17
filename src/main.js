@@ -8,7 +8,6 @@ var Chem = window.Chem
   , SS = window.SS
   , Ship = SS.Ship
   , ShipAi = SS.ShipAi
-  , BULLET_SPEED = 10
 
 Chem.onReady(function () {
   var canvas = document.getElementById("game");
@@ -169,8 +168,7 @@ State.prototype.deleteExplosion = function(explosion) {
   explosion.delete();
 };
 
-State.prototype.createBullet = function(pos, dir, team) {
-  var vel = dir.scaled(BULLET_SPEED);
+State.prototype.createBullet = function(pos, vel, team) {
   var bullet = new SS.Bullet(pos, vel, team);
   this.batch.add(bullet.sprite);
   this.addPhysicsObject(bullet);
