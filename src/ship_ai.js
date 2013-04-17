@@ -45,6 +45,7 @@ ShipAi.prototype.update = function (dt, dx, state) {
   if (! this.target) this.chooseTarget(state);
   if (! this.target) {
     this.ship.shootInput = 0;
+    this.ship.rotateInput = 0;
     return;
   }
 
