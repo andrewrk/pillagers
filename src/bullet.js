@@ -32,7 +32,7 @@ Bullet.prototype.update = function (dt, dx, state) {
   // collision detection with ships
   for (var id in state.aiObjects) {
     var ai = state.aiObjects[id];
-    if (ai.ship.pos.distanceTo(this.pos) < 18) {
+    if (ai.ship.team !== this.team && ai.ship.pos.distanceTo(this.pos) < 18) {
       this.delete(state);
       ai.hit(state);
       return;
