@@ -1,13 +1,9 @@
-//depend "chem"
-//depend "uuid"
-//depend "ship"
+var chem = require('chem');
+var v = chem.vec2d;
+var createId = require('./uuid').createId;
+var Ship = require('./ship');
 
-var SS = window.SS
-  , Chem = window.Chem
-  , v = Chem.Vec2d
-  , createId = SS.createId
-
-SS.ShipAi = ShipAi;
+module.exports = ShipAi;
 
 function ShipAi(ship) {
   this.id = createId();
@@ -57,7 +53,7 @@ ShipAi.prototype.update = function (dt, dx, state) {
   this.ship.shootInput = goodShot ? 1 : 0;
 
   // aim at target
-  this.ship.setRotateInput(delta / SS.Ship.ROTATION_SPEED);
+  this.ship.setRotateInput(delta / Ship.ROTATION_SPEED);
 }
 
 ShipAi.prototype.chooseTarget = function(state) {

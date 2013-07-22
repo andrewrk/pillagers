@@ -1,20 +1,15 @@
-//depend "chem"
-//depend "uuid"
-//depend "chem/sprite"
+var chem = require('chem');
+var createId = require('./uuid').createId;
 
-var SS = window.SS
-  , Chem = window.Chem
-  , v = Chem.Vec2d
-  , createId = SS.createId
-
-SS.Bullet = Bullet;
+module.exports = Bullet;
 
 function Bullet(pos, vel, team) {
   this.pos = pos;
   this.vel = vel;
   this.team = team;
   this.id = createId();
-  this.sprite = new Chem.Sprite('bullet');
+  this.sprite = new chem.Sprite('bullet');
+  this.radius = 2;
 }
 
 Bullet.prototype.delete = function(state) {
@@ -32,7 +27,7 @@ Bullet.prototype.update = function (dt, dx, state) {
   // collision detection with ships
   for (var id in state.aiObjects) {
     var ai = state.aiObjects[id];
-    if (ai.ship.team !== this.team && ai.ship.pos.distanceTo(this.pos) < 18) {
+    if (ai.ship.pos.distance(this.pos) < ai.ship.radius) {
       this.delete(state);
       ai.hit(state);
       return;

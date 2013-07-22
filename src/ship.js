@@ -1,11 +1,8 @@
-//depend "uuid"
-//depend "chem/sprite"
-var SS = window.SS
-  , Chem = window.Chem
-  , v = Chem.Vec2d
-  , createId = SS.createId
+var createId = require('./uuid').createId;
+var chem = require('chem');
+var v = chem.vec2d;
 
-SS.Ship = Ship;
+module.exports = Ship;
 
 var ROTATION_SPEED = Math.PI * 0.03;
 var THRUST_AMT = 0.1;
@@ -19,13 +16,14 @@ function Ship(o) {
   this.pos = o.pos || v();
   this.rotation = o.rotation == null ? Math.PI / 2 : o.rotation;
   this.id = createId();
-  this.sprite = new Chem.Sprite('ship_still');
+  this.sprite = new chem.Sprite('ship_still');
   this.thrustInput = 0;
   this.rotateInput = 0;
   this.shootInput = 0;
   this.recharge = 0;
   this.team = o.team == null ? 0 : o.team;
   this.health = o.health || 1;
+  this.radius = 18;
 }
 
 Ship.ROTATION_SPEED = ROTATION_SPEED;
@@ -63,7 +61,7 @@ Ship.prototype.update = function(dt, dx, state) {
     // create projectile
     var unit = unitFromAngle(this.rotation);
     var vel = unit.scaled(BULLET_SPEED).add(this.vel);
-    state.createBullet(this.pos.plus(unit.scaled(20)), vel, this.team);
+    state.createBullet(this.pos.plus(unit.scaled(this.radius)), vel, this.team);
   }
 };
 

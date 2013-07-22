@@ -5,7 +5,8 @@
   "description": "game with superpowerless",
   "main": "chemfile.js",
   "dependencies": {
-    "chem": "~0.2.7"
+    "chem": "~1.0.0",
+    "chem-cli": "~1.0.1"
   },
   "scripts": {
     "dev": "npm install && chem dev"

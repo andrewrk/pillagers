@@ -1,19 +1,16 @@
-//depend "uuid"
-//depend "chem/sprite"
-var SS = window.SS
-  , Chem = window.Chem
-  , v = Chem.Vec2d
-  , createId = SS.createId
+var createId = require('./uuid').createId;
+var chem = require('chem');
+var v = chem.vec2d;
 
-SS.Explosion = Explosion;
+module.exports = Explosion;
 
 function Explosion(pos, vel) {
   this.pos = pos;
   this.vel = vel;
-  this.sprite = new Chem.Sprite('boom');
+  this.sprite = new chem.Sprite('boom');
   this.timeLeft = 1;
   this.id = createId();
-  this.boomSfx = new Chem.Sound('sfx/boom.ogg');
+  this.boomSfx = new chem.Sound('sfx/boom.ogg');
   this.boomSfx.play();
 }
 

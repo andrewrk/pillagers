@@ -1,42 +1,40 @@
-//depend "chem"
-//depend "ship"
-//depend "ship_ai"
-//depend "explosion"
-//depend "bullet"
-var Chem = window.Chem
-  , v = Chem.Vec2d
-  , SS = window.SS
-  , Ship = SS.Ship
-  , ShipAi = SS.ShipAi
-
-Chem.onReady(function () {
-  var canvas = document.getElementById("game");
-  var engine = new Chem.Engine(canvas);
-  engine.setSize(v(1067, 600));
-
+var chem = require('chem');
+var Ship = require('./ship');
+var ShipAi = require('./ship_ai');
+var Explosion = require('./explosion');
+var Bullet = require('./bullet');
+var v = chem.vec2d;
+var canvas = document.getElementById("game");
+var engine = new chem.Engine(canvas);
+engine.setSize(v(1067, 600));
+engine.showLoadProgressBar();
+engine.start();
+canvas.focus();
+chem.resources.on('ready', function () {
   var state = new State(engine);
   var paused = false;
+  var fpsLabel = engine.createFpsLabel();
 
   // add ship on the left
   state.createShip(0, v(200, 200));
   state.createShip(1, v(500, 200));
 
   engine.on('update', onUpdate);
-  
+
   engine.on('buttondown', function(button) {
-    if (button === Chem.Button.Mouse_Left) {
+    if (button === chem.button.MouseLeft) {
       // manual override ship
-      var aiShip = clickedAiShip(engine.mouse_pos);
+      var aiShip = clickedAiShip(engine.mousePos);
       if (aiShip) {
         state.beginManualOverride(aiShip);
       } else {
         state.endManualOverride();
       }
-    } else if (button === Chem.Button.Mouse_Right) {
+    } else if (button === chem.button.MouseRight) {
       // place ship
-      var team = engine.buttonState(Chem.Button.Key_2) ? 1 : 0;
-      state.createShip(team, engine.mouse_pos.clone());
-    } else if (button === Chem.Button.Key_P) {
+      var team = engine.buttonState(chem.button.Key2) ? 1 : 0;
+      state.createShip(team, engine.mousePos.clone());
+    } else if (button === chem.button.KeyP) {
       paused = !paused;
       if (paused) {
         engine.removeListener('update', onUpdate);
@@ -51,7 +49,7 @@ Chem.onReady(function () {
     context.fillRect(0, 0, engine.size.x, engine.size.y);
 
     // draw all sprites in batch
-    engine.draw(state.batch);
+    state.batch.draw(context);
     for (var id in state.aiObjects) {
       var ai = state.aiObjects[id];
       ai.draw(context);
@@ -63,13 +61,8 @@ Chem.onReady(function () {
       context.fillText("PAUSED", engine.size.x / 2, engine.size.y / 2);
     }
 
-    // draw a little fps counter in the corner
-    context.fillStyle = '#ffffff'
-    context.font = "12pt monospace";
-    engine.drawFps();
+    fpsLabel.draw(context);
   });
-  engine.start();
-  canvas.focus();
 
   function onUpdate (dt, dx) {
     var id;
@@ -84,16 +77,16 @@ Chem.onReady(function () {
         var ship = ai.ship;
         // rotate the ship with left and right arrow keys
         ship.rotateInput = 0;
-        if (engine.buttonState(Chem.Button.Key_Left)) ship.rotateInput -= 1;
-        if (engine.buttonState(Chem.Button.Key_Right)) ship.rotateInput += 1;
+        if (engine.buttonState(chem.button.KeyLeft)) ship.rotateInput -= 1;
+        if (engine.buttonState(chem.button.KeyRight)) ship.rotateInput += 1;
 
         // apply forward and backward thrust with up and down arrow keys
         var thrust = 0;
-        if (engine.buttonState(Chem.Button.Key_Up)) thrust += 1;
-        if (engine.buttonState(Chem.Button.Key_Down)) thrust -= 1;
+        if (engine.buttonState(chem.button.KeyUp)) thrust += 1;
+        if (engine.buttonState(chem.button.KeyDown)) thrust -= 1;
         ship.setThrustInput(thrust);
 
-        ship.shootInput = engine.buttonState(Chem.Button.Key_Space) ? 1 : 0;
+        ship.shootInput = engine.buttonState(chem.button.KeySpace) ? 1 : 0;
       } else {
         ai.update(dt, dx, state);
       }
@@ -103,7 +96,7 @@ Chem.onReady(function () {
   function clickedAiShip(pos) {
     for (var id in state.aiObjects) {
       var ai = state.aiObjects[id];
-      if (ai.ship.pos.distanceTo(pos) < 25) {
+      if (ai.ship.pos.distance(pos) < ai.ship.radius) {
         return ai;
       }
     }
@@ -116,7 +109,7 @@ function State(engine) {
   this.aiObjects = {};
   this.manualOverride = null;
   this.engine = engine;
-  this.batch = new Chem.Batch();
+  this.batch = new chem.Batch();
 }
 
 State.prototype.beginManualOverride = function(ai) {
@@ -158,7 +151,7 @@ State.prototype.deleteShip = function(ai) {
 };
 
 State.prototype.createExplosion = function(pos, vel) {
-  var explosion = new SS.Explosion(pos, vel);
+  var explosion = new Explosion(pos, vel);
   this.addPhysicsObject(explosion);
   this.batch.add(explosion.sprite);
 };
@@ -169,7 +162,7 @@ State.prototype.deleteExplosion = function(explosion) {
 };
 
 State.prototype.createBullet = function(pos, vel, team) {
-  var bullet = new SS.Bullet(pos, vel, team);
+  var bullet = new Bullet(pos, vel, team);
   this.batch.add(bullet.sprite);
   this.addPhysicsObject(bullet);
 };
