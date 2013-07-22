@@ -50,9 +50,9 @@ chem.resources.on('ready', function () {
 
     // draw all sprites in batch
     state.batch.draw(context);
-    for (var id in state.aiObjects) {
-      var ai = state.aiObjects[id];
-      ai.draw(context);
+    for (var id in state.physicsObjects) {
+      var obj = state.physicsObjects[id];
+      obj.draw(context);
     }
 
     if (paused) {
@@ -68,7 +68,7 @@ chem.resources.on('ready', function () {
     var id;
     for (id in state.physicsObjects) {
       var obj = state.physicsObjects[id];
-      obj.update(dt, dx, state);
+      obj.update(dt, dx);
     }
 
     for (id in state.aiObjects) {
@@ -88,7 +88,7 @@ chem.resources.on('ready', function () {
 
         ship.shootInput = engine.buttonState(chem.button.KeySpace) ? 1 : 0;
       } else {
-        ai.update(dt, dx, state);
+        ai.update(dt, dx);
       }
     }
   }
@@ -131,27 +131,25 @@ State.prototype.deletePhysicsObject = function(o) {
   delete this.physicsObjects[o.id];
 }
 
+State.prototype.deleteAi = function(ai) {
+  delete this.aiObjects[ai.id];
+};
+
 State.prototype.addAiObject = function(o) {
   assert(o.id);
   this.aiObjects[o.id] = o;
 };
 
 State.prototype.createShip = function(team, pos) {
-  var ship = new Ship({team: team, pos: pos});
+  var ship = new Ship(this, {team: team, pos: pos});
   this.batch.add(ship.sprite);
   this.addPhysicsObject(ship);
-  var shipAi = new ShipAi(ship);
+  var shipAi = new ShipAi(this, ship);
   this.addAiObject(shipAi);
 };
 
-State.prototype.deleteShip = function(ai) {
-  delete this.aiObjects[ai.id];
-  delete this.physicsObjects[ai.ship.id];
-  ai.delete();
-};
-
 State.prototype.createExplosion = function(pos, vel) {
-  var explosion = new Explosion(pos, vel);
+  var explosion = new Explosion(this, pos, vel);
   this.addPhysicsObject(explosion);
   this.batch.add(explosion.sprite);
 };
@@ -161,8 +159,7 @@ State.prototype.deleteExplosion = function(explosion) {
   explosion.delete();
 };
 
-State.prototype.createBullet = function(pos, vel, team) {
-  var bullet = new Bullet(pos, vel, team);
+State.prototype.addBullet = function(bullet) {
   this.batch.add(bullet.sprite);
   this.addPhysicsObject(bullet);
 };
