@@ -1,4 +1,6 @@
- * militia ship should have short range
+ * turn current ship into Ranger
+   - militia ship should have short range
+ * add militia ship which shoots lightning out front short range
  * don't auto target enemy ships until they're closer
  * ability to right click an enemy ship to tell squad to target it
  * add enemy turrets and ships to level 1
@@ -8,3 +10,14 @@
    - you have to choose how much class 1 and class 2 ships to get.
  * put instruction label text in level 1 to explain controls
  * think about level 2.
+
+
+Ship Classes:
+ * Militia: this is what you'll start out with. has short range. agile.
+   actually doesn't shoot lazers, shoots a short range lightning attack
+   out the front.
+ * Ranger: short range weak lazers. less agile. less defense. in a 1v1, a
+   Militia should be able to overtake a Ranger and kill it.
+ * Artillery: slower, shoots big lazers. slow moving, weak defense.
+ * FlagShip: does not attack. has shields. does not move.
+ * TurretLevel1: stationary, weak lazers.

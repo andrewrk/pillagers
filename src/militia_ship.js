@@ -12,8 +12,11 @@ function MilitiaShip(state, o) {
     still: 'ship_militia_still',
   };
   Ship.call(this, state, o);
-  this.radius = 16;
+  this.radius = 24;
   this.hasBackwardsThrusters = false;
   this.bulletRange = 10;
   this.bulletDamage = 0.1;
+  this.rotationSpeed = Math.PI * 0.03;
+  this.thrustAmt = 0.1;
+  this.rankOrder = 0;
 }

@@ -6,6 +6,7 @@ var util = require('util');
 var v = chem.vec2d;
 
 var MINIMUM_VELOCITY_SQRD = 0.001;
+var MIN_BRAKE_VEL = 0.2;
 
 module.exports = Ship;
 
@@ -19,6 +20,8 @@ function Ship(state, o) {
   this.pos = o.pos || v();
   this.rotation = o.rotation == null ? Math.PI / 2 : o.rotation;
   this.id = createId();
+  // tells where it shows up in the squad
+  this.rankOrder = 0;
 
   this.sprite = new chem.Sprite(this.animationNames.still);
   this.state.batch.add(this.sprite);
@@ -125,8 +128,10 @@ Ship.prototype.update = function(dt, dx) {
   var thrust = v.unit(this.rotation);
   this.vel.add(thrust.scaled(this.thrustInput * this.thrustAmt * dx));
   // if vel is close enough to 0, set it to 0
-  var speedSqrd = this.vel.lengthSqrd()
-  if (speedSqrd < MINIMUM_VELOCITY_SQRD || (this.brakeInput && speedSqrd < 2 * this.thrustAmt * this.thrustAmt)) {
+  var speedSqrd = this.vel.lengthSqrd();
+  var minBrakeVel = Math.max(MIN_BRAKE_VEL, 2 * this.thrustAmt * this.thrustAmt);
+  if (speedSqrd < MINIMUM_VELOCITY_SQRD || (this.brakeInput && speedSqrd < minBrakeVel))
+  {
     this.vel.x = 0;
     this.vel.y = 0;
   }

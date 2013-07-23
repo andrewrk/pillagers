@@ -1,5 +1,4 @@
 var chem = require('chem');
-var MilitiaShip = require('./militia_ship');
 var ShipAi = require('./ship_ai');
 var Explosion = require('./explosion');
 var Bullet = require('./bullet');
@@ -8,7 +7,8 @@ var v = chem.vec2d;
 var PLAYER_TEAM = 0;
 var SCROLL_SPEED = 12;
 var shipTypes = {
-  Militia: MilitiaShip,
+  Militia: require('./militia_ship'),
+  Ranger: require('./ranger_ship'),
 };
 
 var canvas = document.getElementById("game");
@@ -102,7 +102,7 @@ chem.resources.on('ready', function () {
 
   function placeShipAtCursor() {
     var team = engine.buttonState(chem.button.Key2) ? 1 : 0;
-    var ship = new MilitiaShip(state, {team: team, pos: state.mousePos()});
+    var ship = new shipTypes.Militia(state, {team: team, pos: state.mousePos()});
     state.addShip(ship);
   }
 
@@ -394,12 +394,17 @@ ScatterSquad.prototype.command = function(queue) {
   var dest = this.dest;
   this.avgPos.scale(1 / this.units.length);
   this.direction = this.dest.minus(this.avgPos).normalize();
-  // assume all units are same size for now
-  var unitRadius = this.units[0].ship.radius;
+  // figure out max radius
+  var maxRadius = 0;
+  this.units.forEach(function(unit) {
+    if (unit.ship.radius > maxRadius) maxRadius = unit.ship.radius;
+  });
   var unitCountY = Math.floor(Math.sqrt(this.units.length));
   var unitCountX = unitCountY * unitCountY === this.units.length ? unitCountY : unitCountY + 1;
-  // sort units by distance from target point
+  // sort units by rankOrder and then distance from target point
   this.units.sort(function(a, b) {
+    var rankOrderDelta = a.rankOrder - b.rankOrder;
+    if (rankOrderDelta !== 0) return rankOrderDelta;
     return a.ship.pos.distanceSqrd(dest) - b.ship.pos.distanceSqrd(dest);
   });
   // create the unaligned positions
@@ -408,7 +413,7 @@ ScatterSquad.prototype.command = function(queue) {
   var i, x, pt;
   for (i = 0, x = 0; i < this.units.length; x += 1) {
     for (var y = 0; y < unitCountY; y += 1, i += 1) {
-      pt = v(x * unitRadius * 2, y * unitRadius * 2);
+      pt = v(x * maxRadius * 2, y * maxRadius * 2);
       positions[i] = pt;
       destRelCenter.add(pt);
     }

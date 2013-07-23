@@ -12,9 +12,6 @@ exports.spritesheet = {
     anchor: "center"
   },
   animations: {
-    explosion: {
-      loop: false,
-    },
     ship_militia_still: {
       frames: ["ship/militia0.png"],
     },
@@ -35,6 +32,31 @@ exports.spritesheet = {
         "ship/militia1.png",
         "ship/militia0.png",
       ],
+    },
+
+    ship_ranger_still: {
+      frames: ["ship/ranger0.png"],
+    },
+    ship_ranger_accel: {
+      loop: false,
+      frames: [
+        "ship/ranger0.png",
+        "ship/ranger1.png",
+        "ship/ranger2.png",
+        "ship/ranger3.png",
+      ],
+    },
+    ship_ranger_decel: {
+      loop: false,
+      frames: [
+        "ship/ranger3.png",
+        "ship/ranger2.png",
+        "ship/ranger1.png",
+        "ship/ranger0.png",
+      ],
+    },
+    explosion: {
+      loop: false,
     },
     'bullet/circle': {},
     'bullet/small': {},
