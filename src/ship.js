@@ -19,8 +19,12 @@ function Ship(state, o) {
   this.pos = o.pos || v();
   this.rotation = o.rotation == null ? Math.PI / 2 : o.rotation;
   this.id = createId();
+
   this.sprite = new chem.Sprite(this.animationNames.still);
   this.state.batch.add(this.sprite);
+  this.thrustAudio = new Audio("sfx/thruster.ogg");
+  this.thrustAudio.loop = true;
+
   this.thrustInput = 0;
   this.brakeInput = false; // lets you brake at low velocities
   this.rotateInput = 0;
@@ -29,7 +33,6 @@ function Ship(state, o) {
   this.team = o.team == null ? 0 : o.team;
   this.health = o.health || 1;
   this.hasBackwardsThrusters = true;
-
   this.collisionDamping = 0.40;
   this.radius = 16;
   this.rotationSpeed = Math.PI * 0.03;
@@ -53,14 +56,17 @@ Ship.prototype.setThrustInput = function(value, brake) {
   this.brakeInput = brake == null ? false : brake;
   if (this.thrustInput === value) return;
   if (value === 0) {
+    this.thrustAudio.pause();
     if (this.thrustInput > 0) {
       this.sprite.setAnimationName(this.animationNames.decel);
     } else {
       this.sprite.setAnimationName(this.animationNames.backwardsDecel);
     }
   } else if (value > 0) {
+    this.thrustAudio.play();
     this.sprite.setAnimationName(this.animationNames.accel);
   } else if (value < 0) {
+    this.thrustAudio.play();
     this.sprite.setAnimationName(this.animationNames.backwardsAccel);
   }
   this.sprite.setFrameIndex(0);
@@ -158,6 +164,8 @@ Ship.prototype.hit = function(bullet) {
 Ship.prototype.delete = function() {
   this.emit('deleted');
   this.sprite.delete();
+  this.thrustAudio.pause();
+  this.thrustAudio = null;
 };
 
 function assert(value) {

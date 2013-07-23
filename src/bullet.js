@@ -1,4 +1,5 @@
 var chem = require('chem');
+var sfx = require('./sfx');
 var createId = require('./uuid').createId;
 
 module.exports = Bullet;
@@ -16,6 +17,7 @@ function Bullet(state, o) {
   this.sprite.rotation = this.vel.angle() + Math.PI / 2;
   this.state.batch.add(this.sprite);
   this.radius = 2;
+  sfx.shootWeakBullet();
 }
 
 Bullet.prototype.draw = function(context) {}

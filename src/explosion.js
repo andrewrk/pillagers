@@ -1,4 +1,5 @@
 var createId = require('./uuid').createId;
+var sfx = require('./sfx');
 var chem = require('chem');
 var v = chem.vec2d;
 
@@ -12,8 +13,7 @@ function Explosion(state, pos, vel) {
   this.state.batch.add(this.sprite);
   this.timeLeft = 0.6;
   this.id = createId();
-  this.boomSfx = new chem.Sound('sfx/boom.ogg');
-  this.boomSfx.play();
+  sfx.explosion();
 }
 
 Explosion.prototype.draw = function(context) {}
