@@ -39,9 +39,13 @@ exports.spritesheet = {
     'bullet/circle': {},
     'bullet/small': {},
     'bullet/large': {},
+    'flag': {
+      anchor: 'bottomleft',
+    },
 
     'star/small': {},
     'star/large': {},
     'planet-red': {},
+
   }
 };

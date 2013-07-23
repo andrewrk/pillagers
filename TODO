@@ -1,2 +1,2 @@
- * ability to select groups of ships and direct them
+ * movement commands should override previous, unless you hold shift
  * ships can't collide

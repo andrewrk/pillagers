@@ -3,7 +3,7 @@ var createId = require('./uuid').createId;
 
 module.exports = Bullet;
 
-function Bullet(state, o) { //pos, vel, team, damage) {
+function Bullet(state, o) {
   o = o || {};
   this.state = state;
   this.pos = o.pos;
@@ -36,7 +36,7 @@ Bullet.prototype.update = function (dt, dx) {
   // collision detection
   for (var id in this.state.physicsObjects) {
     var obj = this.state.physicsObjects[id];
-    if (! obj.canBeShot) continue;
+    if (! obj.canBeShot || obj.team === this.team) continue;
     if (obj.pos.distance(this.pos) < obj.radius) {
       this.delete();
       obj.hit(this);

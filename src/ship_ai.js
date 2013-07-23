@@ -33,7 +33,7 @@ ShipAi.prototype.update = function (dt, dx) {
 
   if (cmd) {
     cmd.execute(this, dt, dx);
-    if (cmd.done) this.commands.shift();
+    if (cmd.done) this.commands.shift().delete();
     return;
   }
 
@@ -113,12 +113,28 @@ ShipAi.prototype.deselect = function() {
   this.selected = false;
 };
 
-ShipAi.prototype.commandToPoint = function(dir) {
+ShipAi.prototype.commandToPoint = function(dir, queue) {
+  if (! queue) {
+    // delete all existing PointCommands
+    this.commands = this.commands.filter(function(cmd) {
+      var die = cmd instanceof PointCommand;
+      if (die) cmd.delete();
+      return !die;
+    });
+  }
   this.commands.push(new PointCommand(dir));
 };
 
-ShipAi.prototype.commandToMove = function(pt) {
-  this.commands.push(new MoveCommand(pt));
+ShipAi.prototype.commandToMove = function(pt, queue) {
+  if (! queue) {
+    // delete all existing MoveCommands
+    this.commands = this.commands.filter(function(cmd) {
+      var die = cmd instanceof MoveCommand;
+      if (die) cmd.delete();
+      return !die;
+    });
+  }
+  this.commands.push(new MoveCommand(this, pt));
 };
 
 ShipAi.prototype.calcTimeToStop = function() {
@@ -173,11 +189,16 @@ PointCommand.prototype.execute = function(ai, dt, dx) {
 };
 
 PointCommand.prototype.draw = function(ai, context) { };
+PointCommand.prototype.delete = function() { };
 
-function MoveCommand(dest) {
+function MoveCommand(ai, dest) {
   this.dest = dest;
   this.done = false;
   this.threshold = 40; // stop when distanceSqrd < this
+  this.sprite = new chem.Sprite('flag', {
+    batch: ai.state.batch,
+    pos: this.dest,
+  });
 }
 
 MoveCommand.prototype.execute = function(ai, dt, dx) {
@@ -192,7 +213,7 @@ MoveCommand.prototype.execute = function(ai, dt, dx) {
     ai.decelerate();
   } else if (closeEnough) {
     ai.decelerate();
-  } else if (actualDir.dot(targetDir) > 0) {
+  } else if (actualDir.dot(targetDir) > 0.75) {
     // thrusting would get us closer to our target
     ai.ship.setThrustInput(1);
     ai.pointTowardDirection(targetDir);
@@ -204,7 +225,9 @@ MoveCommand.prototype.execute = function(ai, dt, dx) {
 };
 
 MoveCommand.prototype.draw = function(ai, context) {
-  context.fillStyle = "#ffffff";
-  context.fillRect(this.dest.x - 4, this.dest.y - 4, 8, 8);
+  this.sprite.setVisible(ai.selected);
 };
 
+MoveCommand.prototype.delete = function() {
+  this.sprite.delete();
+};

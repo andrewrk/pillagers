@@ -107,7 +107,8 @@ chem.resources.on('ready', function () {
   }
 
   function sendUnitsToCursor() {
-    state.sendSelectedUnitsTo(state.mousePos());
+    var shiftHeld = engine.buttonState(chem.button.KeyShift);
+    state.sendSelectedUnitsTo(state.mousePos(), shiftHeld);
   }
 
   engine.on('buttondown', function(button) {
@@ -364,14 +365,14 @@ State.prototype.isOffscreen = function(pos) {
   return (pos.x < 0 || pos.x > this.mapSize.x || pos.y < 0 || pos.y > this.mapSize.y);
 };
 
-State.prototype.sendSelectedUnitsTo = function(pt) {
+State.prototype.sendSelectedUnitsTo = function(pt, queue) {
   var squad = new ScatterSquad(pt);
   for (var id in this.aiObjects) {
     var ai = this.aiObjects[id];
     if (! ai.selected) continue;
     squad.add(ai);
   }
-  squad.command();
+  squad.command(queue);
 };
 
 function assert(value) {
@@ -389,7 +390,7 @@ ScatterSquad.prototype.add = function(ai) {
   this.avgPos.add(ai.ship.pos);
 };
 
-ScatterSquad.prototype.command = function() {
+ScatterSquad.prototype.command = function(queue) {
   var dest = this.dest;
   this.avgPos.scale(1 / this.units.length);
   this.direction = this.dest.minus(this.avgPos).normalize();
@@ -425,7 +426,7 @@ ScatterSquad.prototype.command = function() {
 
   for (i = 0; i < this.units.length; i += 1) {
     var unit = this.units[i];
-    unit.commandToMove(positions[i]);
-    unit.commandToPoint(this.direction);
+    unit.commandToMove(positions[i], queue);
+    unit.commandToPoint(this.direction, queue);
   }
 };
