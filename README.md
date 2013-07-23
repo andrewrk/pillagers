@@ -6,6 +6,8 @@
 
 Built using [chem rapid development game engine](https://github.com/superjoe30/chem/).
 
+![](http://i.imgur.com/MVwDAeq.png)
+
 ## Developing
 
  1. Install Node.js and libcairo-dev. Both are probably be in your
