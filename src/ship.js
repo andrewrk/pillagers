@@ -40,6 +40,13 @@ function Ship(state, o) {
   this.bulletLife = 3;
 }
 
+Ship.prototype.clearInput = function() {
+  this.setThrustInput(0);
+  this.setRotateInput(0);
+  this.shootInput = false;
+  this.brakeInput = false;
+};
+
 Ship.prototype.setThrustInput = function(value, brake) {
   assert(Math.abs(value) <= 1);
   assert(value >= 0 || this.hasBackwardsThrusters);

@@ -24,6 +24,9 @@ function subscribeToShipEvents(self) {
 }
 
 ShipAi.prototype.delete = function() {
+  while (this.commands.length) {
+    this.commands.shift().delete();
+  }
   this.alive = false;
   this.state.deleteAi(this);
 };
@@ -114,6 +117,7 @@ ShipAi.prototype.deselect = function() {
 };
 
 ShipAi.prototype.commandToPoint = function(dir, queue) {
+  this.ship.clearInput();
   if (! queue) {
     // delete all existing PointCommands
     this.commands = this.commands.filter(function(cmd) {
@@ -126,6 +130,7 @@ ShipAi.prototype.commandToPoint = function(dir, queue) {
 };
 
 ShipAi.prototype.commandToMove = function(pt, queue) {
+  this.ship.clearInput();
   if (! queue) {
     // delete all existing MoveCommands
     this.commands = this.commands.filter(function(cmd) {
