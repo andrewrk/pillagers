@@ -9,6 +9,7 @@ function Explosion(state, pos, vel) {
   this.pos = pos;
   this.vel = vel;
   this.sprite = new chem.Sprite('explosion');
+  this.state.batch.add(this.sprite);
   this.timeLeft = 0.6;
   this.id = createId();
   this.boomSfx = new chem.Sound('sfx/boom.ogg');

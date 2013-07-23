@@ -38,6 +38,9 @@ exports.spritesheet = {
     },
     'bullet/circle': {},
     'bullet/small': {},
-    'bullet/large': {}
+    'bullet/large': {},
+
+    'star/small': {},
+    'star/large': {},
   }
 };

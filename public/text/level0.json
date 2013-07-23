@@ -1,0 +1,16 @@
+{
+  "size": {"x": 2000, "y": 1000},
+  "scroll": {"x": 0, "y": 200},
+  "objects": [
+    {
+      "type": "ShipCluster",
+      "properties": {
+        "type": "Militia",
+        "team": 0,
+        "size": {"x": 200, "y": 200},
+        "pos": {"x": 50, "y": 400},
+        "count": 10
+      }
+    }
+  ]
+}

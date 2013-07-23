@@ -18,6 +18,7 @@ function Ship(state, o) {
   this.rotation = o.rotation == null ? Math.PI / 2 : o.rotation;
   this.id = createId();
   this.sprite = new chem.Sprite(this.animationNames.still);
+  this.state.batch.add(this.sprite);
   this.thrustInput = 0;
   this.rotateInput = 0;
   this.shootInput = 0;

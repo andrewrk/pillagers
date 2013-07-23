@@ -12,6 +12,7 @@ function Bullet(state, o) { //pos, vel, team, damage) {
   this.damage = o.damage;
   this.id = createId();
   this.sprite = new chem.Sprite('bullet/circle');
+  this.state.batch.add(this.sprite);
   this.radius = 2;
 }
 
