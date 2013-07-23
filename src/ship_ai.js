@@ -102,12 +102,9 @@ ShipAi.prototype.chooseTarget = function() {
 ShipAi.prototype.draw = function(context) {
   var drawHealth = this.selected || this.ship.health < 1;
   if (drawHealth) this.ship.drawHealthBar(context);
-  if (this.selected) {
-    this.ship.drawSelectionCircle(context);
-
-    for (var i = 0; i < this.commands.length; i += 1) {
-      this.commands[i].draw(this, context);
-    }
+  if (this.selected) this.ship.drawSelectionCircle(context);
+  for (var i = 0; i < this.commands.length; i += 1) {
+    this.commands[i].draw(this, context);
   }
 };
 
