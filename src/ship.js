@@ -33,7 +33,7 @@ function Ship(state, o) {
   this.rechargeAmt = 0.20;
   this.bulletDamage = 0.1;
   this.bulletSpeed = 10;
-  this.bulletRange = 100;
+  this.bulletLife = 3;
 }
 
 Ship.prototype.setThrustInput = function(value) {
@@ -84,11 +84,13 @@ Ship.prototype.update = function(dt, dx) {
     this.recharge = this.rechargeAmt;
     // create projectile
     var unit = unitFromAngle(this.rotation);
-    var bullet = new Bullet(this.state);
-    bullet.pos = this.pos.plus(unit.scaled(this.radius));
-    bullet.vel = unit.scaled(this.bulletSpeed).add(this.vel);
-    bullet.team = this.team;
-    bullet.damage = this.bulletDamage;
+    var bullet = new Bullet(this.state, {
+      pos: this.pos.plus(unit.scaled(this.radius)),
+      vel: unit.scaled(this.bulletSpeed).add(this.vel),
+      team: this.team,
+      damage: this.bulletDamage,
+      life: this.bulletLife,
+    });
     this.state.addBullet(bullet);
   }
 };

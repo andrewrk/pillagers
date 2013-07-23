@@ -270,7 +270,7 @@ State.prototype.addBullet = function(bullet) {
 };
 
 State.prototype.isOffscreen = function(pos) {
-  return (pos.x < 0 || pos.x > this.engine.size.x || pos.y < 0 || pos.y > this.engine.size.y);
+  return (pos.x < 0 || pos.x > this.mapSize.x || pos.y < 0 || pos.y > this.mapSize.y);
 };
 
 function assert(value) {

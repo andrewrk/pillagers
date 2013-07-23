@@ -10,8 +10,10 @@ function Bullet(state, o) { //pos, vel, team, damage) {
   this.vel = o.vel;
   this.team = o.team;
   this.damage = o.damage;
+  this.life = o.life;
   this.id = createId();
-  this.sprite = new chem.Sprite('bullet/circle');
+  this.sprite = new chem.Sprite('bullet/small');
+  this.sprite.rotation = this.vel.angle() + Math.PI / 2;
   this.state.batch.add(this.sprite);
   this.radius = 2;
 }
@@ -26,7 +28,8 @@ Bullet.prototype.delete = function() {
 Bullet.prototype.update = function (dt, dx) {
   this.pos.add(this.vel);
   this.sprite.pos = this.pos;
-  if (this.state.isOffscreen(this.pos)) {
+  this.life -= dt;
+  if (this.state.isOffscreen(this.pos) || this.life <= 0) {
     this.delete();
     return;
   }
