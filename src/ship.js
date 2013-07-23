@@ -17,13 +17,14 @@ function Ship(state, o) {
   this.pos = o.pos || v();
   this.rotation = o.rotation == null ? Math.PI / 2 : o.rotation;
   this.id = createId();
-  this.sprite = new chem.Sprite('ship_militia_still');
+  this.sprite = new chem.Sprite(this.animationNames.still);
   this.thrustInput = 0;
   this.rotateInput = 0;
   this.shootInput = 0;
   this.recharge = 0;
   this.team = o.team == null ? 0 : o.team;
   this.health = o.health || 1;
+  this.hasBackwardsThrusters = true;
 
   this.radius = 16;
   this.rotationSpeed = Math.PI * 0.03;
@@ -31,15 +32,23 @@ function Ship(state, o) {
   this.rechargeAmt = 0.20;
   this.bulletDamage = 0.1;
   this.bulletSpeed = 10;
+  this.bulletRange = 100;
 }
 
 Ship.prototype.setThrustInput = function(value) {
   assert(Math.abs(value) <= 1);
+  assert(value >= 0 || this.hasBackwardsThrusters);
   if (this.thrustInput === value) return;
   if (value === 0) {
-    this.sprite.setAnimationName('ship_militia_decel');
-  } else {
-    this.sprite.setAnimationName('ship_militia_accel');
+    if (this.thrustInput > 0) {
+      this.sprite.setAnimationName(this.animationNames.decel);
+    } else {
+      this.sprite.setAnimationName(this.animationNames.backwardsDecel);
+    }
+  } else if (value > 0) {
+    this.sprite.setAnimationName(this.animationNames.accel);
+  } else if (value < 0) {
+    this.sprite.setAnimationName(this.animationNames.backwardsAccel);
   }
   this.sprite.setFrameIndex(0);
   this.thrustInput = value;

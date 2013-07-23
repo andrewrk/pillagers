@@ -1,5 +1,5 @@
 var chem = require('chem');
-var Ship = require('./ship');
+var MilitiaShip = require('./militia_ship');
 var ShipAi = require('./ship_ai');
 var Explosion = require('./explosion');
 var Bullet = require('./bullet');
@@ -14,10 +14,21 @@ chem.resources.on('ready', function () {
   var state = new State(engine);
   var paused = false;
   var fpsLabel = engine.createFpsLabel();
+  var pausedLabel = new chem.Label("PAUSED", {
+    pos: engine.size.scaled(0.5),
+    zOrder: 1,
+    fillStyle: "#ffffff",
+    font: "20pt monospace",
+    batch: state.batch,
+    textAlign: 'center',
+    textBaseline: 'middle',
+    visible: false,
+  });
 
   // add ship on the left
   state.createShip(0, v(200, 200));
   state.createShip(1, v(500, 200));
+
 
   engine.on('update', onUpdate);
 
@@ -36,6 +47,7 @@ chem.resources.on('ready', function () {
       state.createShip(team, engine.mousePos.clone());
     } else if (button === chem.button.KeyP) {
       paused = !paused;
+      pausedLabel.setVisible(paused);
       if (paused) {
         engine.removeListener('update', onUpdate);
       } else {
@@ -53,12 +65,6 @@ chem.resources.on('ready', function () {
     for (var id in state.physicsObjects) {
       var obj = state.physicsObjects[id];
       obj.draw(context);
-    }
-
-    if (paused) {
-      context.fillStyle = '#ffffff';
-      context.font = "20pt monospace";
-      context.fillText("PAUSED", engine.size.x / 2, engine.size.y / 2);
     }
 
     fpsLabel.draw(context);
@@ -83,7 +89,7 @@ chem.resources.on('ready', function () {
         // apply forward and backward thrust with up and down arrow keys
         var thrust = 0;
         if (engine.buttonState(chem.button.KeyUp)) thrust += 1;
-        if (engine.buttonState(chem.button.KeyDown)) thrust -= 1;
+        if (ship.hasBackwardsThrusters && engine.buttonState(chem.button.KeyDown)) thrust -= 1;
         ship.setThrustInput(thrust);
 
         ship.shootInput = engine.buttonState(chem.button.KeySpace) ? 1 : 0;
@@ -141,7 +147,7 @@ State.prototype.addAiObject = function(o) {
 };
 
 State.prototype.createShip = function(team, pos) {
-  var ship = new Ship(this, {team: team, pos: pos});
+  var ship = new MilitiaShip(this, {team: team, pos: pos});
   this.batch.add(ship.sprite);
   this.addPhysicsObject(ship);
   var shipAi = new ShipAi(this, ship);
