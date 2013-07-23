@@ -5,6 +5,7 @@ var Explosion = require('./explosion');
 var Bullet = require('./bullet');
 var v = chem.vec2d;
 
+var PLAYER_TEAM = 0;
 var SCROLL_SPEED = 12;
 var shipTypes = {
   Militia: MilitiaShip,
@@ -36,28 +37,101 @@ chem.resources.on('ready', function () {
 
   engine.on('update', onUpdate);
 
+  var mouseDownStart = null;
+  function startBoundingBox() {
+    mouseDownStart = state.mousePos();
+  }
+
+  function finishBoundingBox() {
+    var mouseDownEnd = state.mousePos();
+
+    // orient so start is before end
+    var tmp;
+    if (mouseDownStart.x > mouseDownEnd.x) {
+      tmp = mouseDownStart.x;
+      mouseDownStart.x = mouseDownEnd.x;
+      mouseDownEnd.x = tmp;
+    }
+    if (mouseDownStart.y > mouseDownEnd.y) {
+      tmp = mouseDownStart.y;
+      mouseDownStart.y = mouseDownEnd.y;
+      mouseDownEnd.y = tmp;
+    }
+
+    clearSelection();
+
+    // iterate over owned AIs
+    for (var id in state.aiObjects) {
+      var ai = state.aiObjects[id];
+      if (ai.ship.team !== PLAYER_TEAM) continue;
+      if (ai.ship.pos.x >= mouseDownStart.x && ai.ship.pos.x < mouseDownEnd.x &&
+          ai.ship.pos.y >= mouseDownStart.y && ai.ship.pos.y < mouseDownEnd.y)
+      {
+        ai.select();
+      }
+    }
+
+    mouseDownStart = null;
+  }
+
+  function clearSelection() {
+    for (var id in state.aiObjects) {
+      var ai = state.aiObjects[id];
+      ai.deselect();
+    }
+  }
+
+  function manualOverrideClick() {
+    var aiShip = clickedAiShip(state.mousePos());
+    if (aiShip) {
+      state.beginManualOverride(aiShip);
+    } else {
+      state.endManualOverride();
+    }
+  }
+
+  function togglePause() {
+    paused = !paused;
+    pausedLabel.setVisible(paused);
+    if (paused) {
+      engine.removeListener('update', onUpdate);
+    } else {
+      engine.on('update', onUpdate);
+    }
+  }
+
+  function placeShipAtCursor() {
+    var team = engine.buttonState(chem.button.Key2) ? 1 : 0;
+    var ship = new MilitiaShip(state, {team: team, pos: state.mousePos()});
+    state.addShip(ship);
+  }
+
   engine.on('buttondown', function(button) {
-    if (button === chem.button.MouseLeft) {
-      // manual override ship
-      var aiShip = clickedAiShip(state.mousePos());
-      if (aiShip) {
-        state.beginManualOverride(aiShip);
-      } else {
-        state.endManualOverride();
-      }
-    } else if (button === chem.button.MouseRight) {
-      // place ship
-      var team = engine.buttonState(chem.button.Key2) ? 1 : 0;
-      var ship = new MilitiaShip(state, {team: team, pos: state.mousePos()});
-      state.addShip(ship);
-    } else if (button === chem.button.KeyP) {
-      paused = !paused;
-      pausedLabel.setVisible(paused);
-      if (paused) {
-        engine.removeListener('update', onUpdate);
-      } else {
-        engine.on('update', onUpdate);
-      }
+    switch (button) {
+      case chem.button.MouseLeft:
+        if (engine.buttonState(chem.button.Key0)) {
+          manualOverrideClick();
+        } else {
+          startBoundingBox();
+        }
+        break;
+      case chem.button.MouseRight:
+        if (engine.buttonState(chem.button.Key1) || engine.buttonState(chem.button.Key2)) {
+          placeShipAtCursor();
+        } else {
+          sendUnitsToCursor();
+        }
+        break;
+      case chem.button.KeyP:
+        togglePause();
+        break;
+    }
+  });
+  engine.on('buttonup', function(button) {
+    switch (button) {
+      case chem.button.MouseLeft:
+        finishBoundingBox();
+        break;
     }
   });
   engine.on('draw', function (context) {
@@ -80,11 +154,20 @@ chem.resources.on('ready', function () {
     context.setTransform(1, 0, 0, 1, 0, 0); // load identity
     context.translate(-state.scroll.x, -state.scroll.y);
     state.batch.draw(context);
-    for (var id in state.physicsObjects) {
-      var obj = state.physicsObjects[id];
-      obj.draw(context);
+    for (var id in state.aiObjects) {
+      var ai = state.aiObjects[id];
+      ai.draw(context);
     }
 
+    // draw a selection box
+    if (mouseDownStart) {
+      var size = state.mousePos().minus(mouseDownStart);
+      context.strokeStyle = "#ffffff";
+      context.lineWidth = 2;
+      context.strokeRect(mouseDownStart.x, mouseDownStart.y, size.x, size.y);
+    }
+
+    // static stuff
     context.setTransform(1, 0, 0, 1, 0, 0); // load identity
     state.batchStatic.draw(context);
   });

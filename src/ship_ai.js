@@ -10,6 +10,7 @@ function ShipAi(state, ship) {
   this.ship = ship;
   this.target = null;
   this.alive = true;
+  this.selected = false;
 
   subscribeToShipEvents(this);
 }
@@ -56,6 +57,20 @@ ShipAi.prototype.chooseTarget = function() {
     }
   }
   this.target = null;
+};
+
+ShipAi.prototype.draw = function(context) {
+  var drawHealth = this.selected || this.ship.health < 1;
+  if (drawHealth) this.ship.drawHealthBar(context);
+  if (this.selected) this.ship.drawSelectionCircle(context);
+};
+
+ShipAi.prototype.select = function() {
+  this.selected = true;
+};
+
+ShipAi.prototype.deselect = function() {
+  this.selected = false;
 };
 
 function sign(x) {

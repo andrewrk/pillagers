@@ -61,13 +61,22 @@ Ship.prototype.setRotateInput = function(value) {
   if (this.rotateInput < -1) this.rotateInput = -1;
 };
 
-Ship.prototype.draw = function(context) {
+Ship.prototype.drawHealthBar = function(context) {
   var healthBarSize = v(32, 4);
   var start = this.sprite.pos.minus(healthBarSize.scaled(0.5)).floor();
   context.fillStyle = '#ffffff';
   context.fillRect(start.x - 1, start.y - this.sprite.size.y - 1, healthBarSize.x + 2, healthBarSize.y + 2);
   context.fillStyle = this.health > 0.45 ? '#009413' : '#E20003';
   context.fillRect(start.x, start.y - this.sprite.size.y, healthBarSize.x * this.health, healthBarSize.y);
+};
+
+Ship.prototype.drawSelectionCircle = function(context) {
+  context.beginPath();
+  context.arc(this.sprite.pos.x, this.sprite.pos.y, this.radius, 0, 2 * Math.PI);
+  context.closePath();
+  context.strokeStyle = "#ffffff";
+  context.lineWidth = 1;
+  context.stroke();
 };
 
 Ship.prototype.update = function(dt, dx) {
