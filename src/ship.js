@@ -27,6 +27,7 @@ function Ship(state, o) {
   this.health = o.health || 1;
   this.hasBackwardsThrusters = true;
 
+  this.collisionDamping = 0.40;
   this.radius = 16;
   this.rotationSpeed = Math.PI * 0.03;
   this.thrustAmt = 0.1;
@@ -79,8 +80,28 @@ Ship.prototype.drawSelectionCircle = function(context) {
   context.stroke();
 };
 
+Ship.prototype.checkOutOfBounds = function() {
+  if (this.pos.x - this.radius < 0) {
+    this.pos.x = this.radius;
+    this.vel.x = Math.abs(this.vel.x) * this.collisionDamping;
+  }
+  if (this.pos.y - this.radius < 0) {
+    this.pos.y = this.radius;
+    this.vel.y = Math.abs(this.vel.y) * this.collisionDamping;
+  }
+  if (this.pos.x + this.radius >= this.state.mapSize.x) {
+    this.pos.x = this.state.mapSize.x - this.radius;
+    this.vel.x = -Math.abs(this.vel.x) * this.collisionDamping;
+  }
+  if (this.pos.y + this.radius >= this.state.mapSize.y) {
+    this.pos.y = this.state.mapSize.y - this.radius;
+    this.vel.y = -Math.abs(this.vel.y) * this.collisionDamping;
+  }
+}
+
 Ship.prototype.update = function(dt, dx) {
   this.pos.add(this.vel.scaled(dx));
+  this.checkOutOfBounds();
   this.rotation += this.rotateInput * this.rotationSpeed * dx;
   // clamp rotation
   this.rotation = this.rotation % (2 * Math.PI);
