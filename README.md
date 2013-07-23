@@ -10,6 +10,6 @@ Built using [chem rapid development game engine](https://github.com/superjoe30/c
 
 ## Developing
 
- 1. Install Node.js and libcairo-dev. Both are probably be in your
+ 1. Install Node.js and libcairo-dev. Both are probably in your
     operating system's package manager.
  2. `npm run dev`

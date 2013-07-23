@@ -1,3 +1,10 @@
  * militia ship should have short range
  * don't auto target enemy ships until they're closer
- * ability to right click an enemy ship to tell squad to target and it
+ * ability to right click an enemy ship to tell squad to target it
+ * add enemy turrets and ships to level 1
+ * add victory flag
+ * add 2nd class of ship to ships you get at beginning
+ * replace initial ships with ca$h and buildings to create the ships
+   - you have to choose how much class 1 and class 2 ships to get.
+ * put instruction label text in level 1 to explain controls
+ * think about level 2.
