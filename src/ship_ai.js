@@ -86,14 +86,17 @@ ShipAi.prototype.decelerate = function() {
 };
 
 ShipAi.prototype.chooseTarget = function() {
+  this.target = null;
+  var closestDist;
   for (var id in this.state.aiObjects) {
     var ai = this.state.aiObjects[id];
-    if (ai.ship.team !== this.ship.team) {
+    if (ai.ship.team === this.ship.team) continue;
+    var dist = ai.ship.pos.distanceSqrd(this.ship.pos);
+    if (this.target == null || dist < closestDist) {
+      closestDist = dist;
       this.target = ai;
-      return;
     }
   }
-  this.target = null;
 };
 
 ShipAi.prototype.draw = function(context) {

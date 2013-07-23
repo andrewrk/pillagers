@@ -1,2 +1,3 @@
- * movement commands should override previous, unless you hold shift
- * ships can't collide
+ * militia ship should have short range
+ * don't auto target enemy ships until they're closer
+ * ability to right click an enemy ship to tell squad to target and it
