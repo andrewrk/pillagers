@@ -72,7 +72,13 @@ ShipAi.prototype.chooseTarget = function() {
 ShipAi.prototype.draw = function(context) {
   var drawHealth = this.selected || this.ship.health < 1;
   if (drawHealth) this.ship.drawHealthBar(context);
-  if (this.selected) this.ship.drawSelectionCircle(context);
+  if (this.selected) {
+    this.ship.drawSelectionCircle(context);
+
+    for (var i = 0; i < this.commands.length; i += 1) {
+      this.commands[i].draw(this, context);
+    }
+  }
 };
 
 ShipAi.prototype.select = function() {
@@ -85,6 +91,10 @@ ShipAi.prototype.deselect = function() {
 
 ShipAi.prototype.commandToPoint = function(dir) {
   this.commands.push(new PointCommand(dir));
+};
+
+ShipAi.prototype.commandToMove = function(pt) {
+  this.commands.push(new MoveCommand(pt));
 };
 
 function sign(x) {
@@ -117,3 +127,35 @@ PointCommand.prototype.execute = function(ai, dt, dx) {
   ai.ship.setRotateInput(delta / ai.ship.rotationSpeed);
   this.done = Math.abs(delta) < Math.PI / 20;
 };
+
+PointCommand.prototype.draw = function(ai, context) { };
+
+function MoveCommand(dest) {
+  this.dest = dest;
+  this.done = false;
+  this.threshold = 1; // stop when distanceSqrd < this
+}
+
+MoveCommand.prototype.execute = function(ai, dt, dx) {
+  var targetDir = this.dest.minus(ai.ship.pos).normalize();
+  var actualDir = unitFromAngle(ai.ship.rotation);
+  if (actualDir.dot(targetDir) > 0) {
+    // thrusting would get us closer to our target
+    ai.ship.setThrustInput(1);
+  }
+  var targetAngle = targetDir.angle();
+  var delta = angleSubtract(targetAngle, ai.ship.rotation);
+  ai.ship.setRotateInput(delta / ai.ship.rotationSpeed);
+  var closeEnough = ai.ship.pos.distanceSqrd(this.dest) < this.threshold;
+  var stopped = ai.ship.vel.lengthSqrd() === 0;
+  this.done = stopped && closeEnough;
+};
+
+MoveCommand.prototype.draw = function(ai, context) {
+  context.fillStyle = "#ffffff";
+  context.fillRect(this.dest.x - 4, this.dest.y - 4, 8, 8);
+};
+
+function unitFromAngle(angle) {
+  return v(Math.cos(angle), Math.sin(angle));
+}

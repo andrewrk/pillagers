@@ -243,10 +243,8 @@ State.prototype.mousePos = function() {
 };
 
 State.prototype.capScrollPosition = function() {
-  if (this.scroll.x < 0) this.scroll.x = 0;
-  if (this.scroll.y < 0) this.scroll.y = 0;
-  if (this.scroll.x + engine.size.x > this.mapSize.x) this.scroll.x = this.mapSize.x - engine.size.x;
-  if (this.scroll.y + engine.size.y > this.mapSize.y) this.scroll.y = this.mapSize.y - engine.size.y;
+  this.scroll.boundMin(v());
+  this.scroll.boundMax(this.mapSize.minus(engine.size));
 };
 
 State.prototype.generateStars = function() {
@@ -392,10 +390,42 @@ ScatterSquad.prototype.add = function(ai) {
 };
 
 ScatterSquad.prototype.command = function() {
+  var dest = this.dest;
   this.avgPos.scale(1 / this.units.length);
   this.direction = this.dest.minus(this.avgPos).normalize();
-  for (var i = 0; i < this.units.length; i += 1) {
+  // assume all units are same size for now
+  var unitRadius = this.units[0].ship.radius;
+  var unitCountY = Math.floor(Math.sqrt(this.units.length));
+  var unitCountX = unitCountY * unitCountY === this.units.length ? unitCountY : unitCountY + 1;
+  // sort units by distance from target point
+  this.units.sort(function(a, b) {
+    return a.ship.pos.distanceSqrd(dest) - b.ship.pos.distanceSqrd(dest);
+  });
+  // create the unaligned positions
+  var positions = new Array(this.units.length);
+  var destRelCenter = v();
+  var i, x, pt;
+  for (i = 0, x = 0; i < this.units.length; x += 1) {
+    for (var y = 0; y < unitCountY; y += 1, i += 1) {
+      pt = v(x * unitRadius * 2, y * unitRadius * 2);
+      positions[i] = pt;
+      destRelCenter.add(pt);
+    }
+  }
+  destRelCenter.scale(1 / this.units.length);
+
+  for (i = 0; i < positions.length; i += 1) {
+    // shift so that 0, 0 is in the center
+    positions[i] = destRelCenter.minus(positions[i]);
+    // rotate about 0, 0 to align with direction
+    positions[i].rotate(this.direction);
+    // translate to dest
+    positions[i].add(dest);
+  }
+
+  for (i = 0; i < this.units.length; i += 1) {
     var unit = this.units[i];
+    unit.commandToMove(positions[i]);
     unit.commandToPoint(this.direction);
   }
 };
