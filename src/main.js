@@ -146,8 +146,8 @@ function State(engine) {
   this.batch = new chem.Batch();
   this.batchStatic = new chem.Batch();
   this.bgBackObjects = {};
-  this.bgBackFactor = 0.25; // scrolls 4x slower than normal
-  this.bgForeFactor = 0.5; // scrolls 2x slower than normal
+  this.bgBackFactor = 0.10; // scrolls 10x slower than normal
+  this.bgForeFactor = 0.15;
   this.mapSize = null; // set when loading map
 }
 
@@ -167,7 +167,13 @@ State.prototype.generateStars = function() {
   this.bgBackSize = unseenMapSize.scaled(this.bgBackFactor).add(engine.size);
   this.bgForeSize = unseenMapSize.scaled(this.bgForeFactor).add(engine.size);
   generateStars(this, this.bgBackSize, 0.00025, this.batchBgBack);
-  generateStars(this, this.bgForeSize, 0.00025, this.batchBgFore);
+  generateStars(this, this.bgForeSize, 0.00005, this.batchBgFore);
+  // put in a planet
+  var sprite = new chem.Sprite("planet-red", {
+    batch: this.batchBgFore,
+    zOrder: 1,
+    pos: v(Math.random() * this.bgForeSize.x, Math.random() * this.bgForeSize.y),
+  });
 };
 
 function generateStars(self, size, density, batch) {

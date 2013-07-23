@@ -42,5 +42,6 @@ exports.spritesheet = {
 
     'star/small': {},
     'star/large': {},
+    'planet-red': {},
   }
 };
