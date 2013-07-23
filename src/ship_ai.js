@@ -10,7 +10,9 @@ function ShipAi(state, ship) {
   this.ship = ship;
   this.target = null;
   this.alive = true;
+
   this.selected = false;
+  this.commands = [];
 
   subscribeToShipEvents(this);
 }
@@ -27,6 +29,14 @@ ShipAi.prototype.delete = function() {
 };
 
 ShipAi.prototype.update = function (dt, dx) {
+  var cmd = this.commands[0];
+
+  if (cmd) {
+    cmd.execute(this, dt, dx);
+    if (cmd.done) this.commands.shift();
+    return;
+  }
+
   // un-target dead ships
   if (this.target && !this.target.alive) this.target = null;
 
@@ -38,7 +48,7 @@ ShipAi.prototype.update = function (dt, dx) {
   }
 
   var targetAngle = this.target.ship.pos.minus(this.ship.pos).angle();
-  var delta = targetAngle - this.ship.rotation;
+  var delta = angleSubtract(targetAngle, this.ship.rotation);
   var goodShot = Math.abs(delta) < Math.PI / 10;
 
   // shoot at target
@@ -73,6 +83,10 @@ ShipAi.prototype.deselect = function() {
   this.selected = false;
 };
 
+ShipAi.prototype.commandToPoint = function(dir) {
+  this.commands.push(new PointCommand(dir));
+};
+
 function sign(x) {
   if (x > 0) {
     return 1;
@@ -82,3 +96,24 @@ function sign(x) {
     return 0;
   }
 }
+
+function angleSubtract(left, right) {
+  // subtract right from left and return the smallest absolute correct answer
+  // 359 - 1 should equal -2 (except in radians)
+  var delta = left - right;
+  if (delta > Math.PI) delta -= 2 * Math.PI;
+  if (delta < -Math.PI) delta += 2 * Math.PI;
+  return delta;
+}
+
+function PointCommand(dir) {
+  this.dir = dir;
+  this.done = false;
+}
+
+PointCommand.prototype.execute = function(ai, dt, dx) {
+  var targetAngle = this.dir.angle();
+  var delta = angleSubtract(targetAngle, ai.ship.rotation);
+  ai.ship.setRotateInput(delta / ai.ship.rotationSpeed);
+  this.done = Math.abs(delta) < Math.PI / 20;
+};

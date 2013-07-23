@@ -82,6 +82,8 @@ Ship.prototype.drawSelectionCircle = function(context) {
 Ship.prototype.update = function(dt, dx) {
   this.pos.add(this.vel.scaled(dx));
   this.rotation += this.rotateInput * this.rotationSpeed * dx;
+  // clamp rotation
+  this.rotation = this.rotation % (2 * Math.PI);
   var thrust = v(Math.cos(this.rotation), Math.sin(this.rotation));
   this.vel.add(thrust.scaled(this.thrustInput * this.thrustAmt * dx));
 

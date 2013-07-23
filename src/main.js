@@ -106,6 +106,10 @@ chem.resources.on('ready', function () {
     state.addShip(ship);
   }
 
+  function sendUnitsToCursor() {
+    state.sendSelectedUnitsTo(state.mousePos());
+  }
+
   engine.on('buttondown', function(button) {
     switch (button) {
       case chem.button.MouseLeft:
@@ -362,6 +366,36 @@ State.prototype.isOffscreen = function(pos) {
   return (pos.x < 0 || pos.x > this.mapSize.x || pos.y < 0 || pos.y > this.mapSize.y);
 };
 
+State.prototype.sendSelectedUnitsTo = function(pt) {
+  var squad = new ScatterSquad(pt);
+  for (var id in this.aiObjects) {
+    var ai = this.aiObjects[id];
+    if (! ai.selected) continue;
+    squad.add(ai);
+  }
+  squad.command();
+};
+
 function assert(value) {
   if (!value) throw new Error("Assertion Failure: " + value);
 }
+
+function ScatterSquad(dest) {
+  this.dest = dest;
+  this.avgPos = v();
+  this.units = [];
+}
+
+ScatterSquad.prototype.add = function(ai) {
+  this.units.push(ai);
+  this.avgPos.add(ai.ship.pos);
+};
+
+ScatterSquad.prototype.command = function() {
+  this.avgPos.scale(1 / this.units.length);
+  this.direction = this.dest.minus(this.avgPos).normalize();
+  for (var i = 0; i < this.units.length; i += 1) {
+    var unit = this.units[i];
+    unit.commandToPoint(this.direction);
+  }
+};
