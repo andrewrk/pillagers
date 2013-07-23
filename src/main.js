@@ -160,11 +160,6 @@ State.prototype.createExplosion = function(pos, vel) {
   this.batch.add(explosion.sprite);
 };
 
-State.prototype.deleteExplosion = function(explosion) {
-  delete this.physicsObjects[explosion.id];
-  explosion.delete();
-};
-
 State.prototype.addBullet = function(bullet) {
   this.batch.add(bullet.sprite);
   this.addPhysicsObject(bullet);

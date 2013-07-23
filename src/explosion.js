@@ -22,7 +22,8 @@ Explosion.prototype.update = function(dt, dx) {
   this.sprite.pos = this.pos.floored();
   this.timeLeft -= dt;
   if (this.timeLeft <= 0) {
-    this.state.deleteExplosion(this);
+    this.state.deletePhysicsObject(this);
+    this.delete();
   }
 };
 
