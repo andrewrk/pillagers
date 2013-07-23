@@ -5,6 +5,8 @@ var EventEmitter = require('events').EventEmitter;
 var util = require('util');
 var v = chem.vec2d;
 
+var MINIMUM_VELOCITY_SQRD = 0.001;
+
 module.exports = Ship;
 
 util.inherits(Ship, EventEmitter);
@@ -20,6 +22,7 @@ function Ship(state, o) {
   this.sprite = new chem.Sprite(this.animationNames.still);
   this.state.batch.add(this.sprite);
   this.thrustInput = 0;
+  this.brakeInput = false; // lets you brake at low velocities
   this.rotateInput = 0;
   this.shootInput = 0;
   this.recharge = 0;
@@ -37,9 +40,10 @@ function Ship(state, o) {
   this.bulletLife = 3;
 }
 
-Ship.prototype.setThrustInput = function(value) {
+Ship.prototype.setThrustInput = function(value, brake) {
   assert(Math.abs(value) <= 1);
   assert(value >= 0 || this.hasBackwardsThrusters);
+  this.brakeInput = brake == null ? false : brake;
   if (this.thrustInput === value) return;
   if (value === 0) {
     if (this.thrustInput > 0) {
@@ -105,8 +109,14 @@ Ship.prototype.update = function(dt, dx) {
   this.rotation += this.rotateInput * this.rotationSpeed * dx;
   // clamp rotation
   this.rotation = this.rotation % (2 * Math.PI);
-  var thrust = v(Math.cos(this.rotation), Math.sin(this.rotation));
+  var thrust = v.unit(this.rotation);
   this.vel.add(thrust.scaled(this.thrustInput * this.thrustAmt * dx));
+  // if vel is close enough to 0, set it to 0
+  var speedSqrd = this.vel.lengthSqrd()
+  if (speedSqrd < MINIMUM_VELOCITY_SQRD || (this.brakeInput && speedSqrd < 2 * this.thrustAmt * this.thrustAmt)) {
+    this.vel.x = 0;
+    this.vel.y = 0;
+  }
 
   this.sprite.rotation = this.rotation + Math.PI / 2;
   this.sprite.pos = this.pos.floored();
@@ -115,7 +125,7 @@ Ship.prototype.update = function(dt, dx) {
   if (this.shootInput && this.recharge <= 0) {
     this.recharge = this.rechargeAmt;
     // create projectile
-    var unit = unitFromAngle(this.rotation);
+    var unit = v.unit(this.rotation);
     var bullet = new Bullet(this.state, {
       pos: this.pos.plus(unit.scaled(this.radius)),
       vel: unit.scaled(this.bulletSpeed).add(this.vel),
@@ -142,10 +152,6 @@ Ship.prototype.delete = function() {
   this.emit('deleted');
   this.sprite.delete();
 };
-
-function unitFromAngle(angle) {
-  return v(Math.cos(angle), Math.sin(angle));
-}
 
 function assert(value) {
   if (!value) throw new Error("Assertion Failure: " + value);
