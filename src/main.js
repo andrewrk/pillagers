@@ -113,7 +113,8 @@ chem.resources.on('ready', function () {
 
   function sendUnitsToCursor() {
     var shiftHeld = engine.buttonState(chem.button.KeyShift);
-    state.sendSelectedUnitsTo(state.mousePos(), shiftHeld);
+    var altHeld = engine.buttonState(chem.button.KeyCtrl);
+    state.sendSelectedUnitsTo(state.mousePos(), shiftHeld, altHeld);
   }
 
   engine.on('buttondown', function(button) {
@@ -423,8 +424,9 @@ State.prototype.selectedUnitsAttack = function(target) {
   }
 };
 
-State.prototype.sendSelectedUnitsTo = function(pt, queue) {
+State.prototype.sendSelectedUnitsTo = function(pt, queue, loose) {
   var squad = new ScatterSquad(pt);
+  if (loose) squad.loose = true;
   for (var id in this.aiObjects) {
     var ai = this.aiObjects[id];
     if (! ai.selected) continue;
@@ -441,6 +443,7 @@ function ScatterSquad(dest) {
   this.dest = dest;
   this.avgPos = v();
   this.units = [];
+  this.loose = false;
 }
 
 ScatterSquad.prototype.add = function(ai) {
@@ -489,7 +492,7 @@ ScatterSquad.prototype.command = function(queue) {
 
   for (i = 0; i < this.units.length; i += 1) {
     var unit = this.units[i];
-    unit.commandToMove(positions[i], queue);
+    unit.commandToMove(positions[i], queue, this.loose);
     unit.commandToPoint(this.direction, true);
   }
 };

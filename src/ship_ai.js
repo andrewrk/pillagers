@@ -123,9 +123,13 @@ ShipAi.prototype.commandToPoint = function(dir, queue) {
   this.commands.push(new PointCommand(dir));
 };
 
-ShipAi.prototype.commandToMove = function(pt, queue) {
+ShipAi.prototype.commandToMove = function(pt, queue, loose) {
   if (! queue) this.clearCommands();
-  this.commands.push(new MoveCommand(this, pt));
+  if (loose) {
+    this.commands.push(new EngageCommand(this, pt));
+  } else {
+    this.commands.push(new MoveCommand(this, pt));
+  }
 };
 
 ShipAi.prototype.commandToAttack = function(target, queue, selfCommanded) {
@@ -194,10 +198,70 @@ PointCommand.prototype.execute = function(ai, dt, dx) {
 PointCommand.prototype.draw = function(ai, context) { };
 PointCommand.prototype.delete = function() { };
 
+function EngageCommand(ai, dest) {
+  // move to an area, but don't worry about formation. just get close to dest.
+  this.thresholdSqrd = 100 * 100; // stop when distanceSqrd < this
+  this.dest = dest;
+  this.done = false;
+  this.sprite = new chem.Sprite('knife', {
+    batch: ai.state.batch,
+    pos: this.dest,
+  });
+}
+
+EngageCommand.prototype.execute = function(ai, dt, dx) {
+  var distSqrd = ai.ship.pos.distanceSqrd(this.dest);
+  var closeEnough = distSqrd < this.thresholdSqrd;
+
+  if (closeEnough) {
+    this.done = true;
+    return;
+  }
+
+  var relTargetPt = this.dest.minus(ai.ship.pos);
+  var targetDir = relTargetPt.normalized();
+  var actualDir = v.unit(ai.ship.rotation);
+
+  // consider the distance we would travel if we tried to stop right now.
+  // if that distance is further than the destination, stop now.
+  var stopDistance = ai.calcStopDistance();
+  if (stopDistance > 0) {
+    // find stopPoint which is relative to ship position
+    var relStopPoint = ai.ship.vel.normalized().scale(stopDistance);
+    // figure out which direction to point
+    var newTargetDir = relTargetPt.minus(relStopPoint).normalize();
+    // never point backwards
+    if (ai.ship.hasBackwardsThrusters || newTargetDir.dot(targetDir) >= 0) targetDir = newTargetDir;
+  }
+  if (actualDir.dot(targetDir) > 0.99) {
+    // thrusting would get us closer to our target
+    ai.ship.setThrustInput(1);
+    ai.pointTowardDirection(targetDir);
+  } else if (ai.ship.hasBackwardsThrusters && actualDir.dot(targetDir) < -0.99) {
+    // thrusting backwards would get us closer to our target
+    ai.ship.setThrustInput(-1);
+    ai.pointTowardDirection(targetDir.clone().neg());
+  } else if (ai.ship.hasBackwardsThrusters && actualDir.dot(targetDir) < 0) {
+    ai.ship.setThrustInput(0);
+    ai.pointTowardDirection(targetDir.clone().neg());
+  } else {
+    ai.ship.setThrustInput(0);
+    ai.pointTowardDirection(targetDir);
+  }
+};
+
+EngageCommand.prototype.draw = function(ai, context) {
+  this.sprite.setVisible(ai.selected);
+};
+
+EngageCommand.prototype.delete = function() {
+  this.sprite.delete();
+};
+
 function MoveCommand(ai, dest) {
   this.dest = dest;
   this.done = false;
-  this.threshold = 40; // stop when distanceSqrd < this
+  this.threshold = Math.pow(6, 2); // stop when distanceSqrd < this
   this.sprite = new chem.Sprite('flag', {
     batch: ai.state.batch,
     pos: this.dest,

@@ -126,6 +126,7 @@ exports.spritesheet = {
     'flag': {
       anchor: 'bottomleft',
     },
+    'knife': {},
 
     'star/small': {},
     'star/large': {},
