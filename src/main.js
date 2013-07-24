@@ -48,35 +48,45 @@ chem.resources.on('ready', function () {
   }
 
   function finishBoundingBox() {
-    var mouseDownEnd = state.mousePos();
+    var start = mouseDownStart;
+    var end = state.mousePos();
+    mouseDownStart = null;
 
     // orient so start is before end
     var tmp;
-    if (mouseDownStart.x > mouseDownEnd.x) {
-      tmp = mouseDownStart.x;
-      mouseDownStart.x = mouseDownEnd.x;
-      mouseDownEnd.x = tmp;
+    if (start.x > end.x) {
+      tmp = start.x;
+      start.x = end.x;
+      end.x = tmp;
     }
-    if (mouseDownStart.y > mouseDownEnd.y) {
-      tmp = mouseDownStart.y;
-      mouseDownStart.y = mouseDownEnd.y;
-      mouseDownEnd.y = tmp;
+    if (start.y > end.y) {
+      tmp = start.y;
+      start.y = end.y;
+      end.y = tmp;
     }
 
-    clearSelection();
+    if (! engine.buttonState(chem.button.KeyCtrl) &&
+        ! engine.buttonState(chem.button.KeyShift))
+    {
+      clearSelection();
+    }
+
+    if (end.minus(start).length() < 4) {
+      var clickedAi = clickedAiShip(end);
+      if (clickedAi && clickedAi.ship.team === PLAYER_TEAM) clickedAi.select();
+      return;
+    }
 
     // iterate over owned AIs
     for (var id in state.aiObjects) {
       var ai = state.aiObjects[id];
       if (ai.ship.team !== PLAYER_TEAM) continue;
-      if (ai.ship.pos.x >= mouseDownStart.x && ai.ship.pos.x < mouseDownEnd.x &&
-          ai.ship.pos.y >= mouseDownStart.y && ai.ship.pos.y < mouseDownEnd.y)
+      if (ai.ship.pos.x >= start.x && ai.ship.pos.x < end.x &&
+          ai.ship.pos.y >= start.y && ai.ship.pos.y < end.y)
       {
         ai.select();
       }
     }
-
-    mouseDownStart = null;
   }
 
   function clearSelection() {
@@ -493,6 +503,6 @@ ScatterSquad.prototype.command = function(queue) {
   for (i = 0; i < this.units.length; i += 1) {
     var unit = this.units[i];
     unit.commandToMove(positions[i], queue, this.loose);
-    unit.commandToPoint(this.direction, true);
+    if (! this.loose) unit.commandToPoint(this.direction, true);
   }
 };
