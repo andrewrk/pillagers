@@ -49,7 +49,7 @@ MilitiaShip.prototype.update = function(dt, dx) {
     if (actualDir.dot(targetDir) > 0.80) {
       this.recharge = this.rechargeAmt;
       this.state.createElectricFx(this.pos.clone(), this.vel.clone(), this.rotation);
-      this.meleeInput.hit(this.meleeDamage);
+      this.meleeInput.hit(this.meleeDamage, "disintegrate");
     }
   }
 }

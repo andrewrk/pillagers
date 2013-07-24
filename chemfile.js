@@ -116,6 +116,10 @@ exports.spritesheet = {
     explosion: {
       loop: false,
     },
+    disintegrate: {
+      loop: false,
+      frames: 'fx/disintegrate',
+    },
     'fx/electric': {
       anchor: 'bottom',
       loop: false,

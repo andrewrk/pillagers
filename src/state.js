@@ -402,15 +402,19 @@ State.prototype.createElectricFx = function(pos, vel, rotation) {
   sfx.electricAttack();
 };
 
-State.prototype.createExplosion = function(pos, vel) {
+State.prototype.createExplosion = function(pos, vel, animationName) {
   var explosion = new Fx(this, {
     pos: pos,
     vel: vel,
-    animationName: 'explosion',
+    animationName: animationName,
     duration: 0.6,
   });
   this.addPhysicsObject(explosion);
-  sfx.explosion();
+  if (animationName === 'explosion') {
+    sfx.explosion();
+  } else if (animationName === 'disintegrate') {
+    sfx.disintegrate();
+  }
 };
 
 State.prototype.addBullet = function(bullet) {
@@ -425,7 +429,7 @@ State.prototype.deleteSelectedShips = function() {
   for (var id in this.aiObjects) {
     var ai = this.aiObjects[id];
     if (! ai.selected) continue;
-    ai.ship.hit(1);
+    ai.ship.hit(1, "explosion");
   }
 };
 
