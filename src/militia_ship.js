@@ -19,6 +19,7 @@ function MilitiaShip(state, o) {
   this.rotationSpeed = Math.PI * 0.03;
   this.thrustAmt = 0.1;
   this.rankOrder = 0;
+  this.sensorRange = 500;
 
   this.hasMelee = true;
   this.meleeInput = null; // set to a ship to attack it

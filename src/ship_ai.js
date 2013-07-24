@@ -75,13 +75,14 @@ ShipAi.prototype.attackNearbyEnemy = function() {
     if (!obj.canBeShot) continue;
     if (obj.team === this.ship.team) continue;
     var dist = obj.pos.distanceSqrd(this.ship.pos);
+    if (dist > this.ship.sensorRange * this.ship.sensorRange) continue;
     if (target == null || dist < closestDist) {
       closestDist = dist;
       target = obj;
     }
   }
   if (target) {
-    this.commandToAttack(target);
+    this.commandToAttack(target, false, true);
     return true;
   }
   return false;
@@ -123,12 +124,12 @@ ShipAi.prototype.commandToMove = function(pt, queue) {
   this.commands.push(new MoveCommand(this, pt));
 };
 
-ShipAi.prototype.commandToAttack = function(target, queue) {
+ShipAi.prototype.commandToAttack = function(target, queue, selfCommanded) {
   if (! queue) this.clearCommands();
   if (this.ship.hasBullets) {
-    this.commands.push(new ShootCommand(this, target));
+    this.commands.push(new ShootCommand(this, target, selfCommanded));
   } else if (this.ship.hasMelee) {
-    this.commands.push(new MeleeCommand(this, target));
+    this.commands.push(new MeleeCommand(this, target, selfCommanded));
   }
 };
 
@@ -233,9 +234,11 @@ MoveCommand.prototype.delete = function() {
 };
 
 
-function ShootCommand(ai, target) {
-  this.target = target;
+function ShootCommand(ai, target, selfCommanded) {
+  // pursue and shoot lazers at target
   this.done = false;
+  this.selfCommanded = !!selfCommanded;
+  this.target = target;
 }
 
 ShootCommand.prototype.execute = function(ai, dt, dx) {
@@ -244,6 +247,59 @@ ShootCommand.prototype.execute = function(ai, dt, dx) {
     this.done = true;
     return;
   }
+
+  var relTargetPt = this.target.pos.minus(ai.ship.pos);
+  var targetAngle = relTargetPt.angle();
+  var delta = angleSubtract(targetAngle, ai.ship.rotation);
+  var goodShot = Math.abs(delta) < Math.PI / 10;
+  var targetDir = relTargetPt.normalized();
+  var actualDir = v.unit(ai.ship.rotation);
+  var adjustedBulletVel = ai.ship.vel.plus(targetDir.scaled(ai.ship.bulletSpeed)).minus(this.target.vel);
+  var bulletRange = adjustedBulletVel.length() * ai.ship.bulletLife * 60;
+  var withinRange = ai.ship.pos.distance(this.target.pos) < bulletRange;
+
+  // shoot at target
+  ai.ship.shootInput = goodShot && withinRange;
+
+  if (! withinRange) {
+    var stopDistance = ai.calcStopDistance();
+    if (stopDistance > 0) {
+      // find stopPoint which is relative to ship position
+      var relStopPoint = ai.ship.vel.normalized().scale(stopDistance);
+      // figure out which direction to point
+      var newTargetDir = relTargetPt.minus(relStopPoint).normalize();
+    }
+  }
+  ai.pointTowardDirection(targetDir);
+  var thrust = actualDir.dot(targetDir) > 0.99 ? 1 : 0;
+  ai.ship.setThrustInput(thrust);
+};
+
+ShootCommand.prototype.draw = function(ai, context) {};
+
+ShootCommand.prototype.delete = function() {
+  this.target = null;
+};
+function DefendGroundCommand(ai, target, selfCommanded) {
+  // stand your ground. do not move. shoot nearest target.
+  this.done = false;
+  this.selfCommanded = !!selfCommanded;
+  this.target = target;
+}
+
+DefendGroundCommand.prototype.execute = function(ai, dt, dx) {
+  // un-target dead ships
+  if (this.target.deleted) {
+    this.done = true;
+    return;
+  }
+  // un-target far away ships
+  if (this.target.pos.distanceSqrd(ai.ship.pos) > ai.ship.sensorRange * ai.ship.sensorRange) {
+    this.done = true;
+    return;
+  }
+  ai.ship.setThrustInput(0);
+
   var targetAngle = this.target.pos.minus(ai.ship.pos).angle();
   var delta = angleSubtract(targetAngle, ai.ship.rotation);
   var goodShot = Math.abs(delta) < Math.PI / 10;
@@ -255,15 +311,16 @@ ShootCommand.prototype.execute = function(ai, dt, dx) {
   ai.ship.setRotateInput(delta / ai.ship.rotationSpeed);
 };
 
-ShootCommand.prototype.draw = function(ai, context) {};
+DefendGroundCommand.prototype.draw = function(ai, context) {};
 
-ShootCommand.prototype.delete = function() {
+DefendGroundCommand.prototype.delete = function() {
   this.target = null;
 };
 
-function MeleeCommand(ai, target) {
+function MeleeCommand(ai, target, selfCommanded) {
   this.target = target;
   this.done = false;
+  this.selfCommanded = !!selfCommanded;
 }
 
 MeleeCommand.prototype.execute = function(ai, dt, dx) {

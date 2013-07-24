@@ -18,3 +18,19 @@ Ship Classes:
  * FlagShip: does not attack. has shields. does not move.
  * TurretLevel1: stationary, weak lazers.
  * Medic: heals other ships
+
+Upgrades:
+ * Targeting:
+   - Target the first enemy found (default)
+   - Target the closest enemy.
+   - Communicate with others to divide up the targets evenly.
+ * Ranger
+   - Upgrade range.
+   - Update bullet count to 3.
+   - Evasive maneuvers 1.
+   - Evasive maneuvers 2.
+   - Smarter aiming.
+   - Backwards thrusters.
+ * Militia
+   - Evade lazers.
+   - Backwards thrusters.

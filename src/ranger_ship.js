@@ -20,8 +20,9 @@ function RangerShip(state, o) {
   this.rotationSpeed = Math.PI * 0.02;
   this.thrustAmt = 0.05;
   this.rankOrder = 1;
+  this.sensorRange = 400;
 
-  this.shootInput = 0;
+  this.shootInput = false;
   this.hasBullets = true;
   this.bulletSpeed = 10;
   this.bulletLife = 0.5;

@@ -21,6 +21,16 @@
         "pos": {"x": 50, "y": 300},
         "count": 5
       }
+    },
+    {
+      "type": "ShipCluster",
+      "properties": {
+        "type": "Ranger",
+        "team": 1,
+        "size": {"x": 200, "y": 200},
+        "pos": {"x": 1750, "y": 400},
+        "count": 10
+      }
     }
   ]
 }
