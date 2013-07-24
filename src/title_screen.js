@@ -9,6 +9,7 @@ function TitleScreen(game) {
   this.bg = chem.resources.images['title-screen.png'];
   this.titleImg = chem.resources.images['title.png'];
   this.batch = new chem.Batch();
+  this.time = 0;
   this.options = [
     {
       caption: "Start New Game",
@@ -59,15 +60,20 @@ function initOptions(self) {
 }
 
 TitleScreen.prototype.start = function() {
+  this.engine.on('update', onUpdate.bind(this));
   this.engine.on('draw', onDraw.bind(this));
   this.engine.on('mousemove', onMouseMove.bind(this));
   this.engine.on('buttonup', onButtonUp.bind(this));
 };
 
+function onUpdate(dt, dx) {
+  this.time += dt * 4;
+}
+
 function onDraw(context) {
   context.setTransform(1, 0, 0, 1, 0, 0); // load identity
   context.drawImage(this.bg, 0, 0);
-  context.drawImage(this.titleImg, this.engine.size.x / 2 - this.titleImg.width / 2, 50);
+  context.drawImage(this.titleImg, this.engine.size.x / 2 - this.titleImg.width / 2, 50 + 10 * Math.sin(this.time));
 
   this.batch.draw(context);
 }
