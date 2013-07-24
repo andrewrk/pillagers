@@ -155,6 +155,7 @@ Ship.prototype.hit = function(damage) {
 };
 
 Ship.prototype.delete = function() {
+  if (this.deleted) return;
   this.emit('deleted');
   this.deleted = true;
   this.sprite.delete();

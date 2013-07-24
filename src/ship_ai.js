@@ -40,7 +40,7 @@ ShipAi.prototype.update = function (dt, dx) {
     return;
   }
 
-  this.attackNearbyEnemy();
+  if (! this.attackNearbyEnemy()) this.decelerate();
 }
 
 ShipAi.prototype.pointTowardDirection = function(targetDir) {
@@ -80,7 +80,11 @@ ShipAi.prototype.attackNearbyEnemy = function() {
       target = obj;
     }
   }
-  if (target) this.commandToAttack(target);
+  if (target) {
+    this.commandToAttack(target);
+    return true;
+  }
+  return false;
 };
 
 ShipAi.prototype.draw = function(context) {
@@ -269,15 +273,26 @@ MeleeCommand.prototype.execute = function(ai, dt, dx) {
     return;
   }
   ai.ship.meleeInput = this.target;
-  //var targetAngle = this.target.pos.minus(ai.ship.pos).angle();
-  //var delta = angleSubtract(targetAngle, ai.ship.rotation);
-  //var goodShot = Math.abs(delta) < Math.PI / 10;
 
-  //// shoot at target
-  //ai.ship.shootInput = goodShot ? 1 : 0;
+  var relTargetPt = this.target.pos.minus(ai.ship.pos);
+  var targetDir = relTargetPt.normalized();
+  var actualDir = v.unit(ai.ship.rotation);
+  var withinRange = ai.ship.pos.distance(this.target.pos) < ai.ship.meleeRadius + this.target.radius;
 
-  //// aim at target
-  //ai.ship.setRotateInput(delta / ai.ship.rotationSpeed);
+  if (!withinRange) {
+    var stopDistance = ai.calcStopDistance();
+    if (stopDistance > 0) {
+      // find stopPoint which is relative to ship position
+      var relStopPoint = ai.ship.vel.normalized().scale(stopDistance);
+      // figure out which direction to point
+      var newTargetDir = relTargetPt.minus(relStopPoint).normalize();
+      // never try to go backwards
+      if (newTargetDir.dot(targetDir) >= 0) targetDir = newTargetDir;
+    }
+  }
+  ai.pointTowardDirection(targetDir);
+  var thrust = actualDir.dot(targetDir) > 0.99 ? 1 : 0;
+  ai.ship.setThrustInput(thrust);
 };
 
 MeleeCommand.prototype.draw = function(ai, context) {};

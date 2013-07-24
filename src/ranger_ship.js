@@ -24,8 +24,8 @@ function RangerShip(state, o) {
   this.shootInput = 0;
   this.hasBullets = true;
   this.bulletSpeed = 10;
-  this.bulletLife = 3;
-  this.bulletDamage = 0.1;
+  this.bulletLife = 0.5;
+  this.bulletDamage = 0.05;
   this.rechargeAmt = 0.20;
   this.recharge = 0;
 }
