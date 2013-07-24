@@ -143,11 +143,11 @@ Ship.prototype.update = function(dt, dx) {
 
 };
 
-Ship.prototype.hit = function(bullet) {
-  this.health -= bullet.damage;
-  this.emit('hit', bullet);
+Ship.prototype.hit = function(damage) {
+  this.health -= damage;
+  this.emit('hit');
   if (this.health <= 0) {
-    this.emit('destroyed', bullet);
+    this.emit('destroyed');
     this.state.createExplosion(this.pos, this.vel);
     this.state.deletePhysicsObject(this);
     this.delete();

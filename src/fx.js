@@ -1,24 +1,23 @@
 var createId = require('./uuid').createId;
-var sfx = require('./sfx');
 var chem = require('chem');
 var v = chem.vec2d;
 
-module.exports = Explosion;
+module.exports = Fx;
 
-function Explosion(state, pos, vel) {
+function Fx(state, o) {
   this.state = state;
-  this.pos = pos;
-  this.vel = vel;
-  this.sprite = new chem.Sprite('explosion');
+  this.pos = o.pos;
+  this.vel = o.vel;
+  this.sprite = new chem.Sprite(o.animationName);
+  if (o.rotation != null) this.sprite.rotation = o.rotation;
   this.state.batch.add(this.sprite);
-  this.timeLeft = 0.6;
+  this.timeLeft = o.duration;
   this.id = createId();
-  sfx.explosion();
 }
 
-Explosion.prototype.draw = function(context) {}
+Fx.prototype.draw = function(context) {}
 
-Explosion.prototype.update = function(dt, dx) {
+Fx.prototype.update = function(dt, dx) {
   this.pos.add(this.vel.scaled(dx));
   this.sprite.pos = this.pos.floored();
   this.timeLeft -= dt;
@@ -28,6 +27,8 @@ Explosion.prototype.update = function(dt, dx) {
   }
 };
 
-Explosion.prototype.delete = function() {
+Fx.prototype.delete = function() {
   this.sprite.delete();
 }
+
+

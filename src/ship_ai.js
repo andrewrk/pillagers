@@ -121,7 +121,11 @@ ShipAi.prototype.commandToMove = function(pt, queue) {
 
 ShipAi.prototype.commandToAttack = function(target, queue) {
   if (! queue) this.clearCommands();
-  this.commands.push(new ShootCommand(this, target));
+  if (this.ship.hasBullets) {
+    this.commands.push(new ShootCommand(this, target));
+  } else if (this.ship.hasMelee) {
+    this.commands.push(new MeleeCommand(this, target));
+  }
 };
 
 ShipAi.prototype.calcTimeToStop = function() {
@@ -250,5 +254,34 @@ ShootCommand.prototype.execute = function(ai, dt, dx) {
 ShootCommand.prototype.draw = function(ai, context) {};
 
 ShootCommand.prototype.delete = function() {
+  this.target = null;
+};
+
+function MeleeCommand(ai, target) {
+  this.target = target;
+  this.done = false;
+}
+
+MeleeCommand.prototype.execute = function(ai, dt, dx) {
+  // un-target dead ships
+  if (this.target.deleted) {
+    this.done = true;
+    return;
+  }
+  ai.ship.meleeInput = this.target;
+  //var targetAngle = this.target.pos.minus(ai.ship.pos).angle();
+  //var delta = angleSubtract(targetAngle, ai.ship.rotation);
+  //var goodShot = Math.abs(delta) < Math.PI / 10;
+
+  //// shoot at target
+  //ai.ship.shootInput = goodShot ? 1 : 0;
+
+  //// aim at target
+  //ai.ship.setRotateInput(delta / ai.ship.rotationSpeed);
+};
+
+MeleeCommand.prototype.draw = function(ai, context) {};
+
+MeleeCommand.prototype.delete = function() {
   this.target = null;
 };

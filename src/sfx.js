@@ -18,6 +18,10 @@ exports.explosion = function() {
   return boom.play();
 }
 
+exports.electricAttack = function() {
+  // TODO
+}
+
 exports.shootWeakBullet = function() {
   var index = Math.floor(Math.random() * weakShots.length);
   return weakShots[index].play();

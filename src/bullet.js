@@ -41,7 +41,7 @@ Bullet.prototype.update = function (dt, dx) {
     if (! obj.canBeShot || obj.team === this.team) continue;
     if (obj.pos.distance(this.pos) < obj.radius) {
       this.delete();
-      obj.hit(this);
+      obj.hit(this.damage);
       return;
     }
   }

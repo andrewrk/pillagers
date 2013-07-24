@@ -1,7 +1,8 @@
 var chem = require('chem');
 var ShipAi = require('./ship_ai');
-var Explosion = require('./explosion');
+var Fx = require('./fx');
 var Bullet = require('./bullet');
+var sfx = require('./sfx');
 var Team = require('./team');
 var v = chem.vec2d;
 
@@ -136,6 +137,9 @@ chem.resources.on('ready', function () {
         break;
       case chem.button.KeyP:
         togglePause();
+        break;
+      case chem.button.KeyDelete:
+        state.deleteSelectedShips();
         break;
     }
   });
@@ -370,10 +374,27 @@ State.prototype.addShip = function(ship) {
   this.addAiObject(shipAi);
 };
 
+State.prototype.createElectricFx = function(pos, vel, rotation) {
+  var fx = new Fx(this, {
+    pos: pos,
+    vel: vel,
+    animationName: 'fx/electric',
+    duration: 0.2,
+    rotation: rotation + Math.PI / 2,
+  });
+  this.addPhysicsObject(fx);
+  sfx.electricAttack();
+};
 
 State.prototype.createExplosion = function(pos, vel) {
-  var explosion = new Explosion(this, pos, vel);
+  var explosion = new Fx(this, {
+    pos: pos,
+    vel: vel,
+    animationName: 'explosion',
+    duration: 0.6,
+  });
   this.addPhysicsObject(explosion);
+  sfx.explosion();
 };
 
 State.prototype.addBullet = function(bullet) {
@@ -382,6 +403,14 @@ State.prototype.addBullet = function(bullet) {
 
 State.prototype.isOffscreen = function(pos) {
   return (pos.x < 0 || pos.x > this.mapSize.x || pos.y < 0 || pos.y > this.mapSize.y);
+};
+
+State.prototype.deleteSelectedShips = function() {
+  for (var id in this.aiObjects) {
+    var ai = this.aiObjects[id];
+    if (! ai.selected) continue;
+    ai.ship.hit(1);
+  }
 };
 
 State.prototype.selectedUnitsAttack = function(target) {

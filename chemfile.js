@@ -58,12 +58,13 @@ exports.spritesheet = {
     explosion: {
       loop: false,
     },
+    'fx/electric': {
+      anchor: 'bottom',
+      loop: false,
+    },
     'bullet/circle': {},
     'bullet/small': {},
     'bullet/large': {},
-    'fx/electric': {
-      anchor: 'bottom',
-    },
     'flag': {
       anchor: 'bottomleft',
     },
