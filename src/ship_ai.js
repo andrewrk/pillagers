@@ -127,7 +127,11 @@ ShipAi.prototype.commandToMove = function(pt, queue) {
 ShipAi.prototype.commandToAttack = function(target, queue, selfCommanded) {
   if (! queue) this.clearCommands();
   if (this.ship.hasBullets) {
-    this.commands.push(new ShootCommand(this, target, selfCommanded));
+    if (this.ship.standGround) {
+      this.commands.push(new DefendGroundCommand(this, target, selfCommanded));
+    } else {
+      this.commands.push(new ShootCommand(this, target, selfCommanded));
+    }
   } else if (this.ship.hasMelee) {
     this.commands.push(new MeleeCommand(this, target, selfCommanded));
   }

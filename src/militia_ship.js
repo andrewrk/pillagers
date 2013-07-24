@@ -8,11 +8,6 @@ module.exports = MilitiaShip;
 
 util.inherits(MilitiaShip, Ship);
 function MilitiaShip(state, o) {
-  this.animationNames = {
-    accel: 'ship_militia_accel',
-    decel: 'ship_militia_decel',
-    still: 'ship_militia_still',
-  };
   Ship.call(this, state, o);
   this.radius = 24;
   this.hasBackwardsThrusters = false;
@@ -28,6 +23,12 @@ function MilitiaShip(state, o) {
   this.rechargeAmt = 0.40;
   this.recharge = 0;
 }
+
+MilitiaShip.prototype.animationNames = {
+  accel: 'ship_militia_accel',
+  decel: 'ship_militia_decel',
+  still: 'ship_militia_still',
+};
 
 MilitiaShip.prototype.clearInput = function() {
   Ship.prototype.clearInput.apply(this, arguments);

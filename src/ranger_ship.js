@@ -9,11 +9,6 @@ module.exports = RangerShip;
 
 util.inherits(RangerShip, Ship);
 function RangerShip(state, o) {
-  this.animationNames = {
-    accel: 'ship_ranger_accel',
-    decel: 'ship_ranger_decel',
-    still: 'ship_ranger_still',
-  };
   Ship.call(this, state, o);
   this.radius = 16;
   this.hasBackwardsThrusters = false;
@@ -30,6 +25,12 @@ function RangerShip(state, o) {
   this.rechargeAmt = 0.20;
   this.recharge = 0;
 }
+
+RangerShip.prototype.animationNames = {
+  accel: 'ship_ranger_accel',
+  decel: 'ship_ranger_decel',
+  still: 'ship_ranger_still',
+};
 
 RangerShip.prototype.update = function(dt, dx) {
   Ship.prototype.update.apply(this, arguments);
