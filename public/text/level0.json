@@ -33,6 +33,16 @@
       }
     },
     {
+      "type": "Meteor",
+      "properties": {
+        "animationName": "rock-a",
+        "pos": {"x": 1000, "y": 1000},
+        "vel": {"x": -1, "y": -0.5},
+        "rotVel" : 0.01,
+        "radius": 128
+      }
+    },
+    {
       "type": "ShipCluster",
       "properties": {
         "type": "Ranger",

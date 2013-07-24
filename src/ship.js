@@ -35,13 +35,20 @@ function Ship(state, o) {
   this.team = o.team;
   this.health = o.health || 1;
   this.hasBackwardsThrusters = true;
-  this.collisionDamping = 0.40;
   this.radius = 16;
   this.rotationSpeed = Math.PI * 0.03;
   this.thrustAmt = 0.1;
   this.hasBullets = false;
   this.deleted = false;
+  this.density = 0.02;
+  this.collisionDamping = 0.40;
+  this.canCauseCollision = false;
+  this.canBeStruck = true;
 }
+
+Ship.prototype.mass = function() {
+  return this.density * Math.PI * this.radius * this.radius;
+};
 
 Ship.prototype.clearInput = function() {
   this.setThrustInput(0);
@@ -78,13 +85,15 @@ Ship.prototype.setRotateInput = function(value) {
   if (this.rotateInput < -1) this.rotateInput = -1;
 };
 
+Ship.prototype.draw = function(context) {}
+
 Ship.prototype.drawHealthBar = function(context) {
   var healthBarSize = v(32, 4);
   var start = this.sprite.pos.minus(healthBarSize.scaled(0.5)).floor();
   context.fillStyle = '#ffffff';
-  context.fillRect(start.x - 1, start.y - this.sprite.size.y - 1, healthBarSize.x + 2, healthBarSize.y + 2);
+  context.fillRect(start.x - 1, start.y - this.sprite.size.y * 0.60 - 1, healthBarSize.x + 2, healthBarSize.y + 2);
   context.fillStyle = this.health > 0.45 ? '#009413' : '#E20003';
-  context.fillRect(start.x, start.y - this.sprite.size.y, healthBarSize.x * this.health, healthBarSize.y);
+  context.fillRect(start.x, start.y - this.sprite.size.y * 0.60, healthBarSize.x * this.health, healthBarSize.y);
 };
 
 Ship.prototype.drawSelectionCircle = function(context) {

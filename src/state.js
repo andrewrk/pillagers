@@ -1,9 +1,9 @@
 var chem = require('chem');
 var ShipAi = require('./ship_ai');
 var Fx = require('./fx');
-var Bullet = require('./bullet');
 var sfx = require('./sfx');
 var Team = require('./team');
+var Meteor = require('./meteor');
 var v = chem.vec2d;
 
 var PLAYER_TEAM = new Team();
@@ -213,7 +213,12 @@ function onDraw(context) {
   context.setTransform(1, 0, 0, 1, 0, 0); // load identity
   context.translate(-this.scroll.x, -this.scroll.y);
   this.batch.draw(context);
-  for (var id in this.aiObjects) {
+  var id;
+  for (id in this.physicsObjects) {
+    var obj = this.physicsObjects[id];
+    obj.draw(context);
+  }
+  for (id in this.aiObjects) {
     var ai = this.aiObjects[id];
     ai.draw(context);
   }
@@ -337,10 +342,20 @@ State.prototype.load = function(level) {
         props.team = Team.get(props.team || 0);
         this.addShipCluster(props);
         break;
+      case "Meteor":
+        this.addMeteor(props);
+        break;
       default:
         throw new Error("unrecognized object type in level: " + obj.type);
     }
   }
+};
+
+State.prototype.addMeteor = function(o) {
+  o.pos = v(o.pos);
+  o.vel = v(o.vel);
+  var meteor = new Meteor(this, o);
+  this.addPhysicsObject(meteor);
 };
 
 State.prototype.addShipCluster = function(o) {

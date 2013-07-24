@@ -12,6 +12,12 @@ exports.spritesheet = {
     anchor: "center"
   },
   animations: {
+    'rock-a': {},
+    'rock-b': {},
+    'rock-c': {},
+    'star/small': {},
+    'star/large': {},
+    'planet-red': {},
     ship_militia_still: {
       frames: ["ship/militia0.png"],
     },
@@ -131,10 +137,6 @@ exports.spritesheet = {
       anchor: 'bottomleft',
     },
     'knife': {},
-
-    'star/small': {},
-    'star/large': {},
-    'planet-red': {},
 
   }
 };

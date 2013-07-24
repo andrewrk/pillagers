@@ -13,6 +13,8 @@ function Fx(state, o) {
   this.state.batch.add(this.sprite);
   this.timeLeft = o.duration;
   this.id = createId();
+  this.canCauseCollision = false;
+  this.canBeStruck = false;
 }
 
 Fx.prototype.draw = function(context) {}

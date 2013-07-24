@@ -50,24 +50,30 @@ ShipAi.prototype.pointTowardDirection = function(targetDir) {
 };
 
 ShipAi.prototype.decelerate = function() {
-  this.ship.setThrustInput(0, true);
   var speed = this.ship.vel.length();
-  if (speed === 0) return;
+  if (speed === 0) {
+    this.ship.setThrustInput(0, true);
+    return;
+  }
 
   // point directly at velocity
   var targetDir = this.ship.vel.normalized();
+  var negativeTarget = false;
   if (!this.ship.hasBackwardsThrusters) {
     // point against the velocity
     targetDir.neg();
+    negativeTarget = true;
   }
   var targetAngle = targetDir.angle();
   var delta = angleSubtract(targetAngle, this.ship.rotation);
   if (Math.abs(delta) !== 0) {
     this.ship.setRotateInput(delta / this.ship.rotationSpeed);
+    this.ship.setThrustInput(0, true);
     return;
   }
 
   var thrustInput = Math.min(speed / this.ship.thrustAmt, 1);
+  if (!negativeTarget) thrustInput = -thrustInput;
   this.ship.setThrustInput(thrustInput, true);
 };
 
@@ -77,7 +83,7 @@ ShipAi.prototype.attackNearbyEnemy = function() {
   for (var id in this.state.physicsObjects) {
     var obj = this.state.physicsObjects[id];
     if (!obj.canBeShot) continue;
-    if (obj.team === this.ship.team) continue;
+    if (obj.team == null || obj.team === this.ship.team) continue;
     var dist = obj.pos.distanceSqrd(this.ship.pos);
     if (dist > this.ship.sensorRange * this.ship.sensorRange) continue;
     if (target == null || dist < closestDist) {
