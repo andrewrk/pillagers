@@ -345,9 +345,30 @@ State.prototype.load = function(level) {
       case "Meteor":
         this.addMeteor(props);
         break;
+      case "MeteorCluster":
+        this.addMeteorCluster(props);
+        break;
       default:
         throw new Error("unrecognized object type in level: " + obj.type);
     }
+  }
+};
+
+State.prototype.addMeteorCluster = function(o) {
+  var pos = v(o.pos);
+  var size = v(o.size);
+  var minVel = v(o.minVel);
+  var velRange = v(o.maxVel).minus(minVel);
+  var rotVelRange = o.maxRotVel - o.minRotVel;
+  var radiusRange = o.maxRadius - o.minRadius;
+  for (var i = 0; i < o.count; i += 1) {
+    this.addPhysicsObject(new Meteor(this, {
+      pos: pos.offset(Math.random() * size.x, Math.random() * size.y),
+      vel: minVel.offset(Math.random() * velRange.x, Math.random() * velRange.y),
+      rotVel: o.minRotVel + Math.random() * rotVelRange,
+      animationName: o.animationNames[Math.floor(Math.random() * o.animationNames.length)],
+      radius: o.minRadius + Math.random() * radiusRange,
+    }));
   }
 };
 

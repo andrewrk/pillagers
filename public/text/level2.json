@@ -1,0 +1,86 @@
+{
+  "size": {"x": 2000, "y": 1000},
+  "scroll": {"x": 0, "y": 200},
+  "objects": [
+    {
+      "type": "ShipCluster",
+      "properties": {
+        "type": "Flag",
+        "team": 0,
+        "pos": {"x": 50, "y": 400},
+        "size": {"x": 1, "y": 1},
+        "count": 1
+      }
+    },
+    {
+      "type": "ShipCluster",
+      "properties": {
+        "type": "Militia",
+        "team": 0,
+        "size": {"x": 100, "y": 100},
+        "pos": {"x": 100, "y": 400},
+        "count": 6
+      }
+    },
+    {
+      "type": "ShipCluster",
+      "properties": {
+        "type": "Ranger",
+        "team": 0,
+        "size": {"x": 100, "y": 100},
+        "pos": {"x": 100, "y": 300},
+        "count": 6
+      }
+    },
+    {
+      "type": "Meteor",
+      "properties": {
+        "animationName": "rock-a",
+        "pos": {"x": 1000, "y": 1000},
+        "vel": {"x": -1, "y": -0.5},
+        "rotVel" : 0.01,
+        "radius": 128
+      }
+    },
+    {
+      "type": "ShipCluster",
+      "properties": {
+        "type": "Ranger",
+        "team": 1,
+        "size": {"x": 200, "y": 200},
+        "pos": {"x": 1650, "y": 400},
+        "count": 10
+      }
+    },
+    {
+      "type": "ShipCluster",
+      "properties": {
+        "type": "Flag",
+        "team": 1,
+        "pos": {"x": 1850, "y": 500},
+        "size": {"x": 50, "y": 50},
+        "count": 1
+      }
+    },
+    {
+      "type": "ShipCluster",
+      "properties": {
+        "type": "Turret",
+        "team": 1,
+        "size": {"x": 1, "y": 1},
+        "pos": {"x": 1600, "y": 400},
+        "count": 1
+      }
+    },
+    {
+      "type": "ShipCluster",
+      "properties": {
+        "type": "Turret",
+        "team": 1,
+        "size": {"x": 1, "y": 1},
+        "pos": {"x": 1600, "y": 600},
+        "count": 1
+      }
+    }
+  ]
+}

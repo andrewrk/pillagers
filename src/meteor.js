@@ -11,7 +11,7 @@ function Meteor(state, o) {
   this.radius = o.radius;
 
   this.sprite = new chem.Sprite(o.animationName);
-  var graphicRadius = this.sprite.size.x / 2;
+  var graphicRadius = (this.sprite.size.x + this.sprite.size.y) / 4;
   this.sprite.scale.scale(this.radius / graphicRadius);
 
   if (o.rotation != null) this.sprite.rotation = o.rotation;
