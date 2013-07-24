@@ -18,7 +18,26 @@ chem.resources.on('ready', function () {
 function Game(engine) {
   this.levelIndex = 0;
   this.engine = engine;
+
+  initMusic(this);
 }
+
+function initMusic(self) {
+  self.musicOn = JSON.parse(localStorage.getItem("musicOn") || "true");
+  self.bgMusic = new Audio('music/BG_music.ogg');
+  self.bgMusic.loop = true;
+  self.bgMusic.volume = 0.90;
+  if (self.musicOn) self.bgMusic.play();
+}
+
+Game.prototype.toggleMusic = function() {
+  this.musicOn = !this.musicOn;
+  if (this.musicOn) {
+    this.bgMusic.play();
+  } else {
+    this.bgMusic.pause();
+  }
+};
 
 Game.prototype.showGameOverScreen = function() {
   var gameOverScreen = new GameOverScreen(this);

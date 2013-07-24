@@ -176,6 +176,9 @@ function onButtonDown(button) {
     case chem.button.KeyP:
       togglePause(this);
       break;
+    case chem.button.KeyM:
+      this.game.toggleMusic();
+      break;
     case chem.button.KeyDelete:
       this.deleteSelectedShips();
       break;

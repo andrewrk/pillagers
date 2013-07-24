@@ -1,11 +1,14 @@
- * if ranger is in range, don't accelerate toward target
- * replace initial ships with ca$h and buildings to create the ships
-   - you have to choose how much class 1 and class 2 ships to get.
- * put instruction label text in level 1 to explain controls
- * think about level 2.
+ * replace this level with level 0 of navigating your flag ship through a meteor field
+   - when you win you earn Ranger ship
+ * level 1, we exit the meteor field but there are some attackers. you have to build
+   some Ranger ships to defend.
+   - when you win you earn Militia ship
+ * level 2, enemy flag ship is preventing the portal from appearing.
+   destroy the flag ship to open the portal.
 
-Maybe?
+Nice-to-have:
  * try putting a speed cap on ships
+ * if ranger is in range, don't accelerate toward target
 
 
 Ship Classes:
