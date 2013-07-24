@@ -18,6 +18,7 @@ function Portal(state, o) {
 Portal.prototype.draw = function(context) {}
 
 Portal.prototype.update = function(dt, dx) {
+  // http://25.media.tumblr.com/tumblr_m4hi5ygdtg1qa491po1_1280.jpg
   this.sprite.rotation = Math.random() * Math.PI * 2
 };
 

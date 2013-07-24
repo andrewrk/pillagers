@@ -152,21 +152,18 @@ ShipAi.prototype.commandToAttack = function(target, queue, selfCommanded) {
   }
 };
 
-ShipAi.prototype.calcTimeToStop = function() {
-  // returns the amount of time it would take to stop at current velocity
-  var timeTo180 = this.ship.hasBackwardsThrusters ? 0 : Math.PI / this.ship.rotationSpeed;
-  var speed = this.ship.vel.length();
-  var decelTime = speed / this.ship.thrustAmt;
-  return timeTo180 + decelTime;
-};
-
 ShipAi.prototype.calcStopDistance = function() {
   // returns the distance the ship will travel before it comes to a rest if we
   // try to stop right now.
   if (this.ship.vel.lengthSqrd() === 0) return 0;
-  var timeTo180 = this.ship.hasBackwardsThrusters ? 0 : Math.PI / this.ship.rotationSpeed;
+  var againstVelDir = this.ship.vel.normalized();
+  if (!this.ship.hasBackwardsThrusters) againstVelDir.neg();
+  var againstVelAngle = againstVelDir.angle();
+  var delta = angleSubtract(againstVelAngle, this.ship.rotation);
+  var timeToReorient = Math.abs(delta) / this.ship.rotationSpeed;
+
   var speed = this.ship.vel.length();
-  var distance = timeTo180 * speed;
+  var distance = timeToReorient * speed;
   distance += speed * speed / (2 * this.ship.thrustAmt);
   return distance;
 };
