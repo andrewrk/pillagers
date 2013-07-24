@@ -37,6 +37,7 @@ Game.prototype.toggleMusic = function() {
   } else {
     this.bgMusic.pause();
   }
+  localStorage.setItem("musicOn", JSON.stringify(this.musicOn));
 };
 
 Game.prototype.showGameOverScreen = function() {
