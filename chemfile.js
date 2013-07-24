@@ -15,6 +15,18 @@ exports.spritesheet = {
     'rock-a': {},
     'rock-b': {},
     'rock-c': {},
+    portal: {
+      frames: [
+        "portal/01.png",
+        "portal/02.png",
+        "portal/03.png",
+        "portal/04.png",
+        "portal/05.png",
+        "portal/04.png",
+        "portal/03.png",
+        "portal/02.png",
+      ]
+    },
     'star/small': {},
     'star/large': {},
     'planet-red': {},

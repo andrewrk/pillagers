@@ -1,10 +1,12 @@
 var chem = require('chem');
+var v = chem.vec2d;
+
 var ShipAi = require('./ship_ai');
 var Fx = require('./fx');
 var sfx = require('./sfx');
 var Team = require('./team');
 var Meteor = require('./meteor');
-var v = chem.vec2d;
+var Portal = require('./portal');
 
 var PLAYER_TEAM = new Team();
 var ENEMY_TEAM = new Team();
@@ -234,7 +236,7 @@ function onDraw(context) {
   // static stuff
   context.setTransform(1, 0, 0, 1, 0, 0); // load identity
   this.batchStatic.draw(context);
-};
+}
 
 function onUpdate(dt, dx) {
   var id;
@@ -348,10 +350,19 @@ State.prototype.load = function(level) {
       case "MeteorCluster":
         this.addMeteorCluster(props);
         break;
+      case "Portal":
+        this.addPortal(props);
+        break;
       default:
         throw new Error("unrecognized object type in level: " + obj.type);
     }
   }
+};
+
+State.prototype.addPortal = function(o) {
+  this.addPhysicsObject(new Portal(this, {
+    pos: v(o.pos),
+  }));
 };
 
 State.prototype.addMeteorCluster = function(o) {

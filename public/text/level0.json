@@ -16,10 +16,10 @@
       "type": "MeteorCluster",
       "properties": {
         "animationNames": ["rock-c"],
-        "pos": {"x": 100, "y": 64},
+        "pos": {"x": 500, "y": 64},
         "size": {"x": 3000, "y": 472},
-        "minVel": {"x": -2, "y": -2},
-        "maxVel": {"x": 2, "y": 2},
+        "minVel": {"x": -0.5, "y": -0.5},
+        "maxVel": {"x": 0.5, "y": 0.5},
         "minRotVel" : -0.01,
         "maxRotVel" : 0.01,
         "minRadius": 32,
@@ -34,7 +34,7 @@
         "pos": {"x": 2000, "y": 300},
         "vel": {"x": -0.1, "y": 0.04},
         "rotVel" : -0.001,
-        "radius": 256
+        "radius": 200
       }
     },
     {
@@ -45,6 +45,12 @@
         "vel": {"x": -0.5, "y": -0.2},
         "rotVel" : 0.01,
         "radius": 128
+      }
+    },
+    {
+      "type": "Portal",
+      "properties": {
+        "pos": {"x": 3800, "y": 300}
       }
     }
   ]
