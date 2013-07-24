@@ -2,9 +2,9 @@ Gameplay & Programming:
 =======================
 Andrew Kelley | http://andrewkelley.me
 
-Music:
-======
-BrokenSounds
+Music & Sound Effects:
+======================
+BrokenSounds | http://brokensounds.com
 
 Art Credits:
 ============
