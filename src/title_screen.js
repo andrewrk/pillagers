@@ -16,9 +16,18 @@ function TitleScreen(game) {
     {
       caption: "Credits",
       fn: goToCredits.bind(this),
+    },
+    {
+      caption: "Music: " + (this.game.musicOn ? "On": "Off"),
+      fn: toggleMusic.bind(this),
     }
   ];
   initOptions(this);
+}
+
+function toggleMusic(option) {
+  this.game.toggleMusic();
+  option.label.text = "Music: " + (this.game.musicOn ? "On": "Off");
 }
 
 function startNewGame() {
@@ -77,7 +86,7 @@ function onButtonUp(button) {
     var option = this.options[i];
     var hit = pt.y > option.label.pos.y - 30 && pt.y < option.label.pos.y + 30;
     if (hit) {
-      option.fn();
+      option.fn(option);
       break;
     }
   }
