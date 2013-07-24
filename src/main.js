@@ -2,9 +2,11 @@ var chem = require('chem');
 var ShipAi = require('./ship_ai');
 var Explosion = require('./explosion');
 var Bullet = require('./bullet');
+var Team = require('./team');
 var v = chem.vec2d;
 
-var PLAYER_TEAM = 0;
+var PLAYER_TEAM = new Team();
+var ENEMY_TEAM = new Team();
 var SCROLL_SPEED = 12;
 var shipTypes = {
   Militia: require('./militia_ship'),
@@ -101,7 +103,7 @@ chem.resources.on('ready', function () {
   }
 
   function placeShipAtCursor() {
-    var team = engine.buttonState(chem.button.Key2) ? 1 : 0;
+    var team = engine.buttonState(chem.button.Key2) ? ENEMY_TEAM : PLAYER_TEAM;
     var ship = new shipTypes.Militia(state, {team: team, pos: state.mousePos()});
     state.addShip(ship);
   }
@@ -293,6 +295,7 @@ State.prototype.loadCurrentLevel = function() {
     var props = obj.properties;
     switch (obj.type) {
       case "ShipCluster":
+        props.team = Team.get(props.team || 0);
         this.addShipCluster(props);
         break;
       default:

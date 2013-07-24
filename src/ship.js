@@ -33,7 +33,7 @@ function Ship(state, o) {
   this.rotateInput = 0;
   this.shootInput = 0;
   this.recharge = 0;
-  this.team = o.team == null ? 0 : o.team;
+  this.team = o.team;
   this.health = o.health || 1;
   this.hasBackwardsThrusters = true;
   this.collisionDamping = 0.40;
@@ -98,6 +98,14 @@ Ship.prototype.drawSelectionCircle = function(context) {
   context.strokeStyle = "#ffffff";
   context.lineWidth = 1;
   context.stroke();
+};
+
+Ship.prototype.drawTeamColor = function(context) {
+  context.beginPath();
+  context.arc(this.sprite.pos.x, this.sprite.pos.y, 4, 0, 2 * Math.PI);
+  context.closePath();
+  context.fillStyle = this.team.color;
+  context.fill();
 };
 
 Ship.prototype.checkOutOfBounds = function() {

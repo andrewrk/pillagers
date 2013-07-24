@@ -106,6 +106,7 @@ ShipAi.prototype.draw = function(context) {
   for (var i = 0; i < this.commands.length; i += 1) {
     this.commands[i].draw(this, context);
   }
+  this.ship.drawTeamColor(context);
 };
 
 ShipAi.prototype.select = function() {

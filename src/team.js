@@ -1,17 +1,23 @@
 
 var teamCount = 0;
 var colors = [
-  "#5962D5",
-  "#E25E4B",
+  "#1400FF",
+  "#FF001E",
   "#29CF3C",
   "#C7CB65",
   "#CB65BE",
 ];
+var teams = [];
 
-exports.Team = Team;
-exports.PLAYER = new Team("
 module.exports = Team;
+
 function Team(color) {
   this.number = teamCount++;
-  this.color = color;
+  this.color = colors[this.number];
+  if (! this.color) throw new Error("out of team colors");
+  teams.push(this);
 }
+
+Team.get = function(index) {
+  return teams[index];
+};
