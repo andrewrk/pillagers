@@ -461,7 +461,7 @@ ScatterSquad.prototype.command = function(queue) {
   var unitCountX = unitCountY * unitCountY === this.units.length ? unitCountY : unitCountY + 1;
   // sort units by rankOrder and then distance from target point
   this.units.sort(function(a, b) {
-    var rankOrderDelta = a.rankOrder - b.rankOrder;
+    var rankOrderDelta = a.ship.rankOrder - b.ship.rankOrder;
     if (rankOrderDelta !== 0) return rankOrderDelta;
     return a.ship.pos.distanceSqrd(dest) - b.ship.pos.distanceSqrd(dest);
   });

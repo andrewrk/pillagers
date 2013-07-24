@@ -5,10 +5,20 @@
     {
       "type": "ShipCluster",
       "properties": {
+        "type": "Flag",
+        "team": 0,
+        "pos": {"x": 50, "y": 400},
+        "size": {"x": 1, "y": 1},
+        "count": 1
+      }
+    },
+    {
+      "type": "ShipCluster",
+      "properties": {
         "type": "Militia",
         "team": 0,
-        "size": {"x": 200, "y": 200},
-        "pos": {"x": 50, "y": 400},
+        "size": {"x": 100, "y": 100},
+        "pos": {"x": 100, "y": 400},
         "count": 5
       }
     },
@@ -17,8 +27,8 @@
       "properties": {
         "type": "Ranger",
         "team": 0,
-        "size": {"x": 200, "y": 200},
-        "pos": {"x": 50, "y": 300},
+        "size": {"x": 100, "y": 100},
+        "pos": {"x": 100, "y": 300},
         "count": 5
       }
     },

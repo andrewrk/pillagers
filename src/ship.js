@@ -4,7 +4,7 @@ var EventEmitter = require('events').EventEmitter;
 var util = require('util');
 var v = chem.vec2d;
 
-var MINIMUM_VELOCITY_SQRD = 0.001;
+var MINIMUM_VELOCITY_SQRD = 0.001 * 0.001;
 var MIN_BRAKE_VEL = 0.2;
 
 module.exports = Ship;
