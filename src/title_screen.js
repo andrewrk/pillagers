@@ -7,6 +7,7 @@ function TitleScreen(game) {
   this.game = game;
   this.engine = game.engine;
   this.bg = chem.resources.images['title-screen.png'];
+  this.titleImg = chem.resources.images['title.png'];
   this.batch = new chem.Batch();
   this.options = [
     {
@@ -66,6 +67,7 @@ TitleScreen.prototype.start = function() {
 function onDraw(context) {
   context.setTransform(1, 0, 0, 1, 0, 0); // load identity
   context.drawImage(this.bg, 0, 0);
+  context.drawImage(this.titleImg, this.engine.size.x / 2 - this.titleImg.width / 2, 50);
 
   this.batch.draw(context);
 }
