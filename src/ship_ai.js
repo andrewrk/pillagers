@@ -53,6 +53,7 @@ ShipAi.prototype.decelerate = function() {
   var speed = this.ship.vel.length();
   if (speed === 0) {
     this.ship.setThrustInput(0, true);
+    this.ship.setRotateInput(0);
     return;
   }
 
