@@ -27,6 +27,7 @@ function Ship(state, o) {
   this.thrustAudio = new Audio("sfx/thruster.ogg");
   this.thrustAudio.loop = true;
 
+  this.defense = 1;
   this.sensorRange = 400; // radius of ability to detect ships
   this.thrustInput = 0;
   this.brakeInput = false; // lets you brake at low velocities
@@ -144,7 +145,7 @@ Ship.prototype.update = function(dt, dx) {
 };
 
 Ship.prototype.hit = function(damage) {
-  this.health -= damage;
+  this.health -= damage / this.defense;
   this.emit('hit');
   if (this.health <= 0) {
     this.emit('destroyed');

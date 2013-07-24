@@ -31,6 +31,16 @@
         "pos": {"x": 1750, "y": 400},
         "count": 10
       }
+    },
+    {
+      "type": "ShipCluster",
+      "properties": {
+        "type": "Flag",
+        "team": 1,
+        "size": {"x": 200, "y": 200},
+        "pos": {"x": 1750, "y": 400},
+        "count": 1
+      }
     }
   ]
 }

@@ -12,6 +12,7 @@ var SCROLL_SPEED = 12;
 var shipTypes = {
   Militia: require('./militia_ship'),
   Ranger: require('./ranger_ship'),
+  Flag: require('./flag_ship'),
 };
 
 var canvas = document.getElementById("game");
@@ -379,7 +380,7 @@ State.prototype.createElectricFx = function(pos, vel, rotation) {
     pos: pos,
     vel: vel,
     animationName: 'fx/electric',
-    duration: 0.2,
+    duration: 0.3,
     rotation: rotation + Math.PI / 2,
   });
   this.addPhysicsObject(fx);

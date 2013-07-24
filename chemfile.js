@@ -55,6 +55,43 @@ exports.spritesheet = {
         "ship/ranger0.png",
       ],
     },
+    ship_flag_still: {
+      frames: ["ship/flag0.png"],
+    },
+    ship_flag_decel: {
+      loop: false,
+      frames: [
+        "ship/flag2.png",
+        "ship/flag1.png",
+        "ship/flag0.png",
+      ],
+    },
+    ship_flag_accel: {
+      loop: false,
+      frames: [
+        "ship/flag0.png",
+        "ship/flag1.png",
+        "ship/flag2.png",
+      ],
+    },
+    ship_flag_accel_back: {
+      loop: false,
+      frames: [
+        "ship/flag0.png",
+        "ship/flag3.png",
+        "ship/flag4.png",
+        "ship/flag5.png",
+      ],
+    },
+    ship_flag_decel_back: {
+      loop: false,
+      frames: [
+        "ship/flag5.png",
+        "ship/flag4.png",
+        "ship/flag3.png",
+        "ship/flag0.png",
+      ],
+    },
     explosion: {
       loop: false,
     },

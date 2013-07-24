@@ -1,5 +1,4 @@
- * don't auto target enemy ships until they're closer
- * add enemy turrets and ships to level 1
+ * add enemy turrets and to level 1
  * add victory flag
  * add 2nd class of ship to ships you get at beginning
  * replace initial ships with ca$h and buildings to create the ships
@@ -34,3 +33,4 @@ Upgrades:
  * Militia
    - Evade lazers.
    - Backwards thrusters.
+   - Smarter aiming.
