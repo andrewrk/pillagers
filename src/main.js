@@ -3,6 +3,7 @@ var v = chem.vec2d;
 var State = require('./state');
 var TitleScreen = require('./title_screen');
 var CreditsScreen = require('./credits_screen');
+var GameOverScreen = require('./game_over_screen');
 var canvas = document.getElementById("game");
 var engine = new chem.Engine(canvas);
 engine.setSize(v(1067, 600));
@@ -18,6 +19,11 @@ function Game(engine) {
   this.levelIndex = 0;
   this.engine = engine;
 }
+
+Game.prototype.showGameOverScreen = function() {
+  var gameOverScreen = new GameOverScreen(this);
+  gameOverScreen.start();
+};
 
 Game.prototype.showTitleScreen = function() {
   var title = new TitleScreen(this);

@@ -444,6 +444,15 @@ State.prototype.sendSelectedUnitsTo = function(pt, queue, loose) {
   squad.command(queue);
 };
 
+State.prototype.flagShipDestroyed = function(ship) {
+  this.delete();
+  if (ship.team === PLAYER_TEAM) {
+    this.game.showGameOverScreen();
+  } else {
+    this.game.showCredits();
+  }
+};
+
 function assert(value) {
   if (!value) throw new Error("Assertion Failure: " + value);
 }

@@ -1,11 +1,11 @@
  * if ranger is in range, don't accelerate toward target
- * try putting a speed cap on ships
- * title screen, game over screen when you lose your flag ship
- * killing enemy flag ship should grant victory and access to next level
  * replace initial ships with ca$h and buildings to create the ships
    - you have to choose how much class 1 and class 2 ships to get.
  * put instruction label text in level 1 to explain controls
  * think about level 2.
+
+Maybe?
+ * try putting a speed cap on ships
 
 
 Ship Classes:

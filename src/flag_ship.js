@@ -16,6 +16,8 @@ function FlagShip(state, o) {
   this.sensorRange = 400;
 
   this.defense = 20;
+
+  initListeners(this);
 }
 
 FlagShip.prototype.animationNames = {
@@ -25,3 +27,9 @@ FlagShip.prototype.animationNames = {
   backwardsDecel: 'ship_flag_decel_back',
   still: 'ship_flag_still',
 };
+
+function initListeners(self) {
+  self.on('destroyed', function() {
+    self.state.flagShipDestroyed(self);
+  });
+}
