@@ -157,8 +157,7 @@ ShipAi.prototype.calcStopDistance = function() {
   var timeTo180 = this.hasBackwardsThrusters ? 0 : Math.PI / this.ship.rotationSpeed;
   var speed = this.ship.vel.length();
   var distance = timeTo180 * speed;
-  var decelTime = speed / this.ship.thrustAmt;
-  distance += decelTime * speed - decelTime * this.ship.thrustAmt * this.ship.thrustAmt;
+  distance += speed * speed / (2 * this.ship.thrustAmt);
   return distance;
 };
 
@@ -207,22 +206,28 @@ function MoveCommand(ai, dest) {
 }
 
 MoveCommand.prototype.execute = function(ai, dt, dx) {
-  var targetDir = this.dest.minus(ai.ship.pos).normalize();
+  var relTargetPt = this.dest.minus(ai.ship.pos);
+  var targetDir = relTargetPt.normalized();
   var actualDir = v.unit(ai.ship.rotation);
   var closeEnough = ai.ship.pos.distanceSqrd(this.dest) < this.threshold;
 
   // consider the distance we would travel if we tried to stop right now.
   // if that distance is further than the destination, stop now.
   var stopDistance = ai.calcStopDistance();
-  if (stopDistance > ai.ship.pos.distance(this.dest)) {
+  if (stopDistance > 0) {
+    // find stopPoint which is relative to ship position
+    var relStopPoint = ai.ship.vel.normalized().scale(stopDistance);
+    // figure out which direction to point
+    targetDir = relTargetPt.minus(relStopPoint).normalize();
+  }
+  if (closeEnough) {
     ai.decelerate();
-  } else if (closeEnough) {
-    ai.decelerate();
-  } else if (actualDir.dot(targetDir) > 0.75) {
+  } else if (actualDir.dot(targetDir) > 0.99) {
     // thrusting would get us closer to our target
     ai.ship.setThrustInput(1);
     ai.pointTowardDirection(targetDir);
   } else {
+    ai.ship.setThrustInput(0);
     ai.pointTowardDirection(targetDir);
   }
   var stopped = ai.ship.vel.lengthSqrd() === 0;
