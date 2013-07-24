@@ -126,7 +126,12 @@ chem.resources.on('ready', function () {
         if (engine.buttonState(chem.button.Key1) || engine.buttonState(chem.button.Key2)) {
           placeShipAtCursor();
         } else {
-          sendUnitsToCursor();
+          var obj = clickedAttackableObject(state.mousePos());
+          if (obj && obj.team !== PLAYER_TEAM) {
+            state.selectedUnitsAttack(obj);
+          } else {
+            sendUnitsToCursor();
+          }
         }
         break;
       case chem.button.KeyP:
@@ -212,6 +217,17 @@ chem.resources.on('ready', function () {
         ai.update(dt, dx);
       }
     }
+  }
+
+  function clickedAttackableObject(pos) {
+    for (var id in state.physicsObjects) {
+      var obj = state.physicsObjects[id];
+      if (!obj.canBeShot) continue;
+      if (obj.pos.distance(pos) < obj.radius) {
+        return obj;
+      }
+    }
+    return null;
   }
 
   function clickedAiShip(pos) {
@@ -368,6 +384,14 @@ State.prototype.isOffscreen = function(pos) {
   return (pos.x < 0 || pos.x > this.mapSize.x || pos.y < 0 || pos.y > this.mapSize.y);
 };
 
+State.prototype.selectedUnitsAttack = function(target) {
+  for (var id in this.aiObjects) {
+    var ai = this.aiObjects[id];
+    if (! ai.selected) continue;
+    ai.commandToAttack(target);
+  }
+};
+
 State.prototype.sendSelectedUnitsTo = function(pt, queue) {
   var squad = new ScatterSquad(pt);
   for (var id in this.aiObjects) {
@@ -435,6 +459,6 @@ ScatterSquad.prototype.command = function(queue) {
   for (i = 0; i < this.units.length; i += 1) {
     var unit = this.units[i];
     unit.commandToMove(positions[i], queue);
-    unit.commandToPoint(this.direction, queue);
+    unit.commandToPoint(this.direction, true);
   }
 };

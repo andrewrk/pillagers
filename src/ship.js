@@ -1,6 +1,5 @@
 var createId = require('./uuid').createId;
 var chem = require('chem');
-var Bullet = require('./bullet');
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
 var v = chem.vec2d;
@@ -31,8 +30,6 @@ function Ship(state, o) {
   this.thrustInput = 0;
   this.brakeInput = false; // lets you brake at low velocities
   this.rotateInput = 0;
-  this.shootInput = 0;
-  this.recharge = 0;
   this.team = o.team;
   this.health = o.health || 1;
   this.hasBackwardsThrusters = true;
@@ -40,16 +37,13 @@ function Ship(state, o) {
   this.radius = 16;
   this.rotationSpeed = Math.PI * 0.03;
   this.thrustAmt = 0.1;
-  this.rechargeAmt = 0.20;
-  this.bulletDamage = 0.1;
-  this.bulletSpeed = 10;
-  this.bulletLife = 3;
+  this.hasBullets = false;
+  this.deleted = false;
 }
 
 Ship.prototype.clearInput = function() {
   this.setThrustInput(0);
   this.setRotateInput(0);
-  this.shootInput = false;
   this.brakeInput = false;
 };
 
@@ -147,20 +141,6 @@ Ship.prototype.update = function(dt, dx) {
   this.sprite.rotation = this.rotation + Math.PI / 2;
   this.sprite.pos = this.pos.floored();
 
-  this.recharge -= dt;
-  if (this.shootInput && this.recharge <= 0) {
-    this.recharge = this.rechargeAmt;
-    // create projectile
-    var unit = v.unit(this.rotation);
-    var bullet = new Bullet(this.state, {
-      pos: this.pos.plus(unit.scaled(this.radius)),
-      vel: unit.scaled(this.bulletSpeed).add(this.vel),
-      team: this.team,
-      damage: this.bulletDamage,
-      life: this.bulletLife,
-    });
-    this.state.addBullet(bullet);
-  }
 };
 
 Ship.prototype.hit = function(bullet) {
@@ -176,6 +156,7 @@ Ship.prototype.hit = function(bullet) {
 
 Ship.prototype.delete = function() {
   this.emit('deleted');
+  this.deleted = true;
   this.sprite.delete();
   this.thrustAudio.pause();
   this.thrustAudio = null;

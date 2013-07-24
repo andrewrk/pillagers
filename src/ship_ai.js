@@ -8,8 +8,6 @@ function ShipAi(state, ship) {
   this.state = state;
   this.id = createId();
   this.ship = ship;
-  this.target = null;
-  this.alive = true;
 
   this.selected = false;
   this.commands = [];
@@ -27,7 +25,6 @@ ShipAi.prototype.delete = function() {
   while (this.commands.length) {
     this.commands.shift().delete();
   }
-  this.alive = false;
   this.state.deleteAi(this);
 };
 
@@ -36,29 +33,14 @@ ShipAi.prototype.update = function (dt, dx) {
 
   if (cmd) {
     cmd.execute(this, dt, dx);
-    if (cmd.done) this.commands.shift().delete();
+    if (cmd.done) {
+      this.commands.shift().delete();
+      this.ship.clearInput();
+    }
     return;
   }
 
-  // un-target dead ships
-  if (this.target && !this.target.alive) this.target = null;
-
-  if (! this.target) this.chooseTarget(this.state);
-  if (! this.target) {
-    this.ship.shootInput = 0;
-    this.ship.rotateInput = 0;
-    return;
-  }
-
-  var targetAngle = this.target.ship.pos.minus(this.ship.pos).angle();
-  var delta = angleSubtract(targetAngle, this.ship.rotation);
-  var goodShot = Math.abs(delta) < Math.PI / 10;
-
-  // shoot at target
-  this.ship.shootInput = goodShot ? 1 : 0;
-
-  // aim at target
-  this.ship.setRotateInput(delta / this.ship.rotationSpeed);
+  this.attackNearbyEnemy();
 }
 
 ShipAi.prototype.pointTowardDirection = function(targetDir) {
@@ -85,18 +67,20 @@ ShipAi.prototype.decelerate = function() {
   this.ship.setThrustInput(thrustInput, true);
 };
 
-ShipAi.prototype.chooseTarget = function() {
-  this.target = null;
+ShipAi.prototype.attackNearbyEnemy = function() {
+  var target = null;
   var closestDist;
-  for (var id in this.state.aiObjects) {
-    var ai = this.state.aiObjects[id];
-    if (ai.ship.team === this.ship.team) continue;
-    var dist = ai.ship.pos.distanceSqrd(this.ship.pos);
-    if (this.target == null || dist < closestDist) {
+  for (var id in this.state.physicsObjects) {
+    var obj = this.state.physicsObjects[id];
+    if (!obj.canBeShot) continue;
+    if (obj.team === this.ship.team) continue;
+    var dist = obj.pos.distanceSqrd(this.ship.pos);
+    if (target == null || dist < closestDist) {
       closestDist = dist;
-      this.target = ai;
+      target = obj;
     }
   }
+  if (target) this.commandToAttack(target);
 };
 
 ShipAi.prototype.draw = function(context) {
@@ -117,30 +101,27 @@ ShipAi.prototype.deselect = function() {
   this.selected = false;
 };
 
-ShipAi.prototype.commandToPoint = function(dir, queue) {
+ShipAi.prototype.clearCommands = function() {
+  this.commands.forEach(function(cmd) {
+    cmd.delete();
+  });
+  this.commands = [];
   this.ship.clearInput();
-  if (! queue) {
-    // delete all existing PointCommands
-    this.commands = this.commands.filter(function(cmd) {
-      var die = cmd instanceof PointCommand;
-      if (die) cmd.delete();
-      return !die;
-    });
-  }
+};
+
+ShipAi.prototype.commandToPoint = function(dir, queue) {
+  if (! queue) this.clearCommands();
   this.commands.push(new PointCommand(dir));
 };
 
 ShipAi.prototype.commandToMove = function(pt, queue) {
-  this.ship.clearInput();
-  if (! queue) {
-    // delete all existing MoveCommands
-    this.commands = this.commands.filter(function(cmd) {
-      var die = cmd instanceof MoveCommand;
-      if (die) cmd.delete();
-      return !die;
-    });
-  }
+  if (! queue) this.clearCommands();
   this.commands.push(new MoveCommand(this, pt));
+};
+
+ShipAi.prototype.commandToAttack = function(target, queue) {
+  if (! queue) this.clearCommands();
+  this.commands.push(new ShootCommand(this, target));
 };
 
 ShipAi.prototype.calcTimeToStop = function() {
@@ -241,4 +222,33 @@ MoveCommand.prototype.draw = function(ai, context) {
 
 MoveCommand.prototype.delete = function() {
   this.sprite.delete();
+};
+
+
+function ShootCommand(ai, target) {
+  this.target = target;
+  this.done = false;
+}
+
+ShootCommand.prototype.execute = function(ai, dt, dx) {
+  // un-target dead ships
+  if (this.target.deleted) {
+    this.done = true;
+    return;
+  }
+  var targetAngle = this.target.pos.minus(ai.ship.pos).angle();
+  var delta = angleSubtract(targetAngle, ai.ship.rotation);
+  var goodShot = Math.abs(delta) < Math.PI / 10;
+
+  // shoot at target
+  ai.ship.shootInput = goodShot ? 1 : 0;
+
+  // aim at target
+  ai.ship.setRotateInput(delta / ai.ship.rotationSpeed);
+};
+
+ShootCommand.prototype.draw = function(ai, context) {};
+
+ShootCommand.prototype.delete = function() {
+  this.target = null;
 };
