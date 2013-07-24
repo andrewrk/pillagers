@@ -54,6 +54,10 @@ function State(game) {
 }
 
 State.prototype.delete = function() {
+  for (var id in this.physicsObjects) {
+    var obj = this.physicsObjects[id];
+    obj.delete();
+  }
   this.engine.removeAllListeners();
 };
 
