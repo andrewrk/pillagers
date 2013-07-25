@@ -23,8 +23,9 @@ function TurretShip(state, o) {
 
   this.standGround = true;
 
-  this.name = "Turret";
 }
+
+TurretShip.prototype.name = "Turret";
 
 TurretShip.prototype.animationNames = {
   accel: 'ship_turret_accel',

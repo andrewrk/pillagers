@@ -39,6 +39,7 @@ function initText(self) {
 }
 
 CreditsScreen.prototype.start = function() {
+  this.initDate = new Date();
   this.engine.on('update', onUpdate.bind(this));
   this.engine.on('draw', onDraw.bind(this));
   this.engine.on('buttonup', onButtonUp.bind(this));
@@ -63,7 +64,7 @@ function onMouseMove() {
 }
 
 function onButtonUp(button) {
-  backToTitleScreen(this);
+  if (new Date() - this.initDate > 1000) backToTitleScreen(this);
 }
 
 function onUpdate(dt, dx) {

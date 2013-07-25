@@ -9,6 +9,7 @@ module.exports = Game;
 
 function Game(engine) {
   this.levelIndex = 0;
+  this.cash = 0;
   this.engine = engine;
 
   initMusic(this);
@@ -66,7 +67,7 @@ Game.prototype.playLevel = function() {
   state.start();
 };
 
-Game.prototype.showLevelComplete = function(convoy, stats) {
-  var levelCompleteScreen = new LevelCompleteScreen(this, convoy, stats);
+Game.prototype.showLevelComplete = function(o) {
+  var levelCompleteScreen = new LevelCompleteScreen(this, o);
   levelCompleteScreen.start();
 };

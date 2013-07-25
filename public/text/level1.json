@@ -1,6 +1,20 @@
 {
   "size": {"x": 2000, "y": 1000},
   "scroll": {"x": 0, "y": 200},
+  "rewards": [
+    {
+      "type": "Cash",
+      "properties": {
+        "amount": 100
+      }
+    },
+    {
+      "type": "UnlockShip",
+      "properties": {
+        "shipType": "Militia"
+      }
+    }
+  ],
   "objects": [
     {
       "type": "ShipCluster",
@@ -30,16 +44,6 @@
         "size": {"x": 100, "y": 100},
         "pos": {"x": 100, "y": 300},
         "count": 6
-      }
-    },
-    {
-      "type": "Meteor",
-      "properties": {
-        "animationName": "rock-a",
-        "pos": {"x": 1000, "y": 1000},
-        "vel": {"x": -1, "y": -0.5},
-        "rotVel" : 0.01,
-        "radius": 128
       }
     },
     {

@@ -8,16 +8,12 @@ var Team = require('./team');
 var Meteor = require('./meteor');
 var Portal = require('./portal');
 var Squad = require('./squad');
+var shipTypes = require('./ship_types');
 
 var PLAYER_TEAM = new Team();
 var ENEMY_TEAM = new Team();
 var SCROLL_SPEED = 12;
-var shipTypes = {
-  Militia: require('./militia_ship'),
-  Ranger: require('./ranger_ship'),
-  Flag: require('./flag_ship'),
-  Turret: require('./turret_ship'),
-};
+
 
 module.exports = State;
 
@@ -68,7 +64,6 @@ function State(game) {
     shipsLost: 0,
     shipsGained: 0,
     enemiesDestroyed: 0,
-    cashEarned: 0,
   };
 }
 
@@ -97,7 +92,11 @@ State.prototype.announce = function(text) {
 
 State.prototype.finishLevel = function(convoy) {
   this.delete();
-  this.game.showLevelComplete(convoy, this.stats);
+  this.game.showLevelComplete({
+    convoy: convoy,
+    stats: this.stats,
+    rewards: this.victoryRewards,
+  });
 };
 
 State.prototype.start = function() {
@@ -636,7 +635,7 @@ State.prototype.load = function(level) {
 
   this.mapSize = v(level.size);
   this.scroll = level.scroll ? v(level.scroll) : v();
-  this.stats.cashEarned += level.cash || 0;
+  this.victoryRewards = level.rewards;
 
   this.generateStars();
 
@@ -865,12 +864,16 @@ State.prototype.sendSelectedUnitsTo = function(pt, queue, loose) {
   squad.command(queue);
 };
 
-State.prototype.flagShipDestroyed = function(ship) {
+State.prototype.gameOver = function() {
   this.delete();
+  this.game.showGameOverScreen();
+};
+
+State.prototype.flagShipDestroyed = function(ship) {
   if (ship.team === PLAYER_TEAM) {
-    this.game.showGameOverScreen();
+    this.gameOver();
   } else {
-    this.game.showCredits();
+    this.addPortal({pos: ship.pos.clone()});
   }
 };
 

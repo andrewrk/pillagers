@@ -18,9 +18,10 @@ function FlagShip(state, o) {
 
   this.defense = 20;
 
-  this.name = "Flagship";
   this.isFlagship = true;
 }
+
+FlagShip.prototype.name = "Flagship";
 
 FlagShip.prototype.animationNames = {
   accel: 'ship_flag_accel',

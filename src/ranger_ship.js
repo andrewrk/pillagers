@@ -25,8 +25,9 @@ function RangerShip(state, o) {
   this.rechargeAmt = 0.20;
   this.recharge = 0;
 
-  this.name = "Ranger";
 }
+
+RangerShip.prototype.name = "Ranger";
 
 RangerShip.prototype.animationNames = {
   accel: 'ship_ranger_accel',

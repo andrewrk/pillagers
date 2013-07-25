@@ -38,9 +38,10 @@ function Ship(state, o) {
   this.canBeStruck = true;
 
   this.miniMapColor = this.team.color;
-  this.name = "Ship";
   this.uiAnimationName = this.animationNames.still;
 }
+
+Ship.prototype.name = "Ship";
 
 Ship.prototype.clearInput = function() {
   this.setThrustInput(0);

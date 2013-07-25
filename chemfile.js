@@ -149,6 +149,7 @@ exports.spritesheet = {
       anchor: 'bottomleft',
     },
     'knife': {},
+    'coin': {},
 
   }
 };

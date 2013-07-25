@@ -1,7 +1,20 @@
 {
   "size": {"x": 4000, "y": 600},
   "scroll": {"x": 0, "y": 0},
-  "cash": 100,
+  "rewards": [
+    {
+      "type": "Cash",
+      "properties": {
+        "amount": 100
+      }
+    },
+    {
+      "type": "UnlockShip",
+      "properties": {
+        "shipType": "Ranger"
+      }
+    }
+  ],
   "objects": [
     {
       "type": "ShipCluster",
@@ -46,16 +59,6 @@
         "vel": {"x": -0.5, "y": -0.2},
         "rotVel" : 0.01,
         "radius": 128
-      }
-    },
-    {
-      "type": "ShipCluster",
-      "properties": {
-        "type": "Flag",
-        "team": 0,
-        "pos": {"x": 3800, "y": 300},
-        "size": {"x": 1, "y": 1},
-        "count": 1
       }
     },
     {

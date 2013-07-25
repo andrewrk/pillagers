@@ -1,12 +1,11 @@
- * level complete screen
-   - press button to go to next level
-   - shows that you unlocked Ranger ship
  * label text in level 1 to explain controls and goal of level
  * next level has same fleet that you exited with
- * level 1, we exit the meteor field but there are some attackers. you have to build
+ * show your cash in the UI
+ * allow you to create Ranger in flagship after unlocking it
+ * level 2, we exit the meteor field but there are some attackers. you have to build
    some Ranger ships to defend.
    - when you win you earn Militia ship
- * level 2, enemy flag ship is preventing the portal from appearing.
+ * level 3, enemy flag ship is preventing the portal from appearing.
    destroy the flag ship to open the portal.
 
 Bugs:

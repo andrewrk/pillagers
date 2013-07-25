@@ -23,8 +23,9 @@ function MilitiaShip(state, o) {
   this.rechargeAmt = 0.40;
   this.recharge = 0;
 
-  this.name = "Militia";
 }
+
+MilitiaShip.prototype.name = "Militia";
 
 MilitiaShip.prototype.animationNames = {
   accel: 'ship_militia_accel',
