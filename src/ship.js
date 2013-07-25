@@ -1,7 +1,7 @@
-var createId = require('./uuid').createId;
+var PhysicsObject = require('./physics_object');
+var util = require('util');
 var chem = require('chem');
 var EventEmitter = require('events').EventEmitter;
-var util = require('util');
 var v = chem.vec2d;
 
 var MINIMUM_VELOCITY_SQRD = 0.001 * 0.001;
@@ -9,16 +9,14 @@ var MIN_BRAKE_VEL = 0.2;
 
 module.exports = Ship;
 
-util.inherits(Ship, EventEmitter);
+// multiple inheritance in JavaScript. So sue me.
+util.inherits(Ship, PhysicsObject);
+parasiticInherits(Ship, EventEmitter);
 function Ship(state, o) {
+  PhysicsObject.apply(this, arguments);
   EventEmitter.call(this);
-  o = o || {};
-  this.state = state;
+
   this.canBeShot = true;
-  this.vel = o.vel || v();
-  this.pos = o.pos || v();
-  this.rotation = o.rotation == null ? Math.PI / 2 : o.rotation;
-  this.id = createId();
   // tells where it shows up in the squad
   this.rankOrder = 0;
 
@@ -27,7 +25,7 @@ function Ship(state, o) {
   this.thrustAudio = new Audio("sfx/thruster.ogg");
   this.thrustAudio.loop = true;
 
-  this.defense = 1;
+  this.canBeSelected = true;
   this.sensorRange = 400; // radius of ability to detect ships
   this.thrustInput = 0;
   this.brakeInput = false; // lets you brake at low velocities
@@ -39,16 +37,8 @@ function Ship(state, o) {
   this.rotationSpeed = Math.PI * 0.03;
   this.thrustAmt = 0.1;
   this.hasBullets = false;
-  this.deleted = false;
-  this.density = 0.02;
-  this.collisionDamping = 0.40;
-  this.canCauseCollision = false;
   this.canBeStruck = true;
 }
-
-Ship.prototype.mass = function() {
-  return this.density * Math.PI * this.radius * this.radius;
-};
 
 Ship.prototype.clearInput = function() {
   this.setThrustInput(0);
@@ -85,25 +75,10 @@ Ship.prototype.setRotateInput = function(value) {
   if (this.rotateInput < -1) this.rotateInput = -1;
 };
 
-Ship.prototype.draw = function(context) {}
-
-Ship.prototype.drawHealthBar = function(context) {
-  var healthBarSize = v(32, 4);
-  var start = this.sprite.pos.minus(healthBarSize.scaled(0.5)).floor();
-  context.fillStyle = '#ffffff';
-  context.fillRect(start.x - 1, start.y - this.sprite.size.y * 0.60 - 1, healthBarSize.x + 2, healthBarSize.y + 2);
-  context.fillStyle = this.health > 0.45 ? '#009413' : '#E20003';
-  context.fillRect(start.x, start.y - this.sprite.size.y * 0.60, healthBarSize.x * this.health, healthBarSize.y);
-};
-
-Ship.prototype.drawSelectionCircle = function(context) {
-  context.beginPath();
-  context.arc(this.sprite.pos.x, this.sprite.pos.y, this.radius, 0, 2 * Math.PI);
-  context.closePath();
-  context.strokeStyle = "#ffffff";
-  context.lineWidth = 1;
-  context.stroke();
-};
+Ship.prototype.draw = function(context) {
+  PhysicsObject.prototype.draw.apply(this, arguments);
+  this.drawTeamColor(context);
+}
 
 Ship.prototype.drawTeamColor = function(context) {
   context.beginPath();
@@ -113,28 +88,8 @@ Ship.prototype.drawTeamColor = function(context) {
   context.fill();
 };
 
-Ship.prototype.checkOutOfBounds = function() {
-  if (this.pos.x - this.radius < 0) {
-    this.pos.x = this.radius;
-    this.vel.x = Math.abs(this.vel.x) * this.collisionDamping;
-  }
-  if (this.pos.y - this.radius < 0) {
-    this.pos.y = this.radius;
-    this.vel.y = Math.abs(this.vel.y) * this.collisionDamping;
-  }
-  if (this.pos.x + this.radius >= this.state.mapSize.x) {
-    this.pos.x = this.state.mapSize.x - this.radius;
-    this.vel.x = -Math.abs(this.vel.x) * this.collisionDamping;
-  }
-  if (this.pos.y + this.radius >= this.state.mapSize.y) {
-    this.pos.y = this.state.mapSize.y - this.radius;
-    this.vel.y = -Math.abs(this.vel.y) * this.collisionDamping;
-  }
-}
-
 Ship.prototype.update = function(dt, dx) {
-  this.pos.add(this.vel.scaled(dx));
-  this.checkOutOfBounds();
+  PhysicsObject.prototype.update.apply(this, arguments);
   this.rotation += this.rotateInput * this.rotationSpeed * dx;
   // clamp rotation
   this.rotation = this.rotation % (2 * Math.PI);
@@ -166,8 +121,8 @@ Ship.prototype.hit = function(damage, explosionAnimationName) {
 
 Ship.prototype.delete = function() {
   if (this.deleted) return;
-  this.emit('deleted');
   this.deleted = true;
+  this.emit('deleted');
   this.sprite.delete();
   this.thrustAudio.pause();
   this.thrustAudio = null;
@@ -175,4 +130,10 @@ Ship.prototype.delete = function() {
 
 function assert(value) {
   if (!value) throw new Error("Assertion Failure: " + value);
+}
+
+function parasiticInherits(Base, Super) {
+  Object.keys(Super.prototype).forEach(function(method) {
+    if (!Base.prototype[method]) Base.prototype[method] = Super.prototype[method];
+  });
 }

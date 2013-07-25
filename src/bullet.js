@@ -1,34 +1,35 @@
 var chem = require('chem');
 var sfx = require('./sfx');
-var createId = require('./uuid').createId;
+var PhysicsObject = require('./physics_object');
+var util = require('util');
 
 module.exports = Bullet;
 
+util.inherits(Bullet, PhysicsObject);
 function Bullet(state, o) {
+  PhysicsObject.apply(this, arguments);
   o = o || {};
-  this.state = state;
-  this.pos = o.pos;
-  this.vel = o.vel;
   this.team = o.team;
   this.damage = o.damage;
   this.life = o.life;
-  this.id = createId();
   this.sprite = new chem.Sprite('bullet/small');
   this.sprite.rotation = this.vel.angle() + Math.PI / 2;
   this.state.batch.add(this.sprite);
   this.radius = 2;
+  this.canGoOffscreen = true;
   sfx.shootWeakBullet();
 }
 
-Bullet.prototype.draw = function(context) {}
-
 Bullet.prototype.delete = function() {
+  if (this.deleted) return;
   this.sprite.delete();
+  this.deleted = true;
   this.state.deletePhysicsObject(this);
 };
 
 Bullet.prototype.update = function (dt, dx) {
-  this.pos.add(this.vel);
+  PhysicsObject.prototype.update.apply(this, arguments);
+
   this.sprite.pos = this.pos;
   this.life -= dt;
   if (this.state.isOffscreen(this.pos) || this.life <= 0) {

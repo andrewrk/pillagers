@@ -1,21 +1,19 @@
-var createId = require('./uuid').createId;
+var PhysicsObject = require('./physics_object');
+var util = require('util');
 var chem = require('chem');
 var v = chem.vec2d;
 
 module.exports = Portal;
 
+util.inherits(Portal, PhysicsObject);
 function Portal(state, o) {
-  this.state = state;
-  this.pos = o.pos;
+  PhysicsObject.apply(this, arguments);
   this.sprite = new chem.Sprite('portal');
   this.sprite.pos = this.pos.floored();
   this.state.batch.add(this.sprite);
-  this.id = createId();
-  this.canCauseCollision = false;
-  this.canBeStruck = false;
+  this.canBeSelected = true;
+  this.radius = 64;
 }
-
-Portal.prototype.draw = function(context) {}
 
 Portal.prototype.update = function(dt, dx) {
   // http://25.media.tumblr.com/tumblr_m4hi5ygdtg1qa491po1_1280.jpg

@@ -24,12 +24,15 @@ function State(game) {
   this.game = game;
   this.physicsObjects = {};
   this.aiObjects = {};
+  this.selection = {};
+  this.selectedCount = 0;
   this.manualOverride = null;
   this.engine = game.engine;
   this.batchBgBack = new chem.Batch();
   this.batchBgFore = new chem.Batch();
   this.batch = new chem.Batch();
   this.batchStatic = new chem.Batch();
+  this.batchUiPane = new chem.Batch();
   this.bgBackObjects = {};
   this.bgBackFactor = 0.10; // scrolls 10x slower than normal
   this.bgForeFactor = 0.15;
@@ -53,9 +56,13 @@ function State(game) {
   this.mouseDownStart = null;
 
   this.onUpdateBound = onUpdate.bind(this);
+
+  this.uiPaneImg = chem.resources.images['ui-pane.png'];
+  this.uiPaneTop = this.engine.size.y - this.uiPaneImg.height;
 }
 
 State.prototype.delete = function() {
+  this.clearSelection();
   for (var id in this.physicsObjects) {
     var obj = this.physicsObjects[id];
     obj.delete();
@@ -95,26 +102,57 @@ function finishBoundingBox(state) {
   if (! state.engine.buttonState(chem.button.KeyCtrl) &&
       ! state.engine.buttonState(chem.button.KeyShift))
   {
-    clearSelection(state);
+    state.clearSelection();
   }
 
   if (end.minus(start).length() < 4) {
-    var clickedAi = clickedAiShip(state, end);
-    if (clickedAi && clickedAi.ship.team === PLAYER_TEAM) clickedAi.select();
+    var clickedObj = clickedSelectableObject(state, end);
+    if (clickedObj) state.select(clickedObj);
     return;
   }
 
-  // iterate over owned AIs
+  // iterate over owned objects
   for (var id in state.aiObjects) {
     var ai = state.aiObjects[id];
     if (ai.ship.team !== PLAYER_TEAM) continue;
     if (ai.ship.pos.x >= start.x && ai.ship.pos.x < end.x &&
         ai.ship.pos.y >= start.y && ai.ship.pos.y < end.y)
     {
-      ai.select();
+      state.select(ai.ship);
     }
   }
+
+  state.updateUiPaneVisibility();
 }
+
+State.prototype.clearSelection = function() {
+  for (var id in this.selection) {
+    this.unselect(this.selection[id]);
+  }
+  assert(this.selectedCount === 0);
+  this.updateUiPaneVisibility();
+};
+
+State.prototype.select = function (obj) {
+  if (obj.id in this.selection) return;
+  obj.selected = true;
+  this.selection[obj.id] = obj;
+  this.selectedCount += 1;
+  this.updateUiPaneVisibility();
+}
+
+State.prototype.unselect = function (obj) {
+  if (obj.id in this.selection) {
+    obj.selected = false;
+    delete this.selection[obj.id];
+    this.selectedCount -= 1;
+    this.updateUiPaneVisibility();
+  }
+}
+
+State.prototype.updateUiPaneVisibility = function () {
+  this.showUiPane = this.selectedCount > 0 || this.engine.mousePos.y >= this.uiPaneTop;
+};
 
 function clearSelection(state) {
   for (var id in state.aiObjects) {
@@ -233,6 +271,13 @@ function onDraw(context) {
     context.strokeRect(this.mouseDownStart.x, this.mouseDownStart.y, size.x, size.y);
   }
 
+  context.setTransform(1, 0, 0, 1, 0, 0); // load identity
+  context.translate(0, this.uiPaneTop);
+  if (this.showUiPane) {
+    context.drawImage(this.uiPaneImg, 0, 0);
+    this.batchUiPane.draw(context);
+  }
+
   // static stuff
   context.setTransform(1, 0, 0, 1, 0, 0); // load identity
   this.batchStatic.draw(context);
@@ -283,6 +328,17 @@ function clickedAttackableObject(state, pos) {
   for (var id in state.physicsObjects) {
     var obj = state.physicsObjects[id];
     if (!obj.canBeShot) continue;
+    if (obj.pos.distance(pos) < obj.radius) {
+      return obj;
+    }
+  }
+  return null;
+}
+
+function clickedSelectableObject(state, pos) {
+  for (var id in state.physicsObjects) {
+    var obj = state.physicsObjects[id];
+    if (!obj.canBeSelected) continue;
     if (obj.pos.distance(pos) < obj.radius) {
       return obj;
     }
@@ -428,6 +484,7 @@ State.prototype.addPhysicsObject = function(o) {
 
 State.prototype.deletePhysicsObject = function(o) {
   assert(o.id);
+  this.unselect(o);
   delete this.physicsObjects[o.id];
 }
 
@@ -482,17 +539,17 @@ State.prototype.isOffscreen = function(pos) {
 };
 
 State.prototype.deleteSelectedShips = function() {
-  for (var id in this.aiObjects) {
-    var ai = this.aiObjects[id];
-    if (! ai.selected) continue;
-    ai.ship.hit(1, "explosion");
+  for (var id in this.selection) {
+    var obj = this.selection[id];
+    if (obj.team !== PLAYER_TEAM) continue;
+    obj.hit(99999, "explosion");
   }
 };
 
 State.prototype.selectedUnitsAttack = function(target) {
   for (var id in this.aiObjects) {
     var ai = this.aiObjects[id];
-    if (! ai.selected) continue;
+    if (! ai.ship.selected) continue;
     ai.commandToAttack(target);
   }
 };
@@ -502,7 +559,7 @@ State.prototype.sendSelectedUnitsTo = function(pt, queue, loose) {
   if (loose) squad.loose = true;
   for (var id in this.aiObjects) {
     var ai = this.aiObjects[id];
-    if (! ai.selected) continue;
+    if (! ai.ship.selected) continue;
     squad.add(ai);
   }
   squad.command(queue);

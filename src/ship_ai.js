@@ -9,7 +9,6 @@ function ShipAi(state, ship) {
   this.id = createId();
   this.ship = ship;
 
-  this.selected = false;
   this.commands = [];
 
   subscribeToShipEvents(this);
@@ -100,21 +99,9 @@ ShipAi.prototype.attackNearbyEnemy = function() {
 };
 
 ShipAi.prototype.draw = function(context) {
-  var drawHealth = this.selected || this.ship.health < 1;
-  if (drawHealth) this.ship.drawHealthBar(context);
-  if (this.selected) this.ship.drawSelectionCircle(context);
   for (var i = 0; i < this.commands.length; i += 1) {
     this.commands[i].draw(this, context);
   }
-  this.ship.drawTeamColor(context);
-};
-
-ShipAi.prototype.select = function() {
-  this.selected = true;
-};
-
-ShipAi.prototype.deselect = function() {
-  this.selected = false;
 };
 
 ShipAi.prototype.clearCommands = function() {
@@ -255,7 +242,7 @@ EngageCommand.prototype.execute = function(ai, dt, dx) {
 };
 
 EngageCommand.prototype.draw = function(ai, context) {
-  this.sprite.setVisible(ai.selected);
+  this.sprite.setVisible(ai.ship.selected);
 };
 
 EngageCommand.prototype.delete = function() {
@@ -309,7 +296,7 @@ MoveCommand.prototype.execute = function(ai, dt, dx) {
 };
 
 MoveCommand.prototype.draw = function(ai, context) {
-  this.sprite.setVisible(ai.selected);
+  this.sprite.setVisible(ai.ship.selected);
 };
 
 MoveCommand.prototype.delete = function() {

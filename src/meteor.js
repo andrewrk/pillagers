@@ -1,32 +1,28 @@
-var createId = require('./uuid').createId;
+var PhysicsObject = require('./physics_object');
+var util = require('util');
 var chem = require('chem');
 var v = chem.vec2d;
 
 module.exports = Meteor;
 
+util.inherits(Meteor, PhysicsObject);
 function Meteor(state, o) {
-  this.state = state;
-  this.pos = o.pos;
-  this.vel = o.vel || v();
-  this.radius = o.radius;
+  PhysicsObject.apply(this, arguments);
 
   this.sprite = new chem.Sprite(o.animationName);
   var graphicRadius = (this.sprite.size.x + this.sprite.size.y) / 4;
   this.sprite.scale.scale(this.radius / graphicRadius);
+  this.sprite.rotation = this.rotation;
+  this.state.batch.add(this.sprite);
 
-  if (o.rotation != null) this.sprite.rotation = o.rotation;
   this.rotVel = o.rotVel || 0;
 
-  this.state.batch.add(this.sprite);
-  this.id = createId();
   this.collisionDamping = 1;
   this.density = 0.20;
   this.canBeShot = true;
   this.health = 1;
   this.defense = this.mass();
-  this.deleted = false;
 
-  // an object which canBeStruck can collide when hit by an object that canCauseCollision.
   this.canCauseCollision = true;
   this.canBeStruck = true;
 }
@@ -40,23 +36,8 @@ Meteor.prototype.hit = function(damage, explosionAnimationName) {
   }
 };
 
-Meteor.prototype.mass = function() {
-  return this.density * Math.PI * this.radius * this.radius;
-};
-
-Meteor.prototype.draw = function(context) {
-  if (this.health >= 1) return;
-  var healthBarSize = v(32, 4);
-  var start = this.sprite.pos.minus(healthBarSize.scaled(0.5)).floor();
-  context.fillStyle = '#ffffff';
-  context.fillRect(start.x - 1, start.y - this.sprite.size.y * 0.50 - 1, healthBarSize.x + 2, healthBarSize.y + 2);
-  context.fillStyle = this.health > 0.45 ? '#009413' : '#E20003';
-  context.fillRect(start.x, start.y - this.sprite.size.y * 0.50, healthBarSize.x * this.health, healthBarSize.y);
-};
-
-
 Meteor.prototype.update = function(dt, dx) {
-  this.pos.add(this.vel.scaled(dx));
+  PhysicsObject.prototype.update.apply(this, arguments);
 
   // collision detection
   for (var id in this.state.physicsObjects) {
@@ -86,8 +67,6 @@ Meteor.prototype.update = function(dt, dx) {
     obj.vel.add(impulse.scaled(1 / otherMass));
     break;
   }
-
-  this.checkOutOfBounds();
 
   this.sprite.pos = this.pos.floored();
   this.sprite.rotation += this.rotVel;
