@@ -15,6 +15,7 @@ function FlagShip(state, o) {
   this.rankOrder = 10;
   this.sensorRange = 400;
   this.density = 0.04;
+  this.collisionDamping = 0.10;
 
   this.defense = 20;
 
