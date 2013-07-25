@@ -27,6 +27,7 @@ function State(game) {
   this.aiObjects = {};
   this.selection = {};
   this.selectedCount = 0;
+  this.announcements = [];
   this.manualOverride = null;
   this.batchBgBack = new chem.Batch();
   this.batchBgFore = new chem.Batch();
@@ -70,6 +71,20 @@ State.prototype.delete = function() {
     obj.delete();
   }
   this.engine.removeAllListeners();
+};
+
+State.prototype.announce = function(text) {
+  this.announcements.unshift(new Announcement(this, text));
+  this.announcements = this.announcements.filter(function(announcement) {
+    return !announcement.deleted;
+  });
+  var margin = 4;
+  var y = this.viewSize.y - margin;
+  for (var i = 0; i < this.announcements.length; i += 1) {
+    var announcement = this.announcements[i];
+    announcement.label.pos = v(margin, y);
+    y -= announcement.height - margin;
+  }
 };
 
 State.prototype.start = function() {
@@ -210,7 +225,7 @@ State.prototype.setUpObjectButtonsUi = function(obj) {
     var label = new chem.Label(uiButton.caption, {
       pos: nextPos.plus(buttonSize.scaled(0.5)),
       fillStyle: "#000000",
-      font: "12px monospace",
+      font: "12px sans-serif",
       batch: this.batchStatic,
       textAlign: 'center',
       textBaseline: 'middle',
@@ -530,6 +545,12 @@ function onUpdate(dt, dx) {
       ai.update(dt, dx);
     }
   }
+
+  for (var i = 0; i < this.announcements.length; i += 1) {
+    var announcement = this.announcements[i];
+    if (announcement.deleted) continue;
+    announcement.addTime(dt);
+  }
 }
 
 State.prototype.clickedObject = function(pos, matchFn) {
@@ -651,7 +672,7 @@ State.prototype.setUpUi = function() {
     pos: this.uiPaneInfoPos.offset(this.uiPaneInfoSize.x * 0.5, this.uiPaneInfoSize.y),
     fillStyle: "#ffffff",
     zOrder: 1,
-    font: "12px monospace",
+    font: "12px sans-serif",
     batch: this.batchStatic,
     textAlign: 'center',
     textBaseline: 'bottom',
@@ -894,4 +915,31 @@ ScatterSquad.prototype.command = function(queue) {
   }
 };
 
+function Announcement(state, text) {
+  this.age = 0;
+  this.label = new chem.Label(text, {
+    zOrder: 1,
+    fillStyle: "#ffffff",
+    font: "14px sans-serif",
+    batch: state.batchStatic,
+    textAlign: 'left',
+    textBaseline: 'bottom',
+  });
+  this.height = 20;
+  this.fadeDuration = 6;
+  this.duration = 8;
+  this.deleted = false;
+}
 
+Announcement.prototype.addTime = function(dt) {
+  this.age += dt;
+  if (this.age > this.duration) {
+    this.label.delete();
+    this.deleted = true;
+    return;
+  }
+  if (this.age > this.fadeDuration) {
+    var alphaDuration = this.duration - this.fadeDuration;
+    this.label.alpha = 1 - (this.age - this.fadeDuration) / alphaDuration;
+  }
+};
