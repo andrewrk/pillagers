@@ -35,6 +35,8 @@ function State(game) {
   this.bgBackObjects = {};
   this.bgBackFactor = 0.10; // scrolls 10x slower than normal
   this.bgForeFactor = 0.15;
+  this.mouseDownStart = null;
+  this.mouseDownOnMiniMap = false;
   this.mapSize = null; // set when loading map
   this.uiPaneImg = chem.resources.images['ui-pane.png'];
   this.uiPanePos = v(0, this.engine.size.y - this.uiPaneImg.height);
@@ -56,10 +58,7 @@ function State(game) {
   });
   this.batchStatic.add(this.pausedLabel);
 
-  this.mouseDownStart = null;
-
   this.onUpdateBound = onUpdate.bind(this);
-
 }
 
 State.prototype.delete = function() {
@@ -75,6 +74,7 @@ State.prototype.start = function() {
   this.engine.on('update', this.onUpdateBound);
   this.engine.on('buttondown', onButtonDown.bind(this));
   this.engine.on('buttonup', onButtonUp.bind(this));
+  this.engine.on('mousemove', onMouseMove.bind(this));
   this.engine.on('draw', onDraw.bind(this));
 }
 
@@ -152,7 +152,7 @@ State.prototype.unselect = function (obj) {
 }
 
 State.prototype.updateUiPane = function () {
-  
+  // TODO
 };
 
 function clearSelection(state) {
@@ -196,7 +196,14 @@ function sendUnitsToCursor(state) {
 function onButtonDown(button) {
   switch (button) {
     case chem.button.MouseLeft:
-      if (this.engine.buttonState(chem.button.Key0)) {
+      if (this.engine.mousePos.x >= this.miniMapPos.x &&
+          this.engine.mousePos.x < this.miniMapPos.x + this.miniMapSize.x &&
+          this.engine.mousePos.y >= this.miniMapPos.y &&
+          this.engine.mousePos.y < this.miniMapPos.y + this.miniMapSize.y)
+      {
+        this.mouseDownOnMiniMap = true;
+        this.setScrollFromMiniMap();
+      } else if (this.engine.buttonState(chem.button.Key0)) {
         manualOverrideClick(this);
       } else {
         startBoundingBox(this);
@@ -229,9 +236,20 @@ function onButtonDown(button) {
 function onButtonUp(button) {
   switch (button) {
     case chem.button.MouseLeft:
+      this.mouseDownOnMiniMap = false;
       finishBoundingBox(this);
       break;
   }
+}
+
+function onMouseMove() {
+  if (this.mouseDownOnMiniMap) this.setScrollFromMiniMap();
+}
+
+State.prototype.setScrollFromMiniMap = function() {
+  var centerPt = this.engine.mousePos.minus(this.miniMapPos).divBy(this.miniMapSize).mult(this.mapSize);
+  this.scroll = centerPt.minus(this.viewSize.scaled(0.5));
+  this.capScrollPosition();
 }
 
 function onDraw(context) {
@@ -272,37 +290,27 @@ function onDraw(context) {
     context.strokeRect(this.mouseDownStart.x, this.mouseDownStart.y, size.x, size.y);
   }
 
-  // UI pane
-  context.setTransform(1, 0, 0, 1, 0, 0); // load identity
-  context.translate(this.uiPanePos.x, this.uiPanePos.y);
-  this.drawUiPane(context);
-
   // static stuff
   context.setTransform(1, 0, 0, 1, 0, 0); // load identity
+  this.drawUiPane(context);
   this.batchStatic.draw(context);
 }
 
 State.prototype.drawUiPane = function(context) {
   // (0, 0) is top left of ui pane
   // bg
-  context.drawImage(this.uiPaneImg, 0, 0);
+  context.drawImage(this.uiPaneImg, this.uiPanePos.x, this.uiPanePos.y);
 
   // mini map
-  var margin = 10;
-  var miniMapSize = v();
-  // choose the height and calculate the width 
-  miniMapSize.y = this.uiPaneSize.y - margin - margin;
-  miniMapSize.x = miniMapSize.y / this.mapSize.y * this.mapSize.x;
-  var miniMapPos = v(this.engine.size.x - margin - miniMapSize.x, margin);
   // fill bg with black
   context.fillStyle = "#000000";
-  context.fillRect(miniMapPos.x, miniMapPos.y, miniMapSize.x, miniMapSize.y);
+  context.fillRect(this.miniMapPos.x, this.miniMapPos.y, this.miniMapSize.x, this.miniMapSize.y);
   // draw circles for physics objects
   for (var id in this.physicsObjects) {
     var obj = this.physicsObjects[id];
     if (!obj.miniMapColor) continue;
-    var pos = obj.pos.divBy(this.mapSize).mult(miniMapSize).add(miniMapPos);
-    var radius = obj.radius / this.mapSize.x * miniMapSize.x;
+    var pos = obj.pos.divBy(this.mapSize).mult(this.miniMapSize).add(this.miniMapPos);
+    var radius = obj.radius / this.mapSize.x * this.miniMapSize.x;
     context.beginPath();
     context.arc(pos.x, pos.y, radius, 0, 2 * Math.PI);
     context.closePath();
@@ -312,8 +320,8 @@ State.prototype.drawUiPane = function(context) {
   // rectangle to represent the view area
   context.strokeStyle = "#ffffff";
   context.lineWidth = 1;
-  var miniViewStart = this.scroll.divBy(this.mapSize).mult(miniMapSize).add(miniMapPos);
-  var miniViewSize = this.viewSize.divBy(this.mapSize).mult(miniMapSize);
+  var miniViewStart = this.scroll.divBy(this.mapSize).mult(this.miniMapSize).add(this.miniMapPos);
+  var miniViewSize = this.viewSize.divBy(this.mapSize).mult(this.miniMapSize);
   context.strokeRect(miniViewStart.x, miniViewStart.y, miniViewSize.x, miniViewSize.y);
 }
 
@@ -453,6 +461,13 @@ State.prototype.load = function(level) {
         throw new Error("unrecognized object type in level: " + obj.type);
     }
   }
+  // calculate mini map coordinates
+  this.uiPaneMargin = 10;
+  this.miniMapSize = v();
+  // choose the height and calculate the width 
+  this.miniMapSize.y = this.uiPaneSize.y - this.uiPaneMargin - this.uiPaneMargin;
+  this.miniMapSize.x = this.miniMapSize.y / this.mapSize.y * this.mapSize.x;
+  this.miniMapPos = this.uiPanePos.offset(this.uiPaneSize.x - this.uiPaneMargin - this.miniMapSize.x, this.uiPaneMargin);
 };
 
 State.prototype.addPortal = function(o) {
@@ -523,6 +538,7 @@ State.prototype.deletePhysicsObject = function(o) {
 }
 
 State.prototype.deleteAi = function(ai) {
+  if (this.manualOverride === ai.id) this.endManualOverride();
   delete this.aiObjects[ai.id];
 };
 
