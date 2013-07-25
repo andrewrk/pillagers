@@ -245,10 +245,12 @@ function onUpdate(dt, dx) {
     obj.update(dt, dx);
   }
 
-  if (this.engine.buttonState(chem.button.KeyUp)) this.scroll.y -= SCROLL_SPEED * dx;
-  if (this.engine.buttonState(chem.button.KeyDown)) this.scroll.y += SCROLL_SPEED * dx;
-  if (this.engine.buttonState(chem.button.KeyRight)) this.scroll.x += SCROLL_SPEED * dx;
-  if (this.engine.buttonState(chem.button.KeyLeft)) this.scroll.x -= SCROLL_SPEED * dx;
+  if (!this.manualOverride) {
+    if (this.engine.buttonState(chem.button.KeyUp)) this.scroll.y -= SCROLL_SPEED * dx;
+    if (this.engine.buttonState(chem.button.KeyDown)) this.scroll.y += SCROLL_SPEED * dx;
+    if (this.engine.buttonState(chem.button.KeyRight)) this.scroll.x += SCROLL_SPEED * dx;
+    if (this.engine.buttonState(chem.button.KeyLeft)) this.scroll.x -= SCROLL_SPEED * dx;
+  }
   this.capScrollPosition();
 
   for (id in this.aiObjects) {
@@ -264,9 +266,13 @@ function onUpdate(dt, dx) {
       var thrust = 0;
       if (this.engine.buttonState(chem.button.KeyUp)) thrust += 1;
       if (ship.hasBackwardsThrusters && this.engine.buttonState(chem.button.KeyDown)) thrust -= 1;
-      ship.setThrustInput(thrust);
+      ship.setThrustInput(thrust, thrust === 0);
 
       ship.shootInput = this.engine.buttonState(chem.button.KeySpace) ? 1 : 0;
+
+      this.scroll = ship.pos.minus(this.engine.size.scaled(0.5));
+      this.scroll.boundMin(v());
+      this.scroll.boundMax(this.mapSize.minus(this.engine.size));
     } else {
       ai.update(dt, dx);
     }
