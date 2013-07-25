@@ -10,6 +10,7 @@ function GameOverScreen(game) {
 }
 
 GameOverScreen.prototype.start = function() {
+  this.initDate = new Date();
   this.engine.on('draw', onDraw.bind(this));
   this.engine.on('buttonup', onButtonUp.bind(this));
 };
@@ -24,7 +25,7 @@ function onDraw(context) {
 }
 
 function onButtonUp(button) {
-  backToTitleScreen(this);
+  if (new Date() - this.initDate > 1000) backToTitleScreen(this);
 }
 
 function backToTitleScreen(self) {
