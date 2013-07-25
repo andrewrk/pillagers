@@ -155,6 +155,7 @@ Ship.prototype.delete = function() {
   if (this.deleted) return;
   this.deleted = true;
   this.emit('deleted');
+  this.removeAllListeners();
   this.clearInput();
   this.tearDownResources();
 };

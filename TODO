@@ -1,8 +1,4 @@
  * level complete screen
-   - shows statistics
-     - bad guys killed
-     - your ship deaths
-     - your current convoy
    - press button to go to next level
    - shows that you unlocked Ranger ship
  * label text in level 1 to explain controls and goal of level

@@ -4,7 +4,7 @@ var Squad = require('./squad');
 
 module.exports = LevelCompleteScreen;
 
-function LevelCompleteScreen(game, convoy) {
+function LevelCompleteScreen(game, convoy, stats) {
   this.game = game;
   this.engine = game.engine;
   this.levelCompleteImg = chem.resources.images['level-complete.png'];
@@ -37,7 +37,31 @@ function LevelCompleteScreen(game, convoy) {
       batch: this.batch,
     });
   }.bind(this));
+
+  this.setUpStats(stats);
 }
+
+LevelCompleteScreen.prototype.setUpStats = function(stats) {
+  var captions = {
+    shipsLost: "Ships lost: ",
+    shipsGained: "Ships gained: ",
+    enemiesDestroyed: "Enemies destroyed: ",
+  };
+  var nextPt = v(50, 300);
+  for (var id in captions) {
+    var stat = stats[id];
+    var caption = captions[id];
+    var label = new chem.Label(caption + stat, {
+      pos: nextPt.clone(),
+      fillStyle: "#ffffff",
+      font: "14px sans-serif",
+      batch: this.batch,
+      textAlign: 'left',
+      textBaseline: 'top',
+    });
+    nextPt.y += 20;
+  }
+};
 
 LevelCompleteScreen.prototype.start = function() {
   this.engine.on('update', onUpdate.bind(this));

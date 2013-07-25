@@ -20,8 +20,6 @@ function FlagShip(state, o) {
 
   this.name = "Flagship";
   this.isFlagship = true;
-
-  initListeners(this);
 }
 
 FlagShip.prototype.animationNames = {
@@ -37,3 +35,8 @@ function initListeners(self) {
     self.state.flagShipDestroyed(self);
   });
 }
+
+FlagShip.prototype.initResources = function() {
+  Ship.prototype.initResources.apply(this, arguments);
+  initListeners(this);
+};

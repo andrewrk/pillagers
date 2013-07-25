@@ -63,6 +63,13 @@ function State(game) {
   this.batchStatic.add(this.pausedLabel);
 
   this.onUpdateBound = onUpdate.bind(this);
+
+  this.stats = {
+    shipsLost: 0,
+    shipsGained: 0,
+    enemiesDestroyed: 0,
+    cashEarned: 0,
+  };
 }
 
 State.prototype.delete = function() {
@@ -90,7 +97,7 @@ State.prototype.announce = function(text) {
 
 State.prototype.finishLevel = function(convoy) {
   this.delete();
-  this.game.showLevelComplete(convoy);
+  this.game.showLevelComplete(convoy, this.stats);
 };
 
 State.prototype.start = function() {
@@ -629,6 +636,7 @@ State.prototype.load = function(level) {
 
   this.mapSize = v(level.size);
   this.scroll = level.scroll ? v(level.scroll) : v();
+  this.stats.cashEarned += level.cash || 0;
 
   this.generateStars();
 
@@ -775,6 +783,13 @@ State.prototype.addShip = function(ship) {
   this.addPhysicsObject(ship);
   var shipAi = new ShipAi(this, ship);
   this.addAiObject(shipAi);
+  ship.on('destroyed', function() {
+    if (ship.team === PLAYER_TEAM) {
+      this.stats.shipsLost += 1;
+    } else {
+      this.stats.enemiesDestroyed += 1;
+    }
+  }.bind(this));
 };
 
 State.prototype.createElectricFx = function(pos, vel, rotation) {
