@@ -1,13 +1,12 @@
 var chem = require('chem');
 
-var boom = new chem.Sound('sfx/boom.ogg');
-
 var weakShots = initList('sfx/weak_shot', 5, 0.2);
 var weakHits = initList('sfx/weak_hit', 5, 0.8);
 var disintegrateList = initList('sfx/electric_explosion', 5, 0.2);
+var explosions = initList('sfx/ship_explosion', 5, 0.8);
 
 exports.explosion = function() {
-  return boom.play();
+  return playRandom(explosions);
 }
 
 exports.electricAttack = function() {
