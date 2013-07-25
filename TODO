@@ -1,3 +1,4 @@
+ * implement announcements
  * portal selected, display text that says flag ship must be inside to warp
  * when flag ship is inside portal, portal selected shows button which lets you warp to next level
  * level complete screen

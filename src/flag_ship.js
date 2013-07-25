@@ -9,7 +9,6 @@ util.inherits(FlagShip, Ship);
 function FlagShip(state, o) {
   Ship.call(this, state, o);
   this.radius = 60;
-  this.sprite.scale = v(2, 2);
   this.hasBackwardsThrusters = true;
   this.rotationSpeed = Math.PI * 0.005;
   this.thrustAmt = 0.005;
@@ -30,6 +29,11 @@ FlagShip.prototype.animationNames = {
   backwardsAccel: 'ship_flag_accel_back',
   backwardsDecel: 'ship_flag_decel_back',
   still: 'ship_flag_still',
+};
+
+FlagShip.prototype.initResources = function() {
+  Ship.prototype.initResources.apply(this, arguments);
+  this.sprite.scale = v(2, 2);
 };
 
 function initListeners(self) {
