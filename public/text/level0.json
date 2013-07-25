@@ -17,11 +17,39 @@
   ],
   "objects": [
     {
+      "type": "Text",
+      "properties": {
+        "text": "This is your Flagship. It is big, slow, and\nheavy, but it is your source of life.",
+        "pos": {"x": 10, "y": 150}
+      }
+    },
+    {
+      "type": "Text",
+      "properties": {
+        "text": "Select ships by left clicking. Right Click\nto tell selected ships to form up at\nthat location.",
+        "pos": {"x": 10, "y": 400}
+      }
+    },
+    {
+      "type": "Text",
+      "properties": {
+        "text": "Ctrl + Right Click tells ships to move close to a point without coming to a stop.",
+        "pos": {"x": 1000, "y": 10}
+      }
+    },
+    {
+      "type": "Text",
+      "properties": {
+        "text": "A Portal grants access to the next level.\nSelect ships and Right Click on the\nPortal to enter it.",
+        "pos": {"x": 3000, "y": 10}
+      }
+    },
+    {
       "type": "ShipCluster",
       "properties": {
         "type": "Flag",
         "team": 0,
-        "pos": {"x": 50, "y": 300},
+        "pos": {"x": 100, "y": 300},
         "size": {"x": 1, "y": 1},
         "count": 1
       }
@@ -59,6 +87,13 @@
         "vel": {"x": -0.5, "y": -0.2},
         "rotVel" : 0.01,
         "radius": 128
+      }
+    },
+    {
+      "type": "Text",
+      "properties": {
+        "text": "Left Click a Portal to select it. Once your\nFlagship has entered the Portal, you\nmay go on to the next level.",
+        "pos": {"x": 3700, "y": 420}
       }
     },
     {

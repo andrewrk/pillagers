@@ -671,6 +671,9 @@ State.prototype.load = function(level) {
       case "Portal":
         this.addPortal(props);
         break;
+      case "Text":
+        this.addText(props);
+        break;
       default:
         throw new Error("unrecognized object type in level: " + obj.type);
     }
@@ -713,6 +716,23 @@ State.prototype.setUpUi = function() {
   this.dockedShipSprites = [];
   // ui buttons
   this.uiButtons = [];
+};
+
+State.prototype.addText = function(o) {
+  var pt = v(o.pos);
+  var lines = o.text.split("\n");
+  for (var i = 0; i < lines.length; i += 1) {
+    var line = lines[i];
+    var label = new chem.Label(line, {
+      pos: pt.clone(),
+      fillStyle: "#ffffff",
+      font: "16px sans-serif",
+      batch: this.batch,
+      textAlign: 'left',
+      textBaseline: 'top',
+    });
+    pt.y += 20;
+  }
 };
 
 State.prototype.addPortal = function(o) {
