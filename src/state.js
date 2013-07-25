@@ -22,27 +22,30 @@ module.exports = State;
 
 function State(game) {
   this.game = game;
+  this.engine = game.engine;
   this.physicsObjects = {};
   this.aiObjects = {};
   this.selection = {};
   this.selectedCount = 0;
   this.manualOverride = null;
-  this.engine = game.engine;
   this.batchBgBack = new chem.Batch();
   this.batchBgFore = new chem.Batch();
   this.batch = new chem.Batch();
   this.batchStatic = new chem.Batch();
-  this.batchUiPane = new chem.Batch();
   this.bgBackObjects = {};
   this.bgBackFactor = 0.10; // scrolls 10x slower than normal
   this.bgForeFactor = 0.15;
   this.mapSize = null; // set when loading map
+  this.uiPaneImg = chem.resources.images['ui-pane.png'];
+  this.uiPanePos = v(0, this.engine.size.y - this.uiPaneImg.height);
+  this.uiPaneSize = v(this.engine.size.x, this.engine.size.y - this.uiPanePos.y);
+  this.viewSize = this.engine.size.offset(0, -this.uiPaneImg.height);
 
   this.paused = false;
   var fpsLabel = this.engine.createFpsLabel();
   this.batchStatic.add(fpsLabel);
   this.pausedLabel = new chem.Label("PAUSED", {
-    pos: this.engine.size.scaled(0.5),
+    pos: this.viewSize.scaled(0.5),
     zOrder: 1,
     fillStyle: "#ffffff",
     font: "24px monospace",
@@ -57,8 +60,6 @@ function State(game) {
 
   this.onUpdateBound = onUpdate.bind(this);
 
-  this.uiPaneImg = chem.resources.images['ui-pane.png'];
-  this.uiPaneTop = this.engine.size.y - this.uiPaneImg.height;
 }
 
 State.prototype.delete = function() {
@@ -122,7 +123,7 @@ function finishBoundingBox(state) {
     }
   }
 
-  state.updateUiPaneVisibility();
+  state.updateUiPane();
 }
 
 State.prototype.clearSelection = function() {
@@ -130,7 +131,7 @@ State.prototype.clearSelection = function() {
     this.unselect(this.selection[id]);
   }
   assert(this.selectedCount === 0);
-  this.updateUiPaneVisibility();
+  this.updateUiPane();
 };
 
 State.prototype.select = function (obj) {
@@ -138,7 +139,7 @@ State.prototype.select = function (obj) {
   obj.selected = true;
   this.selection[obj.id] = obj;
   this.selectedCount += 1;
-  this.updateUiPaneVisibility();
+  this.updateUiPane();
 }
 
 State.prototype.unselect = function (obj) {
@@ -146,12 +147,12 @@ State.prototype.unselect = function (obj) {
     obj.selected = false;
     delete this.selection[obj.id];
     this.selectedCount -= 1;
-    this.updateUiPaneVisibility();
+    this.updateUiPane();
   }
 }
 
-State.prototype.updateUiPaneVisibility = function () {
-  this.showUiPane = this.selectedCount > 0 || this.engine.mousePos.y >= this.uiPaneTop;
+State.prototype.updateUiPane = function () {
+  
 };
 
 function clearSelection(state) {
@@ -236,7 +237,7 @@ function onButtonUp(button) {
 function onDraw(context) {
   // clear canvas to black
   context.fillStyle = '#000000';
-  context.fillRect(0, 0, this.engine.size.x, this.engine.size.y);
+  context.fillRect(0, 0, this.viewSize.x, this.viewSize.y);
 
   // batch far bg
   var bgBackScroll = this.scroll.scaled(this.bgBackFactor).neg().floor();
@@ -271,16 +272,49 @@ function onDraw(context) {
     context.strokeRect(this.mouseDownStart.x, this.mouseDownStart.y, size.x, size.y);
   }
 
+  // UI pane
   context.setTransform(1, 0, 0, 1, 0, 0); // load identity
-  context.translate(0, this.uiPaneTop);
-  if (this.showUiPane) {
-    context.drawImage(this.uiPaneImg, 0, 0);
-    this.batchUiPane.draw(context);
-  }
+  context.translate(this.uiPanePos.x, this.uiPanePos.y);
+  this.drawUiPane(context);
 
   // static stuff
   context.setTransform(1, 0, 0, 1, 0, 0); // load identity
   this.batchStatic.draw(context);
+}
+
+State.prototype.drawUiPane = function(context) {
+  // (0, 0) is top left of ui pane
+  // bg
+  context.drawImage(this.uiPaneImg, 0, 0);
+
+  // mini map
+  var margin = 10;
+  var miniMapSize = v();
+  // choose the height and calculate the width 
+  miniMapSize.y = this.uiPaneSize.y - margin - margin;
+  miniMapSize.x = miniMapSize.y / this.mapSize.y * this.mapSize.x;
+  var miniMapPos = v(this.engine.size.x - margin - miniMapSize.x, margin);
+  // fill bg with black
+  context.fillStyle = "#000000";
+  context.fillRect(miniMapPos.x, miniMapPos.y, miniMapSize.x, miniMapSize.y);
+  // draw circles for physics objects
+  for (var id in this.physicsObjects) {
+    var obj = this.physicsObjects[id];
+    if (!obj.miniMapColor) continue;
+    var pos = obj.pos.divBy(this.mapSize).mult(miniMapSize).add(miniMapPos);
+    var radius = obj.radius / this.mapSize.x * miniMapSize.x;
+    context.beginPath();
+    context.arc(pos.x, pos.y, radius, 0, 2 * Math.PI);
+    context.closePath();
+    context.fillStyle = obj.miniMapColor;
+    context.fill();
+  }
+  // rectangle to represent the view area
+  context.strokeStyle = "#ffffff";
+  context.lineWidth = 1;
+  var miniViewStart = this.scroll.divBy(this.mapSize).mult(miniMapSize).add(miniMapPos);
+  var miniViewSize = this.viewSize.divBy(this.mapSize).mult(miniMapSize);
+  context.strokeRect(miniViewStart.x, miniViewStart.y, miniViewSize.x, miniViewSize.y);
 }
 
 function onUpdate(dt, dx) {
@@ -315,9 +349,9 @@ function onUpdate(dt, dx) {
 
       ship.shootInput = this.engine.buttonState(chem.button.KeySpace) ? 1 : 0;
 
-      this.scroll = ship.pos.minus(this.engine.size.scaled(0.5));
+      this.scroll = ship.pos.minus(this.viewSize.scaled(0.5));
       this.scroll.boundMin(v());
-      this.scroll.boundMax(this.mapSize.minus(this.engine.size));
+      this.scroll.boundMax(this.mapSize.minus(this.viewSize));
     } else {
       ai.update(dt, dx);
     }
@@ -362,13 +396,13 @@ State.prototype.mousePos = function() {
 
 State.prototype.capScrollPosition = function() {
   this.scroll.boundMin(v());
-  this.scroll.boundMax(this.mapSize.minus(this.engine.size));
+  this.scroll.boundMax(this.mapSize.minus(this.viewSize));
 };
 
 State.prototype.generateStars = function() {
-  var unseenMapSize = this.mapSize.minus(this.engine.size);
-  this.bgBackSize = unseenMapSize.scaled(this.bgBackFactor).add(this.engine.size);
-  this.bgForeSize = unseenMapSize.scaled(this.bgForeFactor).add(this.engine.size);
+  var unseenMapSize = this.mapSize.minus(this.viewSize);
+  this.bgBackSize = unseenMapSize.scaled(this.bgBackFactor).add(this.viewSize);
+  this.bgForeSize = unseenMapSize.scaled(this.bgForeFactor).add(this.viewSize);
   generateStars(this, this.bgBackSize, 0.00025, this.batchBgBack);
   generateStars(this, this.bgForeSize, 0.00005, this.batchBgFore);
   // put in a planet

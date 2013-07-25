@@ -25,6 +25,8 @@ function PhysicsObject(state, o) {
   // an object which canBeStruck can collide when hit by an object that canCauseCollision.
   this.canCauseCollision = false;
   this.canBeStruck = false;
+
+  this.miniMapColor = null;
 }
 
 PhysicsObject.prototype.mass = function() {

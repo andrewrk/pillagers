@@ -13,6 +13,7 @@ function Portal(state, o) {
   this.state.batch.add(this.sprite);
   this.canBeSelected = true;
   this.radius = 64;
+  this.miniMapColor = "#6A9EA8";
 }
 
 Portal.prototype.update = function(dt, dx) {

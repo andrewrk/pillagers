@@ -38,6 +38,8 @@ function Ship(state, o) {
   this.thrustAmt = 0.1;
   this.hasBullets = false;
   this.canBeStruck = true;
+
+  this.miniMapColor = this.team.color;
 }
 
 Ship.prototype.clearInput = function() {

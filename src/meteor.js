@@ -25,6 +25,8 @@ function Meteor(state, o) {
 
   this.canCauseCollision = true;
   this.canBeStruck = true;
+
+  this.miniMapColor = "#B59277";
 }
 
 Meteor.prototype.hit = function(damage, explosionAnimationName) {
