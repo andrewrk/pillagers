@@ -20,12 +20,10 @@ function Portal(state, o) {
   this.uiAnimationName = "portal";
   this.uiButtons = [
     {
-      enabled: true,
       caption: "Activate Portal",
       fn: this.activatePortal.bind(this),
     },
     {
-      enabled: true,
       caption: "Send Ships Out",
       fn: this.sendShipsOut.bind(this),
     }
@@ -35,6 +33,7 @@ function Portal(state, o) {
 Portal.prototype.sendShipsOut = function() {
   var minRadius = 10;
   var maxRadius = this.radius;
+  var count = 0;
   for (var id in this.shipsInside) {
     var ship = this.shipsInside[id];
     var radians = Math.random() * Math.PI * 2;
@@ -44,13 +43,29 @@ Portal.prototype.sendShipsOut = function() {
     ship.vel = v(0, 0);
     ship.undelete();
     this.state.addShip(ship);
+    count += 1;
   }
   this.shipsInside = {};
   this.state.updateUiPane();
+  if (count === 0) {
+    this.state.announce("There are no ships inside the Portal.");
+  }
+};
+
+Portal.prototype.isFlagshipInside = function() {
+  for (var id in this.shipsInside) {
+    var ship = this.shipsInside[id];
+    if (ship.isFlagship) return true;
+  }
+  return false;
 };
 
 Portal.prototype.activatePortal = function() {
-  // TODO
+  if (!this.isFlagshipInside()) {
+    this.state.announce("Your Flagship must be inside the Portal to activate it.");
+    return;
+  }
+  this.state.finishLevel(this.shipsInside);
 };
 
 Portal.prototype.update = function(dt, dx) {

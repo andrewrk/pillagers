@@ -7,6 +7,7 @@ var sfx = require('./sfx');
 var Team = require('./team');
 var Meteor = require('./meteor');
 var Portal = require('./portal');
+var Squad = require('./squad');
 
 var PLAYER_TEAM = new Team();
 var ENEMY_TEAM = new Team();
@@ -85,6 +86,11 @@ State.prototype.announce = function(text) {
     announcement.label.pos = v(margin, y);
     y -= announcement.height - margin;
   }
+};
+
+State.prototype.finishLevel = function(convoy) {
+  this.delete();
+  this.game.showLevelComplete(convoy);
 };
 
 State.prototype.start = function() {
@@ -857,61 +863,25 @@ function assert(value) {
   if (!value) throw new Error("Assertion Failure: " + value);
 }
 
+
 function ScatterSquad(dest) {
-  this.dest = dest;
-  this.avgPos = v();
-  this.units = [];
+  this.shipToAi = {};
   this.loose = false;
+  this.squad = new Squad(dest);
 }
 
 ScatterSquad.prototype.add = function(ai) {
-  this.units.push(ai);
-  this.avgPos.add(ai.ship.pos);
+  this.shipToAi[ai.ship.id] = ai;
+  this.squad.add(ai.ship);
 };
 
 ScatterSquad.prototype.command = function(queue) {
-  var dest = this.dest;
-  this.avgPos.scale(1 / this.units.length);
-  this.direction = this.dest.minus(this.avgPos).normalize();
-  // figure out max radius
-  var maxRadius = 0;
-  this.units.forEach(function(unit) {
-    if (unit.ship.radius > maxRadius) maxRadius = unit.ship.radius;
-  });
-  var unitCountY = Math.floor(Math.sqrt(this.units.length));
-  var unitCountX = unitCountY * unitCountY === this.units.length ? unitCountY : unitCountY + 1;
-  // sort units by rankOrder and then distance from target point
-  this.units.sort(function(a, b) {
-    var rankOrderDelta = a.ship.rankOrder - b.ship.rankOrder;
-    if (rankOrderDelta !== 0) return rankOrderDelta;
-    return a.ship.pos.distanceSqrd(dest) - b.ship.pos.distanceSqrd(dest);
-  });
-  // create the unaligned positions
-  var positions = new Array(this.units.length);
-  var destRelCenter = v();
-  var i, x, pt;
-  for (i = 0, x = 0; i < this.units.length; x += 1) {
-    for (var y = 0; y < unitCountY; y += 1, i += 1) {
-      pt = v(x * maxRadius * 2, y * maxRadius * 2);
-      positions[i] = pt;
-      destRelCenter.add(pt);
-    }
-  }
-  destRelCenter.scale(1 / this.units.length);
-
-  for (i = 0; i < positions.length; i += 1) {
-    // shift so that 0, 0 is in the center
-    positions[i] = destRelCenter.minus(positions[i]);
-    // rotate about 0, 0 to align with direction
-    positions[i].rotate(this.direction);
-    // translate to dest
-    positions[i].add(dest);
-  }
-
-  for (i = 0; i < this.units.length; i += 1) {
-    var unit = this.units[i];
-    unit.commandToMove(positions[i], queue, this.loose);
-    if (! this.loose) unit.commandToPoint(this.direction, true);
+  this.squad.calculate();
+  for (var i = 0; i < this.squad.units.length; i += 1) {
+    var ship = this.squad.units[i];
+    var unit = this.shipToAi[ship.id];
+    unit.commandToMove(this.squad.positions[i], queue, this.loose);
+    if (! this.loose) unit.commandToPoint(this.squad.direction, true);
   }
 };
 

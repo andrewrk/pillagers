@@ -48,6 +48,16 @@
       }
     },
     {
+      "type": "ShipCluster",
+      "properties": {
+        "type": "Flag",
+        "team": 0,
+        "pos": {"x": 3800, "y": 300},
+        "size": {"x": 1, "y": 1},
+        "count": 1
+      }
+    },
+    {
       "type": "Portal",
       "properties": {
         "pos": {"x": 3800, "y": 300}

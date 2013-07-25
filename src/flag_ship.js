@@ -19,6 +19,7 @@ function FlagShip(state, o) {
   this.defense = 20;
 
   this.name = "Flagship";
+  this.isFlagship = true;
 
   initListeners(this);
 }
@@ -29,11 +30,6 @@ FlagShip.prototype.animationNames = {
   backwardsAccel: 'ship_flag_accel_back',
   backwardsDecel: 'ship_flag_decel_back',
   still: 'ship_flag_still',
-};
-
-FlagShip.prototype.initResources = function() {
-  Ship.prototype.initResources.apply(this, arguments);
-  this.sprite.scale = v(2, 2);
 };
 
 function initListeners(self) {

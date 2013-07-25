@@ -2,6 +2,7 @@ var chem = require('chem');
 var v = chem.vec2d;
 var State = require('./state');
 var TitleScreen = require('./title_screen');
+var LevelCompleteScreen = require('./level_complete_screen');
 var CreditsScreen = require('./credits_screen');
 var GameOverScreen = require('./game_over_screen');
 var canvas = document.getElementById("game");
@@ -79,4 +80,9 @@ Game.prototype.playLevel = function() {
 
   state.load(level);
   state.start();
+};
+
+Game.prototype.showLevelComplete = function(convoy) {
+  var levelCompleteScreen = new LevelCompleteScreen(this, convoy);
+  levelCompleteScreen.start();
 };

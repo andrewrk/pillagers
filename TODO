@@ -1,6 +1,3 @@
- * implement announcements
- * portal selected, display text that says flag ship must be inside to warp
- * when flag ship is inside portal, portal selected shows button which lets you warp to next level
  * level complete screen
    - shows statistics
      - bad guys killed
@@ -20,11 +17,12 @@ Bugs:
  * I suspect that physics objects are not getting deleted
 
 Nice-to-have:
- * try putting a speed cap on ships
+ * experiment with speed cap on ships
  * if ranger is in range, don't accelerate toward target
  * fix the thruster sound glitchiness
  * State should be renamed LevelPlayer
  * each command should draw to indicate that something is commanded
+ * Squad: don't assume all ships have same radius
 
 
 Ship Classes:

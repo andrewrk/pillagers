@@ -91,14 +91,18 @@ Ship.prototype.drawTeamColor = function(context) {
   context.fill();
 };
 
+Ship.prototype.enter = function(other) {
+  other.enter(this);
+  this.state.deletePhysicsObject(this);
+  this.delete();
+};
+
 Ship.prototype.update = function(dt, dx) {
   PhysicsObject.prototype.update.apply(this, arguments);
   if (this.enterInput) {
     var addedRadii = this.radius + this.enterInput.radius;
     if (this.pos.distanceSqrd(this.enterInput.pos) < addedRadii * addedRadii) {
-      this.enterInput.enter(this);
-      this.state.deletePhysicsObject(this);
-      this.delete();
+      this.enter(this.enterInput);
       return;
     }
   }
