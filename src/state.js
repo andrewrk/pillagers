@@ -37,6 +37,7 @@ function State(game) {
   this.bgForeFactor = 0.15;
   this.mouseDownStart = null;
   this.mouseDownOnMiniMap = false;
+  this.mouseDownOnUi = false;
   this.mapSize = null; // set when loading map
   this.uiPaneImg = chem.resources.images['ui-pane.png'];
   this.uiPanePos = v(0, this.engine.size.y - this.uiPaneImg.height);
@@ -87,17 +88,19 @@ function finishBoundingBox(state) {
   var end = state.mousePos();
   state.mouseDownStart = null;
 
-  // orient so start is before end
-  var tmp;
-  if (start.x > end.x) {
-    tmp = start.x;
-    start.x = end.x;
-    end.x = tmp;
-  }
-  if (start.y > end.y) {
-    tmp = start.y;
-    start.y = end.y;
-    end.y = tmp;
+  if (start) {
+    // orient so start is before end
+    var tmp;
+    if (start.x > end.x) {
+      tmp = start.x;
+      start.x = end.x;
+      end.x = tmp;
+    }
+    if (start.y > end.y) {
+      tmp = start.y;
+      start.y = end.y;
+      end.y = tmp;
+    }
   }
 
   if (! state.engine.buttonState(chem.button.KeyCtrl) &&
@@ -106,20 +109,22 @@ function finishBoundingBox(state) {
     state.clearSelection();
   }
 
-  if (end.minus(start).length() < 4) {
+  if (! start || end.minus(start).length() < 4) {
     var clickedObj = clickedSelectableObject(state, end);
     if (clickedObj) state.select(clickedObj);
     return;
   }
 
-  // iterate over owned objects
-  for (var id in state.aiObjects) {
-    var ai = state.aiObjects[id];
-    if (ai.ship.team !== PLAYER_TEAM) continue;
-    if (ai.ship.pos.x >= start.x && ai.ship.pos.x < end.x &&
-        ai.ship.pos.y >= start.y && ai.ship.pos.y < end.y)
-    {
-      state.select(ai.ship);
+  if (start) {
+    // iterate over owned objects
+    for (var id in state.aiObjects) {
+      var ai = state.aiObjects[id];
+      if (ai.ship.team !== PLAYER_TEAM) continue;
+      if (ai.ship.pos.x >= start.x && ai.ship.pos.x < end.x &&
+          ai.ship.pos.y >= start.y && ai.ship.pos.y < end.y)
+      {
+        state.select(ai.ship);
+      }
     }
   }
 
@@ -151,8 +156,64 @@ State.prototype.unselect = function (obj) {
   }
 }
 
+State.prototype.getFirstSelected = function() {
+  for (var id in this.selection) {
+    return this.selection[id];
+  }
+  return null;
+};
+
+State.prototype.clearDockedShipSprites = function() {
+  for (var i = 0; i< this.dockedShipSprites.length; i += 1) {
+    this.dockedShipSprites[i].sprite.delete();
+  }
+  this.dockedShipSprites = [];
+};
+
 State.prototype.updateUiPane = function () {
-  // TODO
+  this.clearDockedShipSprites();
+  this.selectionUiLabel.setVisible(false);
+  this.selectionUiSprite.setVisible(false);
+  if (this.selectedCount === 1) {
+    var obj = this.getFirstSelected();
+    this.selectionUiLabel.text = obj.name;
+    this.selectionUiLabel.setVisible(true);
+
+    this.selectionUiSprite.setAnimationName(obj.uiAnimationName);
+    var desiredSize = this.uiPaneInfoSize.scaled(0.75);
+    var scale = desiredSize.div(this.selectionUiSprite.size);
+    scale.x = Math.min(scale.x, scale.y);
+    scale.y = scale.x;
+    this.selectionUiSprite.scale = scale;
+    this.selectionUiSprite.setVisible(true);
+
+    if (obj.canBeEntered) {
+      var dockItemSize = v(20, 20);
+      var margin = 4;
+      var nextPos = this.uiPaneDockedPos.clone();
+      for (var id in obj.shipsInside) {
+        var dockedShip = obj.shipsInside[id];
+        var sprite = new chem.Sprite(dockedShip.animationNames.still, {
+          batch: this.batchStatic,
+          loop: false,
+        });
+        sprite.scale = dockItemSize.divBy(sprite.size);
+        sprite.scale.x = Math.min(sprite.scale.x, sprite.scale.y);
+        sprite.scale.y = sprite.scale.x;
+        sprite.setLeft(nextPos.x);
+        sprite.setTop(nextPos.y);
+        this.dockedShipSprites.push({
+          ship: dockedShip,
+          sprite: sprite
+        });
+        nextPos.y += dockItemSize.y + margin;
+        if (nextPos.y + dockItemSize.y >= this.uiPaneDockedPos.y + this.uiPaneDockedSize.y) {
+          nextPos.y = this.uiPaneDockedPos.y;
+          nextPos.x += dockItemSize.x + margin;
+        }
+      }
+    }
+  }
 };
 
 function clearSelection(state) {
@@ -202,7 +263,10 @@ function onButtonDown(button) {
           this.engine.mousePos.y < this.miniMapPos.y + this.miniMapSize.y)
       {
         this.mouseDownOnMiniMap = true;
+        this.mouseDownOnUi = true;
         this.setScrollFromMiniMap();
+      } else if (this.engine.mousePos.y >= this.uiPanePos.y) {
+        this.mouseDownOnUi = true;
       } else if (this.engine.buttonState(chem.button.Key0)) {
         manualOverrideClick(this);
       } else {
@@ -241,8 +305,9 @@ function onButtonDown(button) {
 function onButtonUp(button) {
   switch (button) {
     case chem.button.MouseLeft:
+      if (!this.mouseDownOnUi) finishBoundingBox(this);
       this.mouseDownOnMiniMap = false;
-      finishBoundingBox(this);
+      this.mouseDownOnUi = false;
       break;
   }
 }
@@ -465,6 +530,10 @@ State.prototype.load = function(level) {
         throw new Error("unrecognized object type in level: " + obj.type);
     }
   }
+  this.setUpUi();
+};
+
+State.prototype.setUpUi = function() {
   // calculate mini map coordinates
   this.uiPaneMargin = 10;
   this.miniMapSize = v();
@@ -472,6 +541,31 @@ State.prototype.load = function(level) {
   this.miniMapSize.y = this.uiPaneSize.y - this.uiPaneMargin - this.uiPaneMargin;
   this.miniMapSize.x = this.miniMapSize.y / this.mapSize.y * this.mapSize.x;
   this.miniMapPos = this.uiPanePos.offset(this.uiPaneSize.x - this.uiPaneMargin - this.miniMapSize.x, this.uiPaneMargin);
+
+  // info pane
+  this.uiPaneInfoPos = this.uiPanePos.offset(this.uiPaneMargin, this.uiPaneMargin);
+  this.uiPaneInfoSize = v(80, this.uiPaneSize.y - this.uiPaneMargin * 2);
+  this.selectionUiSprite = new chem.Sprite("knife", {
+    pos: this.uiPaneInfoPos.plus(this.uiPaneInfoSize.scaled(0.5)),
+    batch: this.batchStatic,
+    visible: false,
+    loop: false,
+  });
+  this.selectionUiLabel = new chem.Label("", {
+    pos: this.uiPaneInfoPos.offset(this.uiPaneInfoSize.x * 0.5, this.uiPaneInfoSize.y),
+    fillStyle: "#ffffff",
+    zOrder: 1,
+    font: "12px monospace",
+    batch: this.batchStatic,
+    textAlign: 'center',
+    textBaseline: 'bottom',
+    visible: false,
+  });
+
+  // docked ships
+  this.uiPaneDockedPos = this.uiPaneInfoPos.offset(this.uiPaneInfoSize.x + this.uiPaneMargin, 0);
+  this.uiPaneDockedSize = v(160, this.uiPaneInfoSize.y);
+  this.dockedShipSprites = [];
 };
 
 State.prototype.addPortal = function(o) {
@@ -539,6 +633,7 @@ State.prototype.deletePhysicsObject = function(o) {
   assert(o.id);
   this.unselect(o);
   delete this.physicsObjects[o.id];
+  this.updateUiPane();
 }
 
 State.prototype.deleteAi = function(ai) {

@@ -24,6 +24,8 @@ function RangerShip(state, o) {
   this.bulletDamage = 0.05;
   this.rechargeAmt = 0.20;
   this.recharge = 0;
+
+  this.name = "Ranger";
 }
 
 RangerShip.prototype.animationNames = {

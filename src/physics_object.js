@@ -27,6 +27,8 @@ function PhysicsObject(state, o) {
   this.canBeStruck = false;
 
   this.miniMapColor = null;
+  this.name = "PhysicsObject";
+  this.uiAnimationName = "knife"; // silly placeholder
 }
 
 PhysicsObject.prototype.mass = function() {

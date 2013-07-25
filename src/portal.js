@@ -16,7 +16,20 @@ function Portal(state, o) {
   this.miniMapColor = "#6A9EA8";
   this.canBeEntered = true;
   this.shipsInside = {};
+  this.name = "Portal";
+  this.uiAnimationName = "portal";
+  this.uiButtons = [
+    {
+      enabled: true,
+      caption: "Activate Portal",
+      fn: this.activatePortal.bind(this),
+    },
+  ];
 }
+
+Portal.prototype.activatePortal = function() {
+  // TODO
+};
 
 Portal.prototype.update = function(dt, dx) {
   // http://25.media.tumblr.com/tumblr_m4hi5ygdtg1qa491po1_1280.jpg

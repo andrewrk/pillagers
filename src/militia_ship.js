@@ -22,6 +22,8 @@ function MilitiaShip(state, o) {
   this.meleeDamage = 0.5;
   this.rechargeAmt = 0.40;
   this.recharge = 0;
+
+  this.name = "Militia";
 }
 
 MilitiaShip.prototype.animationNames = {

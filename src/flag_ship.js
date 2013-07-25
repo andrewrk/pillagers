@@ -8,7 +8,8 @@ module.exports = FlagShip;
 util.inherits(FlagShip, Ship);
 function FlagShip(state, o) {
   Ship.call(this, state, o);
-  this.radius = 30;
+  this.radius = 60;
+  this.sprite.scale = v(2, 2);
   this.hasBackwardsThrusters = true;
   this.rotationSpeed = Math.PI * 0.005;
   this.thrustAmt = 0.005;
@@ -17,6 +18,8 @@ function FlagShip(state, o) {
   this.density = 0.04;
 
   this.defense = 20;
+
+  this.name = "Flagship";
 
   initListeners(this);
 }
