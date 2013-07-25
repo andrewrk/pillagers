@@ -14,6 +14,8 @@ function Portal(state, o) {
   this.canBeSelected = true;
   this.radius = 64;
   this.miniMapColor = "#6A9EA8";
+  this.canBeEntered = true;
+  this.shipsInside = {};
 }
 
 Portal.prototype.update = function(dt, dx) {
@@ -24,3 +26,7 @@ Portal.prototype.update = function(dt, dx) {
 Portal.prototype.delete = function() {
   this.sprite.delete();
 }
+
+Portal.prototype.enter = function(ship) {
+  this.shipsInside[ship.id] = ship;
+};

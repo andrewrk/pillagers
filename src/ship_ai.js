@@ -126,16 +126,21 @@ ShipAi.prototype.commandToMove = function(pt, queue, loose) {
   }
 };
 
-ShipAi.prototype.commandToAttack = function(target, queue, selfCommanded) {
+ShipAi.prototype.commandToEnter = function(target, queue) {
+  if (! queue) this.clearCommands();
+  this.commands.push(new EnterCommand(this, target));
+};
+
+ShipAi.prototype.commandToAttack = function(target, queue) {
   if (! queue) this.clearCommands();
   if (this.ship.hasBullets) {
     if (this.ship.standGround) {
-      this.commands.push(new DefendGroundCommand(this, target, selfCommanded));
+      this.commands.push(new DefendGroundCommand(this, target));
     } else {
-      this.commands.push(new ShootCommand(this, target, selfCommanded));
+      this.commands.push(new ShootCommand(this, target));
     }
   } else if (this.ship.hasMelee) {
-    this.commands.push(new MeleeCommand(this, target, selfCommanded));
+    this.commands.push(new MeleeCommand(this, target));
   }
 };
 
@@ -249,6 +254,20 @@ EngageCommand.prototype.delete = function() {
   this.sprite.delete();
 };
 
+function EnterCommand(ai, target) {
+  this.target = target;
+  this.done = false;
+}
+
+EnterCommand.prototype.execute = function(ai, dt, dx) {
+  interceptTarget.call(this, ai, dt, dx);
+  ai.ship.enterInput = this.target;
+};
+
+EnterCommand.prototype.draw = function(ai, context) { };
+
+EnterCommand.prototype.delete = function() { };
+
 function MoveCommand(ai, dest) {
   this.dest = dest;
   this.done = false;
@@ -304,10 +323,9 @@ MoveCommand.prototype.delete = function() {
 };
 
 
-function ShootCommand(ai, target, selfCommanded) {
+function ShootCommand(ai, target) {
   // pursue and shoot lazers at target
   this.done = false;
-  this.selfCommanded = !!selfCommanded;
   this.target = target;
 }
 
@@ -350,10 +368,9 @@ ShootCommand.prototype.draw = function(ai, context) {};
 ShootCommand.prototype.delete = function() {
   this.target = null;
 };
-function DefendGroundCommand(ai, target, selfCommanded) {
+function DefendGroundCommand(ai, target) {
   // stand your ground. do not move. shoot nearest target.
   this.done = false;
-  this.selfCommanded = !!selfCommanded;
   this.target = target;
 }
 
@@ -387,19 +404,12 @@ DefendGroundCommand.prototype.delete = function() {
   this.target = null;
 };
 
-function MeleeCommand(ai, target, selfCommanded) {
-  this.target = target;
-  this.done = false;
-  this.selfCommanded = !!selfCommanded;
-}
-
-MeleeCommand.prototype.execute = function(ai, dt, dx) {
+function interceptTarget(ai, dt, dx) {
   // un-target dead ships
   if (this.target.deleted) {
     this.done = true;
     return;
   }
-  ai.ship.meleeInput = this.target;
 
   var relTargetPt = this.target.pos.minus(ai.ship.pos);
   var targetDir = relTargetPt.normalized();
@@ -420,6 +430,16 @@ MeleeCommand.prototype.execute = function(ai, dt, dx) {
   ai.pointTowardDirection(targetDir);
   var thrust = actualDir.dot(targetDir) > 0.99 ? 1 : 0;
   ai.ship.setThrustInput(thrust);
+}
+
+function MeleeCommand(ai, target) {
+  this.target = target;
+  this.done = false;
+}
+
+MeleeCommand.prototype.execute = function(ai, dt, dx) {
+  interceptTarget.call(this, ai, dt, dx);
+  ai.ship.meleeInput = this.target;
 };
 
 MeleeCommand.prototype.draw = function(ai, context) {};

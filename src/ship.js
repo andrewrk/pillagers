@@ -30,6 +30,7 @@ function Ship(state, o) {
   this.thrustInput = 0;
   this.brakeInput = false; // lets you brake at low velocities
   this.rotateInput = 0;
+  this.enterInput = null; // lets you enter buildings
   this.team = o.team;
   this.health = o.health || 1;
   this.hasBackwardsThrusters = true;
@@ -46,6 +47,7 @@ Ship.prototype.clearInput = function() {
   this.setThrustInput(0);
   this.setRotateInput(0);
   this.brakeInput = false;
+  this.enterInput = null;
 };
 
 Ship.prototype.setThrustInput = function(value, brake) {
@@ -92,6 +94,15 @@ Ship.prototype.drawTeamColor = function(context) {
 
 Ship.prototype.update = function(dt, dx) {
   PhysicsObject.prototype.update.apply(this, arguments);
+  if (this.enterInput) {
+    var addedRadii = this.radius + this.enterInput.radius;
+    if (this.pos.distanceSqrd(this.enterInput.pos) < addedRadii * addedRadii) {
+      this.enterInput.enter(this);
+      this.state.deletePhysicsObject(this);
+      this.delete();
+      return;
+    }
+  }
   this.rotation += this.rotateInput * this.rotationSpeed * dx;
   // clamp rotation
   this.rotation = this.rotation % (2 * Math.PI);

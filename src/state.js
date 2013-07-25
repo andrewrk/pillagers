@@ -183,7 +183,7 @@ function togglePause(state) {
 
 function placeShipAtCursor(state) {
   var team = state.engine.buttonState(chem.button.Key2) ? ENEMY_TEAM : PLAYER_TEAM;
-  var ship = new shipTypes.Militia(state, {team: team, pos: state.mousePos()});
+  var ship = new shipTypes.Ranger(state, {team: team, pos: state.mousePos()});
   state.addShip(ship);
 }
 
@@ -212,14 +212,19 @@ function onButtonDown(button) {
     case chem.button.MouseRight:
       if (this.engine.buttonState(chem.button.Key1) || this.engine.buttonState(chem.button.Key2)) {
         placeShipAtCursor(this);
-      } else {
-        var obj = clickedAttackableObject(this, this.mousePos());
-        if (obj && obj.team !== PLAYER_TEAM) {
-          this.selectedUnitsAttack(obj);
-        } else {
-          sendUnitsToCursor(this);
-        }
+        return;
       }
+      var obj = clickedAttackableObject(this, this.mousePos());
+      if (obj && obj.team !== PLAYER_TEAM) {
+        this.selectedUnitsAttack(obj);
+        return;
+      }
+      obj = clickedEnterableObject(this, this.mousePos());
+      if (obj) {
+        this.selectedUnitsEnter(obj);
+        return;
+      }
+      sendUnitsToCursor(this);
       break;
     case chem.button.KeyP:
       togglePause(this);
@@ -366,26 +371,25 @@ function onUpdate(dt, dx) {
   }
 }
 
-function clickedAttackableObject(state, pos) {
-  for (var id in state.physicsObjects) {
-    var obj = state.physicsObjects[id];
-    if (!obj.canBeShot) continue;
-    if (obj.pos.distance(pos) < obj.radius) {
-      return obj;
-    }
+State.prototype.clickedObject = function(pos, matchFn) {
+  for (var id in this.physicsObjects) {
+    var obj = this.physicsObjects[id];
+    if (! matchFn(obj)) continue;
+    if (obj.pos.distance(pos) < obj.radius) return obj;
   }
   return null;
 }
 
+function clickedAttackableObject(state, pos) {
+  return state.clickedObject(pos, function(obj) { return obj.canBeShot; });
+}
+
+function clickedEnterableObject(state, pos) {
+  return state.clickedObject(pos, function(obj) { return obj.canBeEntered; });
+}
+
 function clickedSelectableObject(state, pos) {
-  for (var id in state.physicsObjects) {
-    var obj = state.physicsObjects[id];
-    if (!obj.canBeSelected) continue;
-    if (obj.pos.distance(pos) < obj.radius) {
-      return obj;
-    }
-  }
-  return null;
+  return state.clickedObject(pos, function(obj) { return obj.canBeSelected; });
 }
 
 function clickedAiShip(state, pos) {
@@ -596,22 +600,33 @@ State.prototype.deleteSelectedShips = function() {
   }
 };
 
-State.prototype.selectedUnitsAttack = function(target) {
+State.prototype.commandableSelected = function(cb) {
   for (var id in this.aiObjects) {
     var ai = this.aiObjects[id];
     if (! ai.ship.selected) continue;
-    ai.commandToAttack(target);
+    if (ai.ship.team !== PLAYER_TEAM) continue;
+    cb(ai);
   }
+};
+
+State.prototype.selectedUnitsEnter = function(target) {
+  this.commandableSelected(function(ai) {
+    ai.commandToEnter(target);
+  });
+};
+
+State.prototype.selectedUnitsAttack = function(target) {
+  this.commandableSelected(function(ai) {
+    ai.commandToAttack(target);
+  });
 };
 
 State.prototype.sendSelectedUnitsTo = function(pt, queue, loose) {
   var squad = new ScatterSquad(pt);
   if (loose) squad.loose = true;
-  for (var id in this.aiObjects) {
-    var ai = this.aiObjects[id];
-    if (! ai.ship.selected) continue;
+  this.commandableSelected(function(ai) {
     squad.add(ai);
-  }
+  });
   squad.command(queue);
 };
 

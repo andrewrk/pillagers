@@ -1,7 +1,16 @@
- * mini-map
- * exit portal to get to level 2
- * replace this level with level 0 of navigating your flag ship through a meteor field
-   - when you win you earn Ranger ship
+ * portal selected, show ships which are inside
+ * ability to send ships out of the portal
+ * portal selected, display text that says flag ship must be inside to warp
+ * when flag ship is inside portal, portal selected shows button which lets you warp to next level
+ * level complete screen
+   - shows statistics
+     - bad guys killed
+     - your ship deaths
+     - your current convoy
+   - press button to go to next level
+   - shows that you unlocked Ranger ship
+ * label text in level 1 to explain controls and goal of level
+ * next level has same fleet that you exited with
  * level 1, we exit the meteor field but there are some attackers. you have to build
    some Ranger ships to defend.
    - when you win you earn Militia ship
@@ -16,6 +25,7 @@ Nice-to-have:
  * if ranger is in range, don't accelerate toward target
  * fix the thruster sound glitchiness
  * State should be renamed LevelPlayer
+ * each command should draw to indicate that something is commanded
 
 
 Ship Classes:
