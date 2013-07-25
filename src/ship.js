@@ -20,10 +20,7 @@ function Ship(state, o) {
   // tells where it shows up in the squad
   this.rankOrder = 0;
 
-  this.sprite = new chem.Sprite(this.animationNames.still);
-  this.state.batch.add(this.sprite);
-  this.thrustAudio = new Audio("sfx/thruster.ogg");
-  this.thrustAudio.loop = true;
+  this.initResources();
 
   this.canBeSelected = true;
   this.sensorRange = 400; // radius of ability to detect ships
@@ -134,13 +131,33 @@ Ship.prototype.hit = function(damage, explosionAnimationName) {
   }
 };
 
+Ship.prototype.initResources = function() {
+  this.thrustAudio = new Audio("sfx/thruster.ogg");
+  this.thrustAudio.loop = true;
+
+  this.sprite = new chem.Sprite(this.animationNames.still);
+  this.state.batch.add(this.sprite);
+}
+
+Ship.prototype.tearDownResources = function() {
+  this.thrustAudio.pause();
+  this.thrustAudio = null;
+
+  this.sprite.delete();
+  this.sprite = null;
+};
+
 Ship.prototype.delete = function() {
   if (this.deleted) return;
   this.deleted = true;
   this.emit('deleted');
-  this.sprite.delete();
-  this.thrustAudio.pause();
-  this.thrustAudio = null;
+  this.clearInput();
+  this.tearDownResources();
+};
+
+Ship.prototype.undelete = function() {
+  this.deleted = false;
+  this.initResources();
 };
 
 function assert(value) {

@@ -38,6 +38,7 @@ function State(game) {
   this.mouseDownStart = null;
   this.mouseDownOnMiniMap = false;
   this.mouseDownOnUi = false;
+  this.mouseDownOnButton = null;
   this.mapSize = null; // set when loading map
   this.uiPaneImg = chem.resources.images['ui-pane.png'];
   this.uiPanePos = v(0, this.engine.size.y - this.uiPaneImg.height);
@@ -170,8 +171,16 @@ State.prototype.clearDockedShipSprites = function() {
   this.dockedShipSprites = [];
 };
 
+State.prototype.clearUiButtons = function() {
+  for (var i = 0; i< this.uiButtons.length; i += 1) {
+    this.uiButtons[i].label.delete();
+  }
+  this.uiButtons = [];
+};
+
 State.prototype.updateUiPane = function () {
   this.clearDockedShipSprites();
+  this.clearUiButtons();
   this.selectionUiLabel.setVisible(false);
   this.selectionUiSprite.setVisible(false);
   if (this.selectedCount === 1) {
@@ -187,34 +196,66 @@ State.prototype.updateUiPane = function () {
     this.selectionUiSprite.scale = scale;
     this.selectionUiSprite.setVisible(true);
 
-    if (obj.canBeEntered) {
-      var dockItemSize = v(20, 20);
-      var margin = 4;
-      var nextPos = this.uiPaneDockedPos.clone();
-      for (var id in obj.shipsInside) {
-        var dockedShip = obj.shipsInside[id];
-        var sprite = new chem.Sprite(dockedShip.animationNames.still, {
-          batch: this.batchStatic,
-          loop: false,
-        });
-        sprite.scale = dockItemSize.divBy(sprite.size);
-        sprite.scale.x = Math.min(sprite.scale.x, sprite.scale.y);
-        sprite.scale.y = sprite.scale.x;
-        sprite.setLeft(nextPos.x);
-        sprite.setTop(nextPos.y);
-        this.dockedShipSprites.push({
-          ship: dockedShip,
-          sprite: sprite
-        });
-        nextPos.y += dockItemSize.y + margin;
-        if (nextPos.y + dockItemSize.y >= this.uiPaneDockedPos.y + this.uiPaneDockedSize.y) {
-          nextPos.y = this.uiPaneDockedPos.y;
-          nextPos.x += dockItemSize.x + margin;
-        }
-      }
-    }
+    if (obj.canBeEntered) this.setUpDockedShipsUi(obj);
+    if (obj.uiButtons) this.setUpObjectButtonsUi(obj);
   }
 };
+
+State.prototype.setUpObjectButtonsUi = function(obj) {
+  var buttonSize = v(120, 30);
+  var margin = 4;
+  var nextPos = this.miniMapPos.offset(-this.uiPaneMargin - buttonSize.x, 0);
+  for (var i in obj.uiButtons) {
+    var uiButton = obj.uiButtons[i];
+    var label = new chem.Label(uiButton.caption, {
+      pos: nextPos.plus(buttonSize.scaled(0.5)),
+      fillStyle: "#000000",
+      font: "12px monospace",
+      batch: this.batchStatic,
+      textAlign: 'center',
+      textBaseline: 'middle',
+    });
+    this.uiButtons.push({
+      pos: nextPos.clone(),
+      size: buttonSize,
+      button: uiButton,
+      label: label,
+      mouseOver: false,
+    });
+    nextPos.y += buttonSize.y + margin;
+    if (nextPos.y + buttonSize.y >= this.miniMapPos.y + this.miniMapSize.y) {
+      nextPos.y = this.miniMapPos.y;
+      nextPos.x -= buttonSize.x + margin;
+    }
+  }
+}
+
+State.prototype.setUpDockedShipsUi = function(obj) {
+  var dockItemSize = v(20, 20);
+  var margin = 4;
+  var nextPos = this.uiPaneDockedPos.clone();
+  for (var id in obj.shipsInside) {
+    var dockedShip = obj.shipsInside[id];
+    var sprite = new chem.Sprite(dockedShip.animationNames.still, {
+      batch: this.batchStatic,
+      loop: false,
+    });
+    sprite.scale = dockItemSize.divBy(sprite.size);
+    sprite.scale.x = Math.min(sprite.scale.x, sprite.scale.y);
+    sprite.scale.y = sprite.scale.x;
+    sprite.setLeft(nextPos.x);
+    sprite.setTop(nextPos.y);
+    this.dockedShipSprites.push({
+      ship: dockedShip,
+      sprite: sprite
+    });
+    nextPos.y += dockItemSize.y + margin;
+    if (nextPos.y + dockItemSize.y >= this.uiPaneDockedPos.y + this.uiPaneDockedSize.y) {
+      nextPos.y = this.uiPaneDockedPos.y;
+      nextPos.x += dockItemSize.x + margin;
+    }
+  }
+}
 
 function clearSelection(state) {
   for (var id in state.aiObjects) {
@@ -267,6 +308,7 @@ function onButtonDown(button) {
         this.setScrollFromMiniMap();
       } else if (this.engine.mousePos.y >= this.uiPanePos.y) {
         this.mouseDownOnUi = true;
+        this.mouseDownOnButton = this.getMouseOverButton();
       } else if (this.engine.buttonState(chem.button.Key0)) {
         manualOverrideClick(this);
       } else {
@@ -305,16 +347,56 @@ function onButtonDown(button) {
 function onButtonUp(button) {
   switch (button) {
     case chem.button.MouseLeft:
-      if (!this.mouseDownOnUi) finishBoundingBox(this);
+      if (this.mouseDownStart) {
+        finishBoundingBox(this);
+      } else if (this.mouseDownOnButton) {
+        this.maybeMouseUpButton();
+      }
       this.mouseDownOnMiniMap = false;
       this.mouseDownOnUi = false;
+      this.mouseDownOnButton = null;
       break;
   }
 }
 
+State.prototype.maybeMouseUpButton = function() {
+  var upButton = this.getMouseOverButton();
+  if (upButton.button === this.mouseDownOnButton.button) {
+    upButton.button.fn();
+  }
+};
+
 function onMouseMove() {
-  if (this.mouseDownOnMiniMap) this.setScrollFromMiniMap();
+  if (this.mouseDownOnMiniMap) {
+    this.setScrollFromMiniMap();
+    return;
+  }
+  this.computeHoverForUiButtons();
 }
+
+State.prototype.getMouseOverButton = function() {
+  for (var i = 0; i < this.uiButtons.length; i += 1) {
+    var uiBtn = this.uiButtons[i];
+    if (this.engine.mousePos.x >= uiBtn.pos.x &&
+        this.engine.mousePos.y >= uiBtn.pos.y &&
+        this.engine.mousePos.x < uiBtn.pos.x + uiBtn.size.x &&
+        this.engine.mousePos.y < uiBtn.pos.y + uiBtn.size.y)
+    {
+      return uiBtn;
+    }
+  }
+  return null;
+};
+
+State.prototype.computeHoverForUiButtons = function() {
+  for (var i = 0; i < this.uiButtons.length; i += 1) {
+    var uiBtn = this.uiButtons[i];
+    uiBtn.mouseOver = this.engine.mousePos.x >= uiBtn.pos.x &&
+                      this.engine.mousePos.y >= uiBtn.pos.y &&
+                      this.engine.mousePos.x < uiBtn.pos.x + uiBtn.size.x &&
+                      this.engine.mousePos.y < uiBtn.pos.y + uiBtn.size.y;
+  }
+};
 
 State.prototype.setScrollFromMiniMap = function() {
   var centerPt = this.engine.mousePos.minus(this.miniMapPos).divBy(this.miniMapSize).mult(this.mapSize);
@@ -371,6 +453,9 @@ State.prototype.drawUiPane = function(context) {
   // bg
   context.drawImage(this.uiPaneImg, this.uiPanePos.x, this.uiPanePos.y);
 
+  // ui buttons
+  this.drawUiButtons(context);
+
   // mini map
   // fill bg with black
   context.fillStyle = "#000000";
@@ -394,6 +479,17 @@ State.prototype.drawUiPane = function(context) {
   var miniViewSize = this.viewSize.divBy(this.mapSize).mult(this.miniMapSize);
   context.strokeRect(miniViewStart.x, miniViewStart.y, miniViewSize.x, miniViewSize.y);
 }
+
+State.prototype.drawUiButtons = function(context) {
+  for (var i = 0; i < this.uiButtons.length; i += 1) {
+    var uiBtn = this.uiButtons[i];
+    context.strokeStyle = "#000000";
+    context.lineWidth = 2;
+    context.fillStyle = uiBtn.mouseOver ? "#A2B3E9" : "#EEEEEC";
+    context.fillRect(uiBtn.pos.x, uiBtn.pos.y, uiBtn.size.x, uiBtn.size.y);
+    context.strokeRect(uiBtn.pos.x, uiBtn.pos.y, uiBtn.size.x, uiBtn.size.y);
+  }
+};
 
 function onUpdate(dt, dx) {
   var id;
@@ -566,6 +662,8 @@ State.prototype.setUpUi = function() {
   this.uiPaneDockedPos = this.uiPaneInfoPos.offset(this.uiPaneInfoSize.x + this.uiPaneMargin, 0);
   this.uiPaneDockedSize = v(160, this.uiPaneInfoSize.y);
   this.dockedShipSprites = [];
+  // ui buttons
+  this.uiButtons = [];
 };
 
 State.prototype.addPortal = function(o) {

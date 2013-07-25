@@ -24,8 +24,30 @@ function Portal(state, o) {
       caption: "Activate Portal",
       fn: this.activatePortal.bind(this),
     },
+    {
+      enabled: true,
+      caption: "Send Ships Out",
+      fn: this.sendShipsOut.bind(this),
+    }
   ];
 }
+
+Portal.prototype.sendShipsOut = function() {
+  var minRadius = 10;
+  var maxRadius = this.radius;
+  for (var id in this.shipsInside) {
+    var ship = this.shipsInside[id];
+    var radians = Math.random() * Math.PI * 2;
+    var radius = (maxRadius - minRadius) * Math.random() + minRadius;
+    var offset = v.unit(radians).scale(radius);
+    ship.pos = this.pos.plus(offset);
+    ship.vel = v(0, 0);
+    ship.undelete();
+    this.state.addShip(ship);
+  }
+  this.shipsInside = {};
+  this.state.updateUiPane();
+};
 
 Portal.prototype.activatePortal = function() {
   // TODO
