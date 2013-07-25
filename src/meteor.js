@@ -79,22 +79,3 @@ Meteor.prototype.delete = function() {
   this.deleted = true;
   this.sprite.delete();
 }
-
-Meteor.prototype.checkOutOfBounds = function() {
-  if (this.pos.x - this.radius < 0) {
-    this.pos.x = this.radius;
-    this.vel.x = Math.abs(this.vel.x) * this.collisionDamping;
-  }
-  if (this.pos.y - this.radius < 0) {
-    this.pos.y = this.radius;
-    this.vel.y = Math.abs(this.vel.y) * this.collisionDamping;
-  }
-  if (this.pos.x + this.radius >= this.state.mapSize.x) {
-    this.pos.x = this.state.mapSize.x - this.radius;
-    this.vel.x = -Math.abs(this.vel.x) * this.collisionDamping;
-  }
-  if (this.pos.y + this.radius >= this.state.mapSize.y) {
-    this.pos.y = this.state.mapSize.y - this.radius;
-    this.vel.y = -Math.abs(this.vel.y) * this.collisionDamping;
-  }
-}
