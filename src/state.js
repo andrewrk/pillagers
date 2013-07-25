@@ -340,6 +340,8 @@ function onButtonDown(button) {
         manualOverrideClick(this);
       } else if (this.engine.buttonState(chem.button.KeyN)) {
         this.cheatSkipLevel();
+      } else if (this.engine.buttonState(chem.button.KeyC)) {
+        this.game.cash += 101;
       } else {
         startBoundingBox(this);
       }
@@ -578,6 +580,8 @@ function onUpdate(dt, dx) {
     if (announcement.deleted) continue;
     announcement.addTime(dt);
   }
+
+  this.cashLabel.text = this.game.cash.toString();
 }
 
 State.prototype.clickedObject = function(pos, matchFn) {
@@ -690,8 +694,25 @@ State.prototype.setUpUi = function() {
   this.miniMapSize.x = this.miniMapSize.y / this.mapSize.y * this.mapSize.x;
   this.miniMapPos = this.uiPanePos.offset(this.uiPaneSize.x - this.uiPaneMargin - this.miniMapSize.x, this.uiPaneMargin);
 
+  this.uiPaneCashPos = this.uiPanePos.offset(this.uiPaneMargin, this.uiPaneMargin);
+  this.uiPaneCashSize = v(60, this.uiPaneSize.y - this.uiPaneMargin * 2);
+  var coinSprite = new chem.Sprite('coin', {
+    pos: this.uiPaneCashPos.offset(4, 4),
+    batch: this.batchStatic,
+    scale: v(0.40, 0.40),
+  });
+  coinSprite.pos.add(coinSprite.getSize().scale(0.5));
+  this.cashLabel = new chem.Label("0", {
+    pos: v(coinSprite.getRight() + 4, coinSprite.pos.y),
+    fillStyle: "#ffffff",
+    font: "20px sans-serif",
+    textAlign: "left",
+    textBaseline: "middle",
+    batch: this.batchStatic,
+  });
+
   // info pane
-  this.uiPaneInfoPos = this.uiPanePos.offset(this.uiPaneMargin, this.uiPaneMargin);
+  this.uiPaneInfoPos = this.uiPaneCashPos.offset(this.uiPaneCashSize.x, 0);
   this.uiPaneInfoSize = v(80, this.uiPaneSize.y - this.uiPaneMargin * 2);
   this.selectionUiSprite = new chem.Sprite("knife", {
     pos: this.uiPaneInfoPos.plus(this.uiPaneInfoSize.scaled(0.5)),

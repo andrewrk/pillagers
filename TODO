@@ -1,5 +1,4 @@
  * next level has same fleet that you exited with
- * show your cash in the UI
  * allow you to create Ranger in flagship after unlocking it
  * level 2, we exit the meteor field but there are some attackers. you have to build
    some Ranger ships to defend.
@@ -9,6 +8,7 @@
 
 Bugs:
  * I suspect that physics objects are not getting deleted
+ * flagship not showing up in portal / ships wrong size
 
 Nice-to-have:
  * pan sound effects and volume depending on scroll

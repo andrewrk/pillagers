@@ -36,6 +36,9 @@ LevelCompleteScreen.prototype.setUpRewards = function(rewards) {
     var sprite, label;
     switch (reward.type) {
       case "Cash":
+        // give reward
+        this.game.cash += props.amount;
+
         sprite = new chem.Sprite("coin", {
           pos: nextPt.clone(),
           zOrder: 1,
@@ -54,6 +57,9 @@ LevelCompleteScreen.prototype.setUpRewards = function(rewards) {
         nextPt.y += 30;
         break;
       case "UnlockShip":
+        // give reward
+        this.game.unlockedShips[props.shipType] = true;
+
         var ShipType = shipTypes[props.shipType];
         var animationName = ShipType.prototype.animationNames.still;
         sprite = new chem.Sprite(animationName, {

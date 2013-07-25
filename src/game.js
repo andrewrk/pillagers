@@ -11,6 +11,7 @@ function Game(engine) {
   this.levelIndex = 0;
   this.cash = 0;
   this.engine = engine;
+  this.unlockedShips = {};
 
   initMusic(this);
 }
