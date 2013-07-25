@@ -12,6 +12,7 @@ Bugs:
  * I suspect that physics objects are not getting deleted
 
 Nice-to-have:
+ * pan sound effects and volume depending on scroll
  * experiment with speed cap on ships
  * if ranger is in range, don't accelerate toward target
  * fix the thruster sound glitchiness

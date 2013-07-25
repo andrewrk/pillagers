@@ -4,13 +4,14 @@ var weakShots = initList('sfx/weak_shot', 5, 0.2);
 var weakHits = initList('sfx/weak_hit', 5, 0.8);
 var disintegrateList = initList('sfx/electric_explosion', 5, 0.2);
 var explosions = initList('sfx/ship_explosion', 5, 0.8);
+var electricShots = initList('sfx/electric_shot', 5, 1.0);
 
 exports.explosion = function() {
   return playRandom(explosions);
 }
 
 exports.electricAttack = function() {
-  // TODO
+  return playRandom(electricShots);
 }
 
 exports.disintegrate = function() {
