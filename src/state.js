@@ -338,6 +338,8 @@ function onButtonDown(button) {
         this.mouseDownOnButton = this.getMouseOverButton();
       } else if (this.engine.buttonState(chem.button.Key0)) {
         manualOverrideClick(this);
+      } else if (this.engine.buttonState(chem.button.KeyN)) {
+        this.cheatSkipLevel();
       } else {
         startBoundingBox(this);
       }
@@ -385,6 +387,19 @@ function onButtonUp(button) {
       break;
   }
 }
+
+State.prototype.cheatSkipLevel = function() {
+  this.finishLevel(this.getConvoy());
+};
+
+State.prototype.getConvoy = function() {
+  var convoy = {};
+  for (var id in this.physicsObjects) {
+    var obj = this.physicsObjects[id];
+    if (obj.team === PLAYER_TEAM) convoy[id] = obj;
+  }
+  return convoy;
+};
 
 State.prototype.maybeMouseUpButton = function() {
   var upButton = this.getMouseOverButton();
