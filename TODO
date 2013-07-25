@@ -1,3 +1,4 @@
+ * click a portal to show UI pane
  * exit portal to get to level 2
  * mini-map
  * replace this level with level 0 of navigating your flag ship through a meteor field
@@ -7,6 +8,9 @@
    - when you win you earn Militia ship
  * level 2, enemy flag ship is preventing the portal from appearing.
    destroy the flag ship to open the portal.
+
+Bugs:
+ * I suspect that physics objects are not getting deleted
 
 Nice-to-have:
  * try putting a speed cap on ships

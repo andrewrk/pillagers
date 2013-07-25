@@ -24,6 +24,7 @@ function Meteor(state, o) {
   this.canBeShot = true;
   this.health = 1;
   this.defense = this.mass();
+  this.deleted = false;
 
   // an object which canBeStruck can collide when hit by an object that canCauseCollision.
   this.canCauseCollision = true;
@@ -93,6 +94,8 @@ Meteor.prototype.update = function(dt, dx) {
 };
 
 Meteor.prototype.delete = function() {
+  if (this.deleted) return;
+  this.deleted = true;
   this.sprite.delete();
 }
 
