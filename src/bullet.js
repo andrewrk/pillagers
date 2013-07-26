@@ -39,6 +39,7 @@ Bullet.prototype.update = function (dt, dx) {
   // collision detection
   for (var id in this.state.physicsObjects) {
     var obj = this.state.physicsObjects[id];
+    if (obj.deleted) continue;
     if (! obj.canBeShot || obj.team === this.team) continue;
     if (obj.pos.distance(this.pos) < obj.radius) {
       this.delete();

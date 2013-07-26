@@ -43,6 +43,7 @@ MilitiaShip.prototype.update = function(dt, dx) {
   Ship.prototype.update.apply(this, arguments);
 
   this.recharge -= dt;
+  if (this.meleeInput && this.meleeInput.deleted) this.meleeInput = null;
   if (this.meleeInput && this.recharge <= 0 &&
      (this.meleeInput.pos.distance(this.pos) < this.meleeRadius + this.meleeInput.radius))
   {
