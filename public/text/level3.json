@@ -1,17 +1,15 @@
 {
   "size": {"x": 4000, "y": 800},
   "scroll": {"x": 0, "y": 0},
+  "startPoint": {
+    "pos": {"x": 100, "y": 290},
+    "radius": 1
+  },
   "rewards": [
-    {
-      "type": "Cash",
-      "properties": {
-        "amount": 80
-      }
-    },
     {
       "type": "UnlockShip",
       "properties": {
-        "shipType": "Carrier"
+        "shipType": "Artillery"
       }
     }
   ],
@@ -118,13 +116,6 @@
   },
   "objects": [
     {
-      "type": "StartPoint",
-      "properties": {
-        "pos": {"x": 100, "y": 290},
-        "radius": 1
-      }
-    },
-    {
       "type": "MeteorCluster",
       "properties": {
         "animationNames": ["rock-a", "rock-b"],
@@ -152,9 +143,12 @@
     {
       "type": "TriggerShip",
       "properties": {
-        "team": 1,
-        "pos": {"x": 1100, "y": 700},
-        "condition": "killed",
+        "ship": {
+          "type": "Civilian",
+          "team": 1,
+          "pos": {"x": 1100, "y": 700}
+        },
+        "condition": "destroyed",
         "event": "DistressSignal"
       }
     }

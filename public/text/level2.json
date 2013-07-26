@@ -1,6 +1,10 @@
 {
   "size": {"x": 2000, "y": 1000},
   "scroll": {"x": 0, "y": 200},
+  "startPoint": {
+    "radius": 100,
+    "pos": {"x": 150, "y": 400}
+  },
   "rewards": [
     {
       "type": "Cash",
@@ -16,13 +20,6 @@
     }
   ],
   "objects": [
-    {
-      "type": "StartPoint",
-      "properties": {
-        "radius": 100,
-        "pos": {"x": 150, "y": 400}
-      }
-    },
     {
       "type": "ShipCluster",
       "properties": {

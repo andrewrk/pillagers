@@ -4,6 +4,7 @@ var chem = require('chem');
 var RangerShip = require('./ranger_ship');
 var MilitiaShip = require('./militia_ship');
 var TurretShip = require('./turret_ship');
+var ArtilleryShip = require('./artillery_ship');
 var v = chem.vec2d;
 
 module.exports = FlagShip;
@@ -40,6 +41,12 @@ function FlagShip(state, o) {
       caption: "Create Turret",
       fn: createShipFn(this, TurretShip),
       cost: 15
+    },
+    {
+      shipTypeLock: "Artillery",
+      caption: "Create Artillery",
+      fn: createShipFn(this, ArtilleryShip),
+      cost: 25
     },
   ];
 }

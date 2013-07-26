@@ -152,6 +152,27 @@ exports.spritesheet = {
         "ship/civilian0.png",
       ],
     },
+    ship_artillery_still: {
+      frames: [ "ship/artillery0.png"],
+    },
+    ship_artillery_accel: {
+      loop: false,
+      frames: [
+        "ship/artillery0.png",
+        "ship/artillery1.png",
+        "ship/artillery2.png",
+        "ship/artillery3.png",
+      ],
+    },
+    ship_artillery_decel: {
+      loop: false,
+      frames: [
+        "ship/artillery3.png",
+        "ship/artillery2.png",
+        "ship/artillery1.png",
+        "ship/artillery0.png",
+      ],
+    },
     explosion: {
       loop: false,
     },

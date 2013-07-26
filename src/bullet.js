@@ -12,12 +12,11 @@ function Bullet(state, o) {
   this.team = o.team;
   this.damage = o.damage;
   this.life = o.life;
-  this.sprite = new chem.Sprite('bullet/small');
+  this.sprite = new chem.Sprite(o.animationName || 'bullet/circle');
   this.sprite.rotation = this.vel.angle() + Math.PI / 2;
   this.state.batch.add(this.sprite);
   this.radius = 2;
   this.canGoOffscreen = true;
-  sfx.shootWeakBullet();
 }
 
 Bullet.prototype.delete = function() {
@@ -41,7 +40,7 @@ Bullet.prototype.update = function (dt, dx) {
     var obj = this.state.physicsObjects[id];
     if (obj.deleted) continue;
     if (! obj.canBeShot || obj.team === this.team) continue;
-    if (obj.pos.distance(this.pos) < obj.radius) {
+    if (obj.pos.distanceSqrd(this.pos) < obj.radius * obj.radius) {
       this.delete();
       obj.hit(this.damage, "explosion");
       sfx.weakHit();

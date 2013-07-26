@@ -24,6 +24,7 @@ function State(game) {
   this.selectedCount = 0;
   this.announcements = [];
   this.cashEffects = [];
+  this.timers = [];
   this.manualOverride = null;
   this.batchBgBack = new chem.Batch();
   this.batchBgFore = new chem.Batch();
@@ -591,6 +592,7 @@ function onUpdate(dt, dx) {
   var id;
   for (id in this.physicsObjects) {
     var obj = this.physicsObjects[id];
+    if (obj.deleted) continue;
     obj.update(dt, dx);
   }
 
@@ -630,6 +632,12 @@ function onUpdate(dt, dx) {
     var cashEffect = this.cashEffects[i];
     if (cashEffect.deleted) continue;
     cashEffect.update(dt, dx);
+  }
+
+  for (i = 0; i < this.timers.length; i += 1) {
+    var timer = this.timers[i];
+    if (timer.deleted) continue;
+    timer.update(dt, dx);
   }
 
   this.cashLabel.text = this.game.cash.toString();
@@ -701,41 +709,97 @@ function generateStars(self, size, density, batch) {
   }
 }
 
+State.prototype.triggerEvent = function(eventName) {
+  var levelEvent = this.events[eventName];
+  assert(levelEvent, "Event not declared: " + eventName);
+  levelEvent.actions.forEach(function(action) {
+    var props = action.properties;
+    switch (action.type) {
+      case "Announcement":
+        this.announce(props.text);
+        break;
+      case "Timer":
+        this.addTimer(props);
+        break;
+      case "EveryoneTargetThatSuckersFlagship":
+        this.allEnemyShipsTargetFlagship();
+        break;
+      case "SpawnObject":
+        this.spawnObject(props);
+        break;
+      default:
+        throw new Error("Unknown action type: " + action.type);
+    }
+  }.bind(this));
+};
+
+State.prototype.addTimer = function(o) {
+  var timer = new Timer(this, o.timeout, o.event);
+  this.timers.push(timer);
+  this.timers = this.timers.filter(function(timer) {
+    return !timer.deleted;
+  });
+};
+
+State.prototype.allEnemyShipsTargetFlagship = function(o) {
+  for (var id in this.aiObjects) {
+    var ai = this.aiObjects[id];
+    if (ai.ship.team === this.playerTeam) continue;
+    ai.commandToAttack(this.getPlayerFlagship());
+  }
+};
+
+State.prototype.getPlayerFlagship = function() {
+  for (var id in this.physicsObjects) {
+    var obj = this.physicsObjects[id];
+    if (obj.isFlagship && obj.team === this.playerTeam) {
+      return obj;
+    }
+  }
+  return null;
+};
+
+State.prototype.spawnObject = function(obj) {
+  var props = obj.properties;
+  switch (obj.type) {
+    case "ShipCluster":
+      props.team = Team.get(props.team || 0);
+      this.addShipCluster(props);
+      break;
+    case "TriggerShip":
+      this.addTriggerShip(props);
+      break;
+    case "Meteor":
+      this.addMeteor(props);
+      break;
+    case "MeteorCluster":
+      this.addMeteorCluster(props);
+      break;
+    case "Portal":
+      this.addPortal(props);
+      break;
+    case "Text":
+      this.addText(props);
+      break;
+    default:
+      throw new Error("unrecognized object type in level: " + obj.type);
+  }
+}
+
 State.prototype.load = function(level, convoy) {
   this.mapSize = v(level.size);
   this.scroll = level.scroll ? v(level.scroll) : v();
   this.victoryRewards = level.rewards;
   this.skippable = level.skippable;
+  this.events = level.events;
 
   this.generateStars();
 
   for (var i = 0; i < level.objects.length; i += 1) {
-    var obj = level.objects[i];
-    var props = obj.properties;
-    switch (obj.type) {
-      case "ShipCluster":
-        props.team = Team.get(props.team || 0);
-        this.addShipCluster(props);
-        break;
-      case "Meteor":
-        this.addMeteor(props);
-        break;
-      case "MeteorCluster":
-        this.addMeteorCluster(props);
-        break;
-      case "Portal":
-        this.addPortal(props);
-        break;
-      case "Text":
-        this.addText(props);
-        break;
-      case "StartPoint":
-        this.insertConvoyAtStartPoint(convoy, props);
-        break;
-      default:
-        throw new Error("unrecognized object type in level: " + obj.type);
-    }
+    this.spawnObject(level.objects[i]);
   }
+  this.insertConvoyAtStartPoint(convoy, level.startPoint);
+
   this.setUpUi();
 };
 
@@ -865,6 +929,18 @@ State.prototype.addMeteor = function(o) {
   o.vel = v(o.vel);
   var meteor = new Meteor(this, o);
   this.addPhysicsObject(meteor);
+};
+
+State.prototype.addTriggerShip = function(o) {
+  var ShipType = shipTypes[o.ship.type];
+  var ship = new ShipType(this, {
+    team: Team.get(o.ship.team),
+    pos: v(o.ship.pos),
+  });
+  ship.once(o.condition, function() {
+    this.triggerEvent(o.event);
+  }.bind(this));
+  this.addShip(ship);
 };
 
 State.prototype.addShipCluster = function(o) {
@@ -1096,4 +1172,19 @@ CashEffect.prototype.update = function(dt, dx) {
 CashEffect.prototype.delete = function() {
   this.label.delete();
   this.deleted = true;
+};
+
+function Timer(state, timeout, eventName) {
+  this.state = state;
+  this.timeLeft = timeout;
+  this.eventName = eventName;
+  this.deleted = false;
+}
+
+Timer.prototype.update = function(dt, dx) {
+  this.timeLeft -= dt;
+  if (this.timeLeft <= 0) {
+    this.deleted = true;
+    this.state.triggerEvent(this.eventName);
+  }
 };

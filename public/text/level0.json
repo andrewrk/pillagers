@@ -2,6 +2,10 @@
   "size": {"x": 4000, "y": 600},
   "scroll": {"x": 0, "y": 0},
   "skippable": true,
+  "startPoint": {
+    "pos": {"x": 200, "y": 300},
+    "radius": 100
+  },
   "rewards": [
     {
       "type": "Cash",
@@ -43,13 +47,6 @@
       "properties": {
         "text": "A Portal grants access to the next level.\nSelect ships and Right Click on the\nPortal to enter it.",
         "pos": {"x": 3000, "y": 100}
-      }
-    },
-    {
-      "type": "StartPoint",
-      "properties": {
-        "pos": {"x": 200, "y": 300},
-        "radius": 100
       }
     },
     {

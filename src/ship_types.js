@@ -5,4 +5,5 @@ module.exports = {
   Flag: require('./flag_ship'),
   Turret: require('./turret_ship'),
   Civilian: require('./civilian_ship'),
+  Artillery: require('./artillery_ship'),
 };

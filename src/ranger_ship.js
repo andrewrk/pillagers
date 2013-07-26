@@ -3,6 +3,7 @@ var Ship = require('./ship');
 var Bullet = require('./bullet');
 var chem = require('chem');
 var v = chem.vec2d;
+var sfx = require('./sfx');
 
 module.exports = RangerShip;
 
@@ -22,6 +23,7 @@ function RangerShip(state, o) {
   this.bulletSpeed = 10;
   this.bulletLife = 0.5;
   this.bulletDamage = 0.05;
+  this.bulletAnimationName = 'bullet/small';
   this.rechargeAmt = 0.20;
   this.recharge = 0;
 
@@ -40,16 +42,7 @@ RangerShip.prototype.update = function(dt, dx) {
   this.recharge -= dt;
   if (this.shootInput && this.recharge <= 0) {
     this.recharge = this.rechargeAmt;
-    // create projectile
-    var unit = v.unit(this.rotation);
-    var bullet = new Bullet(this.state, {
-      pos: this.pos.plus(unit.scaled(this.radius)),
-      vel: unit.scaled(this.bulletSpeed).add(this.vel),
-      team: this.team,
-      damage: this.bulletDamage,
-      life: this.bulletLife,
-    });
-    this.state.addBullet(bullet);
+    this.createProjectile();
   }
 }
 
@@ -57,4 +50,18 @@ RangerShip.prototype.clearInput = function() {
   Ship.prototype.clearInput.apply(this, arguments);
 
   this.shootInput = false;
+}
+
+RangerShip.prototype.createProjectile = function() {
+  sfx.shootWeakBullet();
+  var unit = v.unit(this.rotation);
+  var bullet = new Bullet(this.state, {
+    pos: this.pos.plus(unit.scaled(this.radius)),
+    vel: unit.scaled(this.bulletSpeed).add(this.vel),
+    team: this.team,
+    damage: this.bulletDamage,
+    life: this.bulletLife,
+    animationName: this.bulletAnimationName,
+  });
+  this.state.addBullet(bullet);
 }

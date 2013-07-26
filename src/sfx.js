@@ -1,6 +1,7 @@
 var chem = require('chem');
 
 var weakShots = initList('sfx/weak_shot', 5, 0.2);
+var strongShot = new chem.Sound('sfx/strong_shot.ogg');
 var weakHits = initList('sfx/weak_hit', 5, 0.8);
 var disintegrateList = initList('sfx/electric_explosion', 5, 0.2);
 var explosions = initList('sfx/ship_explosion', 5, 0.8);
@@ -16,6 +17,10 @@ exports.electricAttack = function() {
 
 exports.disintegrate = function() {
   return playRandom(disintegrateList);
+};
+
+exports.shootStrongBullet = function() {
+  return strongShot.play();
 };
 
 exports.shootWeakBullet = function() {

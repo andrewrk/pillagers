@@ -1,9 +1,3 @@
-Next:
- * Level 4:
-   - when you attack the civilians they send a distress signal
-   - small fleet arrives to defend the civilians
-   - incoming army directly targets your flagship
-
 Features:
  * Add a command that tells a ship to defend another ship.
 
@@ -26,6 +20,7 @@ Nice-to-have:
  * fix the thruster sound glitchiness
  * State should be renamed LevelPlayer
  * each command should draw to indicate that something is commanded
+ * civilian ships should wander around
 
 
 Ship Classes:

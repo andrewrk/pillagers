@@ -1,6 +1,10 @@
 {
   "size": {"x": 3000, "y": 1000},
   "scroll": {"x": 0, "y": 0},
+  "startPoint": {
+    "pos": {"x": 100, "y": 290},
+    "radius": 1
+  },
   "rewards": [
     {
       "type": "Cash",
@@ -16,13 +20,6 @@
     }
   ],
   "objects": [
-    {
-      "type": "StartPoint",
-      "properties": {
-        "pos": {"x": 100, "y": 290},
-        "radius": 1
-      }
-    },
     {
       "type": "Text",
       "properties": {
