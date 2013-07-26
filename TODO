@@ -5,7 +5,8 @@
  * AI sends their army to attack your flagship directly
  * have to travel through a deadly area which you have no hope of destroying.
    get inside a tank to make it through.
- * somehow utilize manual override
+ * enemy has a ship which disables auto-pilot. you have to use manual override
+   to destroy that ship to reactivate your army
 
 Bugs:
  * I suspect that physics objects are not getting deleted

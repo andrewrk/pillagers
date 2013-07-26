@@ -257,6 +257,7 @@ EngageCommand.prototype.delete = function() {
 function EnterCommand(ai, target) {
   this.target = target;
   this.done = false;
+  this.speedCap = 9999;
 }
 
 EnterCommand.prototype.execute = function(ai, dt, dx) {
@@ -327,6 +328,7 @@ function ShootCommand(ai, target) {
   // pursue and shoot lazers at target
   this.done = false;
   this.target = target;
+  this.speedCap = 4;
 }
 
 ShootCommand.prototype.execute = function(ai, dt, dx) {
@@ -359,7 +361,15 @@ ShootCommand.prototype.execute = function(ai, dt, dx) {
     }
   }
   ai.pointTowardDirection(targetDir);
-  var thrust = actualDir.dot(targetDir) > 0.99 ? 1 : 0;
+  var thrust = (actualDir.dot(targetDir) > 0.99) ? 1 : 0;
+  if (thrust > 0) {
+    var speedSqrd = ai.ship.vel.lengthSqrd();
+    var atSpeedcap = speedSqrd > this.speedCap * this.speedCap;
+    if (atSpeedcap) {
+      var thrustWouldIncreaseSpeed = actualDir.dot(ai.ship.vel) > 0;
+      if (thrustWouldIncreaseSpeed) thrust = 0;
+    }
+  }
   ai.ship.setThrustInput(thrust);
 };
 
@@ -428,13 +438,22 @@ function interceptTarget(ai, dt, dx) {
     }
   }
   ai.pointTowardDirection(targetDir);
-  var thrust = actualDir.dot(targetDir) > 0.99 ? 1 : 0;
+  var thrust = (actualDir.dot(targetDir) > 0.99) ? 1 : 0;
+  if (thrust > 0) {
+    var speedSqrd = ai.ship.vel.lengthSqrd();
+    var atSpeedcap = speedSqrd > this.speedCap * this.speedCap;
+    if (atSpeedcap) {
+      var thrustWouldIncreaseSpeed = actualDir.dot(ai.ship.vel) > 0;
+      if (thrustWouldIncreaseSpeed) thrust = 0;
+    }
+  }
   ai.ship.setThrustInput(thrust);
 }
 
 function MeleeCommand(ai, target) {
   this.target = target;
   this.done = false;
+  this.speedCap = 6;
 }
 
 MeleeCommand.prototype.execute = function(ai, dt, dx) {
