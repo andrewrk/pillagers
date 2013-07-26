@@ -15,43 +15,101 @@ Squad.prototype.add = function(ship) {
 };
 
 Squad.prototype.calculate = function() {
-  var dest = this.dest;
   this.avgPos.scale(1 / this.units.length);
   this.direction = this.dest.minus(this.avgPos).normalize();
-  // figure out max radius
-  var maxRadius = 0;
-  this.units.forEach(function(unit) {
-    if (unit.radius > maxRadius) maxRadius = unit.radius;
-  });
-  var unitCountY = Math.floor(Math.sqrt(this.units.length));
-  var unitCountX = unitCountY * unitCountY === this.units.length ? unitCountY : unitCountY + 1;
-  // sort units by rankOrder and then distance from target point
+
+  // sort units by rankOrder and then radius
   this.units.sort(function(a, b) {
-    var rankOrderDelta = a.rankOrder - b.rankOrder;
+    var rankOrderDelta = b.rankOrder - a.rankOrder;
     if (rankOrderDelta !== 0) return rankOrderDelta;
-    return a.pos.distanceSqrd(dest) - b.pos.distanceSqrd(dest);
+    return b.radius - a.radius;
   });
-  // create the unaligned positions
-  var positions = new Array(this.units.length);
-  var destRelCenter = v();
-  var i, x, pt;
-  for (i = 0, x = 0; i < this.units.length; x += 1) {
-    for (var y = 0; y < unitCountY; y += 1, i += 1) {
-      pt = v(x * maxRadius * 2, y * maxRadius * 2);
-      positions[i] = pt;
-      destRelCenter.add(pt);
+
+  // divide into sub-groups
+  var currentRadius = null;
+  var groups = [];
+  var currentGroup = null;
+  var i, unit;
+  for (i = 0; i < this.units.length; i += 1) {
+    unit = this.units[i];
+    if (unit.radius !== currentRadius) {
+      groups.push(currentGroup = []);
     }
+    currentRadius = unit.radius;
+    currentGroup.push(unit);
+  }
+
+  // create the unaligned positions
+  var positions = {}; // indexed by ship id
+  var destRelCenter = v();
+  var nextPos = v();
+  var groupMins = [];
+  var groupMaxs = [];
+  var groupIndex, group;
+  for (groupIndex = 0; groupIndex < groups.length; groupIndex += 1) {
+    group = groups[groupIndex];
+    var groupMin = v();
+    var groupMax = v();
+    var unitCountX = Math.floor(Math.sqrt(group.length));
+    var unitCountY = unitCountX * unitCountX === group.length ? unitCountX : unitCountX + 1;
+    var radius = group[0].radius;
+    var y = 0;
+    for (i = 0; i < group.length; i += 1) {
+      unit = group[i];
+      positions[unit.id] = nextPos.clone();
+      destRelCenter.add(nextPos);
+      groupMin.boundMax(nextPos.offset(-radius, -radius));
+      groupMax.boundMin(nextPos.offset(radius, radius));
+      nextPos.y += radius * 2;
+      y += 1;
+      if (y >= unitCountY) {
+        y = 0;
+        nextPos.y = 0;
+        nextPos.x -= radius;
+        if (i + 1 < group.length) {
+          // for the next ship in the same group
+          nextPos.x -= radius;
+        }
+      }
+    }
+    nextPos.y = 0;
+    if (groupIndex + 1 < groups.length) {
+      nextPos.x -= radius + groups[groupIndex + 1][0].radius;
+    }
+    groupMins[groupIndex] = groupMin;
+    groupMaxs[groupIndex] = groupMax;
   }
   destRelCenter.scale(1 / this.units.length);
 
-  for (i = 0; i < positions.length; i += 1) {
-    // shift so that 0, 0 is in the center
-    positions[i] = destRelCenter.minus(positions[i]);
-    // rotate about 0, 0 to align with direction
-    positions[i].rotate(this.direction);
-    // translate to dest
-    positions[i].add(dest);
+  // vertically center the groups
+  var targetCenter;
+  for (groupIndex = 0; groupIndex < groups.length; groupIndex += 1) {
+    var min = groupMins[groupIndex];
+    var max = groupMaxs[groupIndex];
+    var size = max.minus(min);
+    var center = min.plus(size.scaled(0.5));
+    if (groupIndex === 0) {
+      targetCenter = center;
+      continue;
+    }
+    group = groups[groupIndex];
+    var deltaY = targetCenter.y - center.y;
+    for (i = 0; i < group.length; i += 1) {
+      unit = group[i];
+      positions[unit.id].y += deltaY;
+    }
   }
 
+  for (var id in positions) {
+    var position = positions[id];
+    // shift so that 0, 0 is in the center
+    position = destRelCenter.minus(position);
+    // rotate about 0, 0 to align with direction
+    position.rotate(this.direction);
+    // translate to dest
+    position.add(this.dest);
+
+    positions[id] = position;
+  }
   this.positions = positions;
 };

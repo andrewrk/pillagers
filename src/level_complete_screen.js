@@ -104,9 +104,9 @@ LevelCompleteScreen.prototype.setUpConvoy = function(convoy) {
     squad.add(ship);
   }
   squad.calculate();
-  squad.units.forEach(function(ship, index) {
+  squad.units.forEach(function(ship) {
     var sprite = new chem.Sprite(ship.animationNames.still, {
-      pos: squad.positions[index],
+      pos: squad.positions[ship.id],
       rotation: squad.direction.angle() + Math.PI / 2,
       batch: this.batch,
     });

@@ -199,6 +199,7 @@ function EngageCommand(ai, dest) {
   this.thresholdSqrd = 100 * 100; // stop when distanceSqrd < this
   this.dest = dest;
   this.done = false;
+  this.speedCap = 3;
   this.sprite = new chem.Sprite('knife', {
     batch: ai.state.batch,
     pos: this.dest,
@@ -210,6 +211,11 @@ EngageCommand.prototype.execute = function(ai, dt, dx) {
   var closeEnough = distSqrd < this.thresholdSqrd;
 
   if (closeEnough) {
+    this.done = true;
+    return;
+  }
+
+  if (ai.attackNearbyEnemy()) {
     this.done = true;
     return;
   }
@@ -231,11 +237,11 @@ EngageCommand.prototype.execute = function(ai, dt, dx) {
   }
   if (actualDir.dot(targetDir) > 0.99) {
     // thrusting would get us closer to our target
-    ai.ship.setThrustInput(1);
+    this.setThrustWithCap(ai, 1);
     ai.pointTowardDirection(targetDir);
   } else if (ai.ship.hasBackwardsThrusters && actualDir.dot(targetDir) < -0.99) {
     // thrusting backwards would get us closer to our target
-    ai.ship.setThrustInput(-1);
+    this.setThrustWithCap(ai, -1);
     ai.pointTowardDirection(targetDir.clone().neg());
   } else if (ai.ship.hasBackwardsThrusters && actualDir.dot(targetDir) < 0) {
     ai.ship.setThrustInput(0);
@@ -244,6 +250,24 @@ EngageCommand.prototype.execute = function(ai, dt, dx) {
     ai.ship.setThrustInput(0);
     ai.pointTowardDirection(targetDir);
   }
+};
+
+EngageCommand.prototype.setThrustWithCap = function(ai, thrustInput) {
+  if (thrustInput === 0) {
+    ai.ship.setThrustInput(thrustInput);
+    return;
+  }
+  var speedSqrd = ai.ship.vel.lengthSqrd();
+  var atSpeedcap = speedSqrd > this.speedCap * this.speedCap;
+  if (! atSpeedcap) {
+    ai.ship.setThrustInput(thrustInput);
+    return;
+  }
+  var actualDir = v.unit(ai.ship.rotation);
+  var thrustWouldIncreaseSpeed = actualDir.dot(ai.ship.vel) > 0;
+  if (thrustInput < 0) thrustWouldIncreaseSpeed = !thrustWouldIncreaseSpeed;
+  if (thrustWouldIncreaseSpeed) return;
+  ai.ship.setThrustInput(thrustInput);
 };
 
 EngageCommand.prototype.draw = function(ai, context) {

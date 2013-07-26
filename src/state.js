@@ -1035,7 +1035,7 @@ ScatterSquad.prototype.command = function(queue) {
   for (var i = 0; i < this.squad.units.length; i += 1) {
     var ship = this.squad.units[i];
     var unit = this.shipToAi[ship.id];
-    unit.commandToMove(this.squad.positions[i], queue, this.loose);
+    unit.commandToMove(this.squad.positions[ship.id], queue, this.loose);
     if (! this.loose) unit.commandToPoint(this.squad.direction, true);
   }
 };
