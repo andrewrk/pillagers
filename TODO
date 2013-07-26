@@ -1,5 +1,11 @@
  * level 4 - moderate sized army is coming to attack you
 
+Level ideas:
+ * AI sends their army to attack your flagship directly
+ * have to travel through a deadly area which you have no hope of destroying.
+   get inside a tank to make it through.
+ * somehow utilize manual override
+
 Bugs:
  * I suspect that physics objects are not getting deleted
  * flagship not showing up in portal / ships wrong size
@@ -15,11 +21,7 @@ Nice-to-have:
 
 
 Ship Classes:
- * Militia: this is what you'll start out with. has short range. agile.
-   actually doesn't shoot lazers, shoots a short range lightning attack
-   out the front.
- * Ranger: short range weak lazers. less agile. less defense. in a 1v1, a
-   Militia should be able to overtake a Ranger and kill it.
+ * Carrier: has no attack. slow. very high defense. can contain other ships.
  * Artillery: slower, shoots big lazers. slow moving, weak defense.
  * FlagShip: does not attack. has shields. does not move.
  * TurretLevel1: stationary, weak lazers.

@@ -57,8 +57,6 @@ function State(game) {
   });
   this.batchStatic.add(this.pausedLabel);
 
-  this.onUpdateBound = onUpdate.bind(this);
-
   this.stats = {
     shipsLost: 0,
     shipsGained: 0,
@@ -102,7 +100,7 @@ State.prototype.finishLevel = function(convoy) {
 };
 
 State.prototype.start = function() {
-  this.engine.on('update', this.onUpdateBound);
+  this.engine.on('update', onUpdate.bind(this));
   this.engine.on('buttondown', onButtonDown.bind(this));
   this.engine.on('buttonup', onButtonUp.bind(this));
   this.engine.on('mousemove', onMouseMove.bind(this));
@@ -313,11 +311,6 @@ function manualOverrideClick(state) {
 State.prototype.togglePause = function() {
   this.paused = !this.paused;
   this.pausedLabel.setVisible(this.paused);
-  if (this.paused) {
-    this.engine.removeListener('update', this.onUpdateBound);
-  } else {
-    this.engine.on('update', this.onUpdateBound);
-  }
 }
 
 function placeShipAtCursor(state) {
@@ -581,12 +574,6 @@ State.prototype.drawUiButtons = function(context) {
 };
 
 function onUpdate(dt, dx) {
-  var id;
-  for (id in this.physicsObjects) {
-    var obj = this.physicsObjects[id];
-    obj.update(dt, dx);
-  }
-
   if (!this.manualOverride) {
     if (this.engine.buttonState(chem.button.KeyUp)) this.scroll.y -= SCROLL_SPEED * dx;
     if (this.engine.buttonState(chem.button.KeyDown)) this.scroll.y += SCROLL_SPEED * dx;
@@ -594,6 +581,15 @@ function onUpdate(dt, dx) {
     if (this.engine.buttonState(chem.button.KeyLeft)) this.scroll.x -= SCROLL_SPEED * dx;
   }
   this.capScrollPosition();
+
+  if (this.paused) return;
+
+  var id;
+  for (id in this.physicsObjects) {
+    var obj = this.physicsObjects[id];
+    obj.update(dt, dx);
+  }
+
 
   for (id in this.aiObjects) {
     var ai = this.aiObjects[id];
