@@ -1,8 +1,4 @@
- * level 2, we exit the meteor field but there are some attackers. you have to build
-   some Ranger ships to defend.
-   - when you win you earn Militia ship
- * level 3, enemy flag ship is preventing the portal from appearing.
-   destroy the flag ship to open the portal.
+ * level 4 - moderate sized army is coming to attack you
 
 Bugs:
  * I suspect that physics objects are not getting deleted
