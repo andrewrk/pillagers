@@ -268,25 +268,24 @@ State.prototype.setUpObjectButtonsUi = function(obj) {
 State.prototype.setUpDockedShipsUi = function(obj) {
   var dockItemSize = v(20, 20);
   var margin = 4;
-  var nextPos = this.uiPaneDockedPos.clone();
+  var nextPos = this.uiPaneDockedPos.plus(dockItemSize.scaled(0.5));
   for (var id in obj.shipsInside) {
     var dockedShip = obj.shipsInside[id];
     var sprite = new chem.Sprite(dockedShip.animationNames.still, {
       batch: this.batchStatic,
       loop: false,
+      pos: nextPos.clone(),
     });
     sprite.scale = dockItemSize.divBy(sprite.size);
     sprite.scale.x = Math.min(sprite.scale.x, sprite.scale.y);
     sprite.scale.y = sprite.scale.x;
-    sprite.setLeft(nextPos.x);
-    sprite.setTop(nextPos.y);
     this.dockedShipSprites.push({
       ship: dockedShip,
       sprite: sprite
     });
     nextPos.y += dockItemSize.y + margin;
-    if (nextPos.y + dockItemSize.y >= this.uiPaneDockedPos.y + this.uiPaneDockedSize.y) {
-      nextPos.y = this.uiPaneDockedPos.y;
+    if (nextPos.y + dockItemSize.y * 0.5 >= this.uiPaneDockedPos.y + this.uiPaneDockedSize.y) {
+      nextPos.y = this.uiPaneDockedPos.y + dockItemSize.y * 0.5;
       nextPos.x += dockItemSize.x + margin;
     }
   }

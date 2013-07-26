@@ -9,7 +9,6 @@
 
 Bugs:
  * I suspect that physics objects are not getting deleted
- * flagship not showing up in portal / ships wrong size
 
 Nice-to-have:
  * pan sound effects and volume depending on scroll
