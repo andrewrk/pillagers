@@ -21,6 +21,7 @@ function FlagShip(state, o) {
   this.collisionDamping = 0.10;
   this.defense = 20;
   this.isFlagship = true;
+  this.bounty = 50;
   this.uiButtons = [
     {
       shipTypeLock: "Ranger",

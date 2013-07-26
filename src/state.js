@@ -437,17 +437,22 @@ State.prototype.maybeMouseUpButton = function() {
   }
 };
 
-State.prototype.createCashEffect = function(pos, amount) {
-  var cashEffect = new CashEffect(this, pos, amount);
+State.prototype.createCashEffect = function(pos, batch, amount) {
+  var cashEffect = new CashEffect(batch, pos, amount);
   this.cashEffects.push(cashEffect);
   this.cashEffects = this.cashEffects.filter(function(cashEffect) {
     return !cashEffect.deleted;
   });
 };
 
+State.prototype.gainCash = function(pos, amount) {
+  this.game.cash += amount;
+  this.createCashEffect(pos, this.batch, amount);
+}
+
 State.prototype.spendCash = function(amount) {
   this.game.cash -= amount;
-  this.createCashEffect(this.coinSprite.pos.clone(), -amount);
+  this.createCashEffect(this.coinSprite.pos.clone(), this.batchStatic, -amount);
 }
 
 function onMouseMove() {
@@ -906,6 +911,7 @@ State.prototype.addShip = function(ship) {
       this.stats.shipsLost += 1;
     } else {
       this.stats.enemiesDestroyed += 1;
+      this.gainCash(ship.pos, ship.bounty);
     }
   }.bind(this));
 };
@@ -1051,14 +1057,16 @@ Announcement.prototype.addTime = function(dt) {
   }
 };
 
-function CashEffect(state, pos, amount) {
-  this.label = new chem.Label(amount.toString(), {
-    pos: pos,
+function CashEffect(batch, pos, amount) {
+  var amountStr = amount.toString();
+  if (amount > 0) amountStr = "+" + amountStr;
+  this.label = new chem.Label(amountStr, {
+    pos: pos.clone(),
     fillStyle: amount >= 0 ? "#029200" : "#FF0000",
     font: "28px sans-serif",
     textAlign: "center",
     textBaseline: "middle",
-    batch: state.batchStatic,
+    batch: batch,
     zOrder: 1,
   });
   this.vel = v(0, -0.4);

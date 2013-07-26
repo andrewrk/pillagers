@@ -3,7 +3,6 @@
    - when you win you earn Militia ship
  * level 3, enemy flag ship is preventing the portal from appearing.
    destroy the flag ship to open the portal.
- * get cash from killing enemy ships
 
 Bugs:
  * I suspect that physics objects are not getting deleted

@@ -20,6 +20,7 @@ function Ship(state, o) {
   this.health = o.health || 1;
 
   this.canBeShot = true;
+  this.bounty = 5;
   // tells where it shows up in the squad
   this.rankOrder = 0;
 
