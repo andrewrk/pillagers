@@ -131,9 +131,9 @@ Ship.prototype.hit = function(damage, explosionAnimationName) {
   this.health -= damage / this.defense;
   this.emit('hit');
   if (this.health <= 0) {
-    this.emit('destroyed');
     this.state.createExplosion(this.pos, this.vel, explosionAnimationName);
     this.state.deletePhysicsObject(this);
+    this.emit('destroyed');
     this.delete();
   }
 };

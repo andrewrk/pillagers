@@ -1,6 +1,7 @@
- * level 4 - moderate sized army is coming to attack you
+ Features:
+ * Add a command that tells a ship to defend another ship.
 
-Level ideas:
+ Level ideas:
  * AI sends their army to attack your flagship directly
  * have to travel through a deadly area which you have no hope of destroying.
    get inside a tank to make it through.
@@ -21,11 +22,15 @@ Nice-to-have:
 
 
 Ship Classes:
+ * ResearchFacility: allows you to research upgrades
+ * EnergyBooster: ship which provides increased stats to ships within its radius.
+ * ShieldProvider: ship which provides shield coverage to ships within its radius.
  * Carrier: has no attack. slow. very high defense. can contain other ships.
  * Artillery: slower, shoots big lazers. slow moving, weak defense.
- * FlagShip: does not attack. has shields. does not move.
  * TurretLevel1: stationary, weak lazers.
- * Medic: heals other ships
+ * TurretLevel2: stationary, strong lazers.
+ * TurretLevel3: stationary heavy artillery
+ * Medic: heals ships within its radius
 
 Upgrades:
  * Targeting:
@@ -43,3 +48,5 @@ Upgrades:
    - Evade lazers.
    - Backwards thrusters.
    - Smarter aiming.
+ * Economy
+   - Gain more scrap money from destroying ships.
