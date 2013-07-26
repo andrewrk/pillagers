@@ -210,6 +210,7 @@ State.prototype.updateUiPane = function () {
   this.clearUiButtons();
   this.selectionUiLabel.setVisible(false);
   this.selectionUiSprite.setVisible(false);
+  this.skippableLevelLabel.setVisible(false);
   if (this.selectedCount === 1) {
     var obj = this.getFirstSelected();
     this.selectionUiLabel.text = obj.name;
@@ -225,6 +226,8 @@ State.prototype.updateUiPane = function () {
 
     if (obj.canBeEntered) this.setUpDockedShipsUi(obj);
     if (obj.uiButtons) this.setUpObjectButtonsUi(obj);
+  } else if (this.selectedCount === 0) {
+    this.skippableLevelLabel.setVisible(this.skippable);
   }
 };
 
@@ -391,6 +394,8 @@ function onButtonUp(button) {
       this.mouseDownOnUi = false;
       this.mouseDownOnButton = null;
       break;
+    case chem.button.KeyEscape:
+      if (this.skippable) this.cheatSkipLevel();
   }
 }
 
@@ -700,6 +705,7 @@ State.prototype.load = function(level, convoy) {
   this.mapSize = v(level.size);
   this.scroll = level.scroll ? v(level.scroll) : v();
   this.victoryRewards = level.rewards;
+  this.skippable = level.skippable;
 
   this.generateStars();
 
@@ -773,6 +779,15 @@ State.prototype.setUpUi = function() {
     textBaseline: "middle",
     batch: this.batchStatic,
   });
+  this.skippableLevelLabel = new chem.Label("You may skip this level by pressing Escape.", {
+    pos: this.uiPanePos.offset(this.uiPaneMargin, this.uiPaneSize.y - this.uiPaneMargin),
+    fillStyle: "#ffffff",
+    font: "16px sans-serif",
+    textAlign: "left",
+    textBaseline: "bottom",
+    batch: this.batchStatic,
+    visible: false,
+  });
 
   // info pane
   this.uiPaneInfoPos = this.uiPaneCashPos.offset(this.uiPaneCashSize.x, 0);
@@ -800,6 +815,8 @@ State.prototype.setUpUi = function() {
   this.dockedShipSprites = [];
   // ui buttons
   this.uiButtons = [];
+
+  this.updateUiPane();
 };
 
 State.prototype.addText = function(o) {
