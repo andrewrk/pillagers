@@ -1,9 +1,9 @@
- * allow you to create Ranger in flagship after unlocking it
  * level 2, we exit the meteor field but there are some attackers. you have to build
    some Ranger ships to defend.
    - when you win you earn Militia ship
  * level 3, enemy flag ship is preventing the portal from appearing.
    destroy the flag ship to open the portal.
+ * get cash from killing enemy ships
 
 Bugs:
  * I suspect that physics objects are not getting deleted

@@ -23,6 +23,7 @@ function State(game) {
   this.selection = {};
   this.selectedCount = 0;
   this.announcements = [];
+  this.cashEffects = [];
   this.manualOverride = null;
   this.batchBgBack = new chem.Batch();
   this.batchBgFore = new chem.Batch();
@@ -235,7 +236,15 @@ State.prototype.setUpObjectButtonsUi = function(obj) {
   var nextPos = this.miniMapPos.offset(-this.uiPaneMargin - buttonSize.x, 0);
   for (var i in obj.uiButtons) {
     var uiButton = obj.uiButtons[i];
-    var label = new chem.Label(uiButton.caption, {
+    if (uiButton.shipTypeLock) {
+      if (!this.game.unlockedShips[uiButton.shipTypeLock]) {
+        // ship is locked. don't show the button
+        continue
+      }
+    }
+    var caption = uiButton.caption;
+    if (uiButton.cost) caption = "($" + uiButton.cost + ") " + caption;
+    var label = new chem.Label(caption, {
       pos: nextPos.plus(buttonSize.scaled(0.5)),
       fillStyle: "#000000",
       font: "12px sans-serif",
@@ -301,7 +310,7 @@ function manualOverrideClick(state) {
   }
 }
 
-function togglePause(state) {
+State.prototype.togglePause = function() {
   this.paused = !this.paused;
   this.pausedLabel.setVisible(this.paused);
   if (this.paused) {
@@ -343,6 +352,8 @@ function onButtonDown(button) {
         this.cheatSkipLevel();
       } else if (this.engine.buttonState(chem.button.KeyC)) {
         this.game.cash += 101;
+      } else if (this.engine.buttonState(chem.button.KeyU)) {
+        this.cheatUnlockEverything();
       } else {
         startBoundingBox(this);
       }
@@ -365,7 +376,7 @@ function onButtonDown(button) {
       sendUnitsToCursor(this);
       break;
     case chem.button.KeyP:
-      togglePause(this);
+      this.togglePause();
       break;
     case chem.button.KeyM:
       this.game.toggleMusic();
@@ -395,6 +406,12 @@ State.prototype.cheatSkipLevel = function() {
   this.finishLevel(this.getConvoy());
 };
 
+State.prototype.cheatUnlockEverything = function() {
+  for (var shipType in shipTypes) {
+    this.game.unlockedShips[shipType] = true;
+  }
+};
+
 State.prototype.getConvoy = function() {
   var convoy = {};
   for (var id in this.physicsObjects) {
@@ -409,9 +426,29 @@ State.prototype.getConvoy = function() {
 State.prototype.maybeMouseUpButton = function() {
   var upButton = this.getMouseOverButton();
   if (upButton.button === this.mouseDownOnButton.button) {
+    if (upButton.button.cost) {
+      if (this.game.cash < upButton.button.cost) {
+        this.announce("This is not enough Golds.");
+        return;
+      }
+      this.spendCash(upButton.button.cost);
+    }
     upButton.button.fn();
   }
 };
+
+State.prototype.createCashEffect = function(pos, amount) {
+  var cashEffect = new CashEffect(this, pos, amount);
+  this.cashEffects.push(cashEffect);
+  this.cashEffects = this.cashEffects.filter(function(cashEffect) {
+    return !cashEffect.deleted;
+  });
+};
+
+State.prototype.spendCash = function(amount) {
+  this.game.cash -= amount;
+  this.createCashEffect(this.coinSprite.pos.clone(), -amount);
+}
 
 function onMouseMove() {
   if (this.mouseDownOnMiniMap) {
@@ -584,6 +621,12 @@ function onUpdate(dt, dx) {
     announcement.addTime(dt);
   }
 
+  for (i = 0; i < this.cashEffects.length; i += 1) {
+    var cashEffect = this.cashEffects[i];
+    if (cashEffect.deleted) continue;
+    cashEffect.update(dt, dx);
+  }
+
   this.cashLabel.text = this.game.cash.toString();
 }
 
@@ -700,6 +743,7 @@ State.prototype.insertConvoyAtStartPoint = function(convoy, o) {
     ship.pos = pt;
     ship.vel = v();
     ship.undelete(this);
+    ship.rotation = 0;
     this.addShip(ship);
   }
 };
@@ -715,14 +759,14 @@ State.prototype.setUpUi = function() {
 
   this.uiPaneCashPos = this.uiPanePos.offset(this.uiPaneMargin, this.uiPaneMargin);
   this.uiPaneCashSize = v(60, this.uiPaneSize.y - this.uiPaneMargin * 2);
-  var coinSprite = new chem.Sprite('coin', {
+  this.coinSprite = new chem.Sprite('coin', {
     pos: this.uiPaneCashPos.offset(4, 4),
     batch: this.batchStatic,
     scale: v(0.40, 0.40),
   });
-  coinSprite.pos.add(coinSprite.getSize().scale(0.5));
+  this.coinSprite.pos.add(this.coinSprite.getSize().scale(0.5));
   this.cashLabel = new chem.Label("0", {
-    pos: v(coinSprite.getRight() + 4, coinSprite.pos.y),
+    pos: v(this.coinSprite.getRight() + 4, this.coinSprite.pos.y),
     fillStyle: "#ffffff",
     font: "20px sans-serif",
     textAlign: "left",
@@ -1005,4 +1049,31 @@ Announcement.prototype.addTime = function(dt) {
     var alphaDuration = this.duration - this.fadeDuration;
     this.label.alpha = 1 - (this.age - this.fadeDuration) / alphaDuration;
   }
+};
+
+function CashEffect(state, pos, amount) {
+  this.label = new chem.Label(amount.toString(), {
+    pos: pos,
+    fillStyle: amount >= 0 ? "#029200" : "#FF0000",
+    font: "28px sans-serif",
+    textAlign: "center",
+    textBaseline: "middle",
+    batch: state.batchStatic,
+    zOrder: 1,
+  });
+  this.vel = v(0, -0.4);
+  // I love this variable name
+  this.alphaDelta = 0.02;
+  this.deleted = false;
+}
+
+CashEffect.prototype.update = function(dt, dx) {
+  this.label.pos.add(this.vel.scaled(dx));
+  this.label.alpha = Math.max(0, this.label.alpha - dx * this.alphaDelta);
+  if (this.label.alpha === 0) this.delete();
+};
+
+CashEffect.prototype.delete = function() {
+  this.label.delete();
+  this.deleted = true;
 };

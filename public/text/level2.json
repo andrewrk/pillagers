@@ -1,0 +1,67 @@
+{
+  "size": {"x": 2000, "y": 1000},
+  "scroll": {"x": 0, "y": 200},
+  "rewards": [
+    {
+      "type": "Cash",
+      "properties": {
+        "amount": 100
+      }
+    },
+    {
+      "type": "UnlockShip",
+      "properties": {
+        "shipType": "Turret"
+      }
+    }
+  ],
+  "objects": [
+    {
+      "type": "StartPoint",
+      "properties": {
+        "radius": 100,
+        "pos": {"x": 150, "y": 400}
+      }
+    },
+    {
+      "type": "ShipCluster",
+      "properties": {
+        "type": "Ranger",
+        "team": 1,
+        "size": {"x": 200, "y": 200},
+        "pos": {"x": 1650, "y": 400},
+        "count": 10
+      }
+    },
+    {
+      "type": "ShipCluster",
+      "properties": {
+        "type": "Flag",
+        "team": 1,
+        "pos": {"x": 1850, "y": 500},
+        "size": {"x": 50, "y": 50},
+        "count": 1
+      }
+    },
+    {
+      "type": "ShipCluster",
+      "properties": {
+        "type": "Turret",
+        "team": 1,
+        "size": {"x": 1, "y": 1},
+        "pos": {"x": 1600, "y": 400},
+        "count": 1
+      }
+    },
+    {
+      "type": "ShipCluster",
+      "properties": {
+        "type": "Turret",
+        "team": 1,
+        "size": {"x": 1, "y": 1},
+        "pos": {"x": 1600, "y": 600},
+        "count": 1
+      }
+    }
+  ]
+}

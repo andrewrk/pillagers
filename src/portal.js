@@ -26,7 +26,7 @@ function Portal(state, o) {
     {
       caption: "Send Ships Out",
       fn: this.sendShipsOut.bind(this),
-    }
+    },
   ];
 }
 

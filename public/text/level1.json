@@ -1,6 +1,6 @@
 {
-  "size": {"x": 2000, "y": 1000},
-  "scroll": {"x": 0, "y": 200},
+  "size": {"x": 3000, "y": 1000},
+  "scroll": {"x": 0, "y": 0},
   "rewards": [
     {
       "type": "Cash",
@@ -19,8 +19,47 @@
     {
       "type": "StartPoint",
       "properties": {
-        "radius": 100,
-        "pos": {"x": 150, "y": 400}
+        "pos": {"x": 100, "y": 290},
+        "radius": 1
+      }
+    },
+    {
+      "type": "Text",
+      "properties": {
+        "text": "You have almost made it through the meteor field,\nbut now there is a small fleet of ships waiting in ambush.",
+        "pos": {"x": 10, "y": 150}
+      }
+    },
+    {
+      "type": "Text",
+      "properties": {
+        "text": "Select your Flagship and purchase units to\ndefend yourself.",
+        "pos": {"x": 10, "y": 400}
+      }
+    },
+    {
+      "type": "Meteor",
+      "properties": {
+        "animationName": "rock-b",
+        "pos": {"x": 1500, "y": 250},
+        "vel": {"x": 0, "y": 0},
+        "rotVel" : 0.0001,
+        "radius": 200
+      }
+    },
+    {
+      "type": "MeteorCluster",
+      "properties": {
+        "animationNames": ["rock-a"],
+        "pos": {"x": 1000, "y": 0},
+        "size": {"x": 1000, "y": 1000},
+        "minVel": {"x": -0.5, "y": -0.5},
+        "maxVel": {"x": 0.5, "y": 0.5},
+        "minRotVel" : -0.01,
+        "maxRotVel" : 0.01,
+        "minRadius": 20,
+        "maxRadius": 50,
+        "count": 3
       }
     },
     {
@@ -28,40 +67,17 @@
       "properties": {
         "type": "Ranger",
         "team": 1,
-        "size": {"x": 200, "y": 200},
-        "pos": {"x": 1650, "y": 400},
-        "count": 10
+        "size": {"x": 200, "y": 100},
+        "pos": {"x": 1400, "y": 700},
+        "count": 4
       }
     },
     {
-      "type": "ShipCluster",
+      "type": "Portal",
       "properties": {
-        "type": "Flag",
-        "team": 1,
-        "pos": {"x": 1850, "y": 500},
-        "size": {"x": 50, "y": 50},
-        "count": 1
-      }
-    },
-    {
-      "type": "ShipCluster",
-      "properties": {
-        "type": "Turret",
-        "team": 1,
-        "size": {"x": 1, "y": 1},
-        "pos": {"x": 1600, "y": 400},
-        "count": 1
-      }
-    },
-    {
-      "type": "ShipCluster",
-      "properties": {
-        "type": "Turret",
-        "team": 1,
-        "size": {"x": 1, "y": 1},
-        "pos": {"x": 1600, "y": 600},
-        "count": 1
+        "pos": {"x": 2800, "y": 800}
       }
     }
   ]
 }
+

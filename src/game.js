@@ -14,10 +14,7 @@ module.exports = Game;
 
 
 function Game(engine) {
-  this.levelIndex = 0;
-  this.cash = 0;
   this.engine = engine;
-  this.unlockedShips = {};
 
   initMusic(this);
 }
@@ -57,6 +54,8 @@ Game.prototype.showCredits = function() {
 
 Game.prototype.startNewGame = function() {
   this.levelIndex = 0;
+  this.cash = 0;
+  this.unlockedShips = {};
 
   // start game with only a flagship
   var convoy = {};
