@@ -92,7 +92,7 @@ ShipAi.prototype.attackNearbyEnemy = function() {
     }
   }
   if (target) {
-    this.commandToAttack(target, false, true);
+    this.commandToAttack(target, false);
     return true;
   }
   return false;

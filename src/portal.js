@@ -41,7 +41,7 @@ Portal.prototype.sendShipsOut = function() {
     var offset = v.unit(radians).scale(radius);
     ship.pos = this.pos.plus(offset);
     ship.vel = v(0, 0);
-    ship.undelete();
+    ship.undelete(this.state);
     this.state.addShip(ship);
     count += 1;
   }

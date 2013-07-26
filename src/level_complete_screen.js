@@ -10,6 +10,7 @@ function LevelCompleteScreen(game, o) {
   this.engine = game.engine;
   this.levelCompleteImg = chem.resources.images['level-complete.png'];
   this.batch = new chem.Batch();
+  this.convoy = o.convoy;
 
   this.setUpConvoy(o.convoy);
   this.setUpStats(o.stats);
@@ -180,5 +181,5 @@ LevelCompleteScreen.prototype.delete = function() {
 LevelCompleteScreen.prototype.playNextLevel = function() {
   this.delete();
   this.game.levelIndex += 1;
-  this.game.playLevel();
+  this.game.playLevel(this.convoy);
 };

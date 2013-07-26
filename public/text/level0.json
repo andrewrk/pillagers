@@ -34,24 +34,21 @@
       "type": "Text",
       "properties": {
         "text": "Ctrl + Right Click tells ships to move close to a point without coming to a stop.",
-        "pos": {"x": 1000, "y": 10}
+        "pos": {"x": 1000, "y": 100}
       }
     },
     {
       "type": "Text",
       "properties": {
         "text": "A Portal grants access to the next level.\nSelect ships and Right Click on the\nPortal to enter it.",
-        "pos": {"x": 3000, "y": 10}
+        "pos": {"x": 3000, "y": 100}
       }
     },
     {
-      "type": "ShipCluster",
+      "type": "StartPoint",
       "properties": {
-        "type": "Flag",
-        "team": 0,
-        "pos": {"x": 100, "y": 300},
-        "size": {"x": 1, "y": 1},
-        "count": 1
+        "pos": {"x": 200, "y": 300},
+        "radius": 100
       }
     },
     {

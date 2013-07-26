@@ -34,8 +34,7 @@ function toggleMusic(option) {
 
 function startNewGame() {
   this.delete();
-  this.game.levelIndex = 0;
-  this.game.playLevel();
+  this.game.startNewGame();
 }
 
 function goToCredits() {

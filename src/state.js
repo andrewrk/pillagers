@@ -10,8 +10,6 @@ var Portal = require('./portal');
 var Squad = require('./squad');
 var shipTypes = require('./ship_types');
 
-var PLAYER_TEAM = new Team();
-var ENEMY_TEAM = new Team();
 var SCROLL_SPEED = 12;
 
 
@@ -65,6 +63,9 @@ function State(game) {
     shipsGained: 0,
     enemiesDestroyed: 0,
   };
+  this.playerTeam = Team.get(0);
+  this.enemyTeam = Team.get(1);
+
 }
 
 State.prototype.delete = function() {
@@ -147,7 +148,7 @@ function finishBoundingBox(state) {
     // iterate over owned objects
     for (var id in state.aiObjects) {
       var ai = state.aiObjects[id];
-      if (ai.ship.team !== PLAYER_TEAM) continue;
+      if (ai.ship.team !== state.playerTeam) continue;
       if (ai.ship.pos.x >= start.x && ai.ship.pos.x < end.x &&
           ai.ship.pos.y >= start.y && ai.ship.pos.y < end.y)
       {
@@ -311,7 +312,7 @@ function togglePause(state) {
 }
 
 function placeShipAtCursor(state) {
-  var team = state.engine.buttonState(chem.button.Key2) ? ENEMY_TEAM : PLAYER_TEAM;
+  var team = state.engine.buttonState(chem.button.Key2) ? state.enemyTeam : state.playerTeam;
   var ship = new shipTypes.Ranger(state, {team: team, pos: state.mousePos()});
   state.addShip(ship);
 }
@@ -352,7 +353,7 @@ function onButtonDown(button) {
         return;
       }
       var obj = clickedAttackableObject(this, this.mousePos());
-      if (obj && obj.team !== PLAYER_TEAM) {
+      if (obj && obj.team !== this.playerTeam) {
         this.selectedUnitsAttack(obj);
         return;
       }
@@ -398,7 +399,9 @@ State.prototype.getConvoy = function() {
   var convoy = {};
   for (var id in this.physicsObjects) {
     var obj = this.physicsObjects[id];
-    if (obj.team === PLAYER_TEAM) convoy[id] = obj;
+    if (!obj.canBeSelected) continue;
+    if (obj.team !== this.playerTeam) continue;
+    convoy[id] = obj;
   }
   return convoy;
 };
@@ -650,8 +653,7 @@ function generateStars(self, size, density, batch) {
   }
 }
 
-State.prototype.load = function(level) {
-
+State.prototype.load = function(level, convoy) {
   this.mapSize = v(level.size);
   this.scroll = level.scroll ? v(level.scroll) : v();
   this.victoryRewards = level.rewards;
@@ -678,11 +680,28 @@ State.prototype.load = function(level) {
       case "Text":
         this.addText(props);
         break;
+      case "StartPoint":
+        this.insertConvoyAtStartPoint(convoy, props);
+        break;
       default:
         throw new Error("unrecognized object type in level: " + obj.type);
     }
   }
   this.setUpUi();
+};
+
+State.prototype.insertConvoyAtStartPoint = function(convoy, o) {
+  var pos = v(o.pos);
+  for (var id in convoy) {
+    var ship = convoy[id];
+    var radius = Math.random() * o.radius;
+    var radians = Math.random() * Math.PI * 2;
+    var pt = v.unit(radians).scale(radius).plus(pos);
+    ship.pos = pt;
+    ship.vel = v();
+    ship.undelete(this);
+    this.addShip(ship);
+  }
 };
 
 State.prototype.setUpUi = function() {
@@ -839,7 +858,7 @@ State.prototype.addShip = function(ship) {
   var shipAi = new ShipAi(this, ship);
   this.addAiObject(shipAi);
   ship.on('destroyed', function() {
-    if (ship.team === PLAYER_TEAM) {
+    if (ship.team === this.playerTeam) {
       this.stats.shipsLost += 1;
     } else {
       this.stats.enemiesDestroyed += 1;
@@ -885,7 +904,7 @@ State.prototype.isOffscreen = function(pos) {
 State.prototype.deleteSelectedShips = function() {
   for (var id in this.selection) {
     var obj = this.selection[id];
-    if (obj.team !== PLAYER_TEAM) continue;
+    if (obj.team !== this.playerTeam) continue;
     obj.hit(99999, "explosion");
   }
 };
@@ -894,7 +913,7 @@ State.prototype.commandableSelected = function(cb) {
   for (var id in this.aiObjects) {
     var ai = this.aiObjects[id];
     if (! ai.ship.selected) continue;
-    if (ai.ship.team !== PLAYER_TEAM) continue;
+    if (ai.ship.team !== this.playerTeam) continue;
     cb(ai);
   }
 };
@@ -926,7 +945,7 @@ State.prototype.gameOver = function() {
 };
 
 State.prototype.flagShipDestroyed = function(ship) {
-  if (ship.team === PLAYER_TEAM) {
+  if (ship.team === this.playerTeam) {
     this.gameOver();
   } else {
     this.addPortal({pos: ship.pos.clone()});

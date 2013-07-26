@@ -16,11 +16,14 @@ function Ship(state, o) {
   PhysicsObject.apply(this, arguments);
   EventEmitter.call(this);
 
+  this.team = o.team;
+  this.health = o.health || 1;
+
   this.canBeShot = true;
   // tells where it shows up in the squad
   this.rankOrder = 0;
 
-  this.initResources();
+  this.initResources(state);
 
   this.canBeSelected = true;
   this.sensorRange = 400; // radius of ability to detect ships
@@ -28,8 +31,6 @@ function Ship(state, o) {
   this.brakeInput = false; // lets you brake at low velocities
   this.rotateInput = 0;
   this.enterInput = null; // lets you enter buildings
-  this.team = o.team;
-  this.health = o.health || 1;
   this.hasBackwardsThrusters = true;
   this.radius = 16;
   this.rotationSpeed = Math.PI * 0.03;
@@ -136,7 +137,12 @@ Ship.prototype.hit = function(damage, explosionAnimationName) {
   }
 };
 
-Ship.prototype.initResources = function() {
+Ship.prototype.initResources = function(state) {
+  // sometimes we want to create a ship outside the context of a level player
+  if (state == null) return;
+
+  this.state = state;
+
   this.thrustAudio = new Audio("sfx/thruster.ogg");
   this.thrustAudio.loop = true;
 
@@ -145,6 +151,8 @@ Ship.prototype.initResources = function() {
 }
 
 Ship.prototype.tearDownResources = function() {
+  this.state = null;
+
   this.thrustAudio.pause();
   this.thrustAudio = null;
 
@@ -161,9 +169,9 @@ Ship.prototype.delete = function() {
   this.tearDownResources();
 };
 
-Ship.prototype.undelete = function() {
+Ship.prototype.undelete = function(state) {
   this.deleted = false;
-  this.initResources();
+  this.initResources(state);
 };
 
 function assert(value) {

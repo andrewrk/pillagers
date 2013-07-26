@@ -1,11 +1,17 @@
 var chem = require('chem');
 var State = require('./state');
+var Team = require('./team');
+var FlagShip = require('./flag_ship');
 var TitleScreen = require('./title_screen');
 var LevelCompleteScreen = require('./level_complete_screen');
 var CreditsScreen = require('./credits_screen');
 var GameOverScreen = require('./game_over_screen');
 
+var playerTeam = new Team();
+var enemyTeam = new Team();
+
 module.exports = Game;
+
 
 function Game(engine) {
   this.levelIndex = 0;
@@ -49,7 +55,19 @@ Game.prototype.showCredits = function() {
   credits.start();
 };
 
-Game.prototype.playLevel = function() {
+Game.prototype.startNewGame = function() {
+  this.levelIndex = 0;
+
+  // start game with only a flagship
+  var convoy = {};
+  var flagship = new FlagShip(null, {
+    team: playerTeam,
+  });
+  convoy[flagship.id] = flagship;
+  this.playLevel(convoy);
+};
+
+Game.prototype.playLevel = function(convoy) {
   var state = new State(this);
   var levelText = chem.resources.text["level" + this.levelIndex + ".json"];
   if (levelText == null) {
@@ -64,7 +82,7 @@ Game.prototype.playLevel = function() {
     throw new Error("Error parsing level. Invalid JSON: " + err.stack);
   }
 
-  state.load(level);
+  state.load(level, convoy);
   state.start();
 };
 

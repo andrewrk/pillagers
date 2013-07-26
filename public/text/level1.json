@@ -17,33 +17,10 @@
   ],
   "objects": [
     {
-      "type": "ShipCluster",
+      "type": "StartPoint",
       "properties": {
-        "type": "Flag",
-        "team": 0,
-        "pos": {"x": 50, "y": 400},
-        "size": {"x": 1, "y": 1},
-        "count": 1
-      }
-    },
-    {
-      "type": "ShipCluster",
-      "properties": {
-        "type": "Militia",
-        "team": 0,
-        "size": {"x": 100, "y": 100},
-        "pos": {"x": 100, "y": 400},
-        "count": 6
-      }
-    },
-    {
-      "type": "ShipCluster",
-      "properties": {
-        "type": "Ranger",
-        "team": 0,
-        "size": {"x": 100, "y": 100},
-        "pos": {"x": 100, "y": 300},
-        "count": 6
+        "radius": 100,
+        "pos": {"x": 150, "y": 400}
       }
     },
     {

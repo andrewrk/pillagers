@@ -38,7 +38,7 @@ function initListeners(self) {
   });
 }
 
-FlagShip.prototype.initResources = function() {
+FlagShip.prototype.initResources = function(state) {
   Ship.prototype.initResources.apply(this, arguments);
   initListeners(this);
 };
