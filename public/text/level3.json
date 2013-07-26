@@ -1,0 +1,162 @@
+{
+  "size": {"x": 4000, "y": 800},
+  "scroll": {"x": 0, "y": 0},
+  "rewards": [
+    {
+      "type": "Cash",
+      "properties": {
+        "amount": 80
+      }
+    },
+    {
+      "type": "UnlockShip",
+      "properties": {
+        "shipType": "Carrier"
+      }
+    }
+  ],
+  "events": {
+    "DistressSignal": {
+      "actions": [
+        {
+          "type": "Announcement",
+          "properties": {
+            "text": "You intercept an outgoing distress message: \"...we are under attack, send rein--\""
+          }
+        },
+        {
+          "type": "Timer",
+          "properties": {
+            "timeout": 5,
+            "event": "ArmyArrival"
+          }
+        }
+      ]
+    },
+    "TargetFlagship": {
+      "actions": [
+        {
+          "type": "EveryoneTargetThatSuckersFlagship"
+        },
+        {
+          "type": "Announcement",
+          "properties": {
+            "text": "The fleet seems to be headed directly for your Flagship!"
+          }
+        }
+      ]
+    },
+    "ArmyArrival": {
+      "actions": [
+        {
+          "type": "SpawnObject",
+          "properties": {
+            "type": "ShipCluster",
+            "properties": {
+              "type": "Ranger",
+              "team": 1,
+              "pos": {"x": 3600, "y": 300},
+              "size": {"x": 300, "y": 300},
+              "count": 8
+            }
+          }
+        },
+        {
+          "type": "SpawnObject",
+          "properties": {
+            "type": "ShipCluster",
+            "properties": {
+              "type": "Militia",
+              "team": 1,
+              "pos": {"x": 3600, "y": 300},
+              "size": {"x": 300, "y": 300},
+              "count": 8
+            }
+          }
+        },
+        {
+          "type": "SpawnObject",
+          "properties": {
+            "type": "ShipCluster",
+            "properties": {
+              "type": "Flag",
+              "team": 1,
+              "pos": {"x": 3600, "y": 300},
+              "size": {"x": 300, "y": 300},
+              "count": 1
+            }
+          }
+        },
+        {
+          "type": "SpawnObject",
+          "properties": {
+            "type": "ShipCluster",
+            "properties": {
+              "type": "Artillery",
+              "team": 1,
+              "pos": {"x": 3600, "y": 300},
+              "size": {"x": 300, "y": 300},
+              "count": 1
+            }
+          }
+        },
+        {
+          "type": "Announcement",
+          "properties": {
+            "text": "A fleet of military ships have arrived."
+          }
+        },
+        {
+          "type": "Timer",
+          "properties": {
+            "timeout": 5,
+            "event": "TargetFlagship"
+          }
+        }
+      ]
+    }
+  },
+  "objects": [
+    {
+      "type": "StartPoint",
+      "properties": {
+        "pos": {"x": 100, "y": 290},
+        "radius": 1
+      }
+    },
+    {
+      "type": "MeteorCluster",
+      "properties": {
+        "animationNames": ["rock-a", "rock-b"],
+        "pos": {"x": 1000, "y": 0},
+        "size": {"x": 1000, "y": 1000},
+        "minVel": {"x": -0.5, "y": -0.5},
+        "maxVel": {"x": 0.5, "y": 0.5},
+        "minRotVel" : -0.01,
+        "maxRotVel" : 0.01,
+        "minRadius": 20,
+        "maxRadius": 50,
+        "count": 8
+      }
+    },
+    {
+      "type": "ShipCluster",
+      "properties": {
+        "type": "Civilian",
+        "team": 1,
+        "size": {"x": 200, "y": 100},
+        "pos": {"x": 1100, "y": 700},
+        "count": 4
+      }
+    },
+    {
+      "type": "TriggerShip",
+      "properties": {
+        "team": 1,
+        "pos": {"x": 1100, "y": 700},
+        "condition": "killed",
+        "event": "DistressSignal"
+      }
+    }
+  ]
+}

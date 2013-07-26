@@ -33,7 +33,7 @@ function FlagShip(state, o) {
       shipTypeLock: "Militia",
       caption: "Create Militia",
       fn: createShipFn(this, MilitiaShip),
-      cost: 20
+      cost: 15
     },
     {
       shipTypeLock: "Turret",

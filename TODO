@@ -1,7 +1,15 @@
- Features:
+Next:
+ * Level 4:
+   - when you attack the civilians they send a distress signal
+   - small fleet arrives to defend the civilians
+   - incoming army directly targets your flagship
+
+Features:
  * Add a command that tells a ship to defend another ship.
 
- Level ideas:
+Level ideas:
+ * portals that enemies come out of
+ * you attack some civilians for cash and the AI retorts
  * AI sends their army to attack your flagship directly
  * have to travel through a deadly area which you have no hope of destroying.
    get inside a tank to make it through.
@@ -12,13 +20,12 @@ Bugs:
  * I suspect that physics objects are not getting deleted
 
 Nice-to-have:
+ * ability to retry level when you get game over
  * pan sound effects and volume depending on scroll
- * experiment with speed cap on ships
  * if ranger is in range, don't accelerate toward target
  * fix the thruster sound glitchiness
  * State should be renamed LevelPlayer
  * each command should draw to indicate that something is commanded
- * Squad: don't assume all ships have same radius
 
 
 Ship Classes:

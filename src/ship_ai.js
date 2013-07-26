@@ -39,7 +39,11 @@ ShipAi.prototype.update = function (dt, dx) {
     return;
   }
 
-  if (! this.attackNearbyEnemy()) this.decelerate();
+  if (this.ship.hostile) {
+    if (! this.attackNearbyEnemy()) this.decelerate();
+  } else {
+    this.decelerate();
+  }
 }
 
 ShipAi.prototype.pointTowardDirection = function(targetDir) {
@@ -266,7 +270,7 @@ EngageCommand.prototype.setThrustWithCap = function(ai, thrustInput) {
   var actualDir = v.unit(ai.ship.rotation);
   var thrustWouldIncreaseSpeed = actualDir.dot(ai.ship.vel) > 0;
   if (thrustInput < 0) thrustWouldIncreaseSpeed = !thrustWouldIncreaseSpeed;
-  if (thrustWouldIncreaseSpeed) return;
+  if (thrustWouldIncreaseSpeed) thrustInput = 0;
   ai.ship.setThrustInput(thrustInput);
 };
 

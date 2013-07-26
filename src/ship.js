@@ -38,6 +38,7 @@ function Ship(state, o) {
   this.thrustAmt = 0.1;
   this.hasBullets = false;
   this.canBeStruck = true;
+  this.hostile = true;
 
   this.miniMapColor = this.team.color;
   this.uiAnimationName = this.animationNames.still;
