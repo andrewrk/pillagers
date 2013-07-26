@@ -32,7 +32,7 @@ ShipAi.prototype.update = function (dt, dx) {
 
   if (cmd) {
     cmd.execute(this, dt, dx);
-    if (cmd.done) {
+    while (this.commands[0] && this.commands[0].done) {
       this.commands.shift().delete();
       this.ship.clearInput();
     }
