@@ -1,8 +1,7 @@
 {
-  "name": "superpowerless",
+  "name": "pillagers",
   "version": "0.0.0",
-  "private": true,
-  "description": "game with superpowerless",
+  "description": "space-physics real time strategy game made for 7dRTS",
   "main": "chemfile.js",
   "dependencies": {
     "chem": "~2.0.0",
@@ -13,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "ssh://git@bitbucket.org/superjoe/superpowerless.git"
+    "url": "https://github.com/superjoe30/pillagers.git"
   },
   "license": "BSD"
 }
