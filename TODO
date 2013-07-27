@@ -1,3 +1,9 @@
+Next:
+ * Add a turret to flagship
+ * Update level 1 with a civilian and use that to explain ctrl+right-click
+   vs right-click
+ * Add dogfighting mode.
+
 Features:
  * Add a command that tells a ship to defend another ship.
 
@@ -8,10 +14,10 @@ Level ideas:
  * enemy has a ship which disables auto-pilot. you have to use manual override
    to destroy that ship to reactivate your army
 
-Bugs:
- * Performance slowdown issue.
-
 Nice-to-have:
+ * Make WASD work.
+ * Ability to change controls.
+ * Ability to selecet all.
  * ability to retry level when you get game over
  * pan sound effects and volume depending on scroll
  * if ranger is in range, don't accelerate toward target

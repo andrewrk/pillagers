@@ -12,8 +12,12 @@ function TitleScreen(game) {
   this.time = 0;
   this.options = [
     {
-      caption: "Start New Game",
-      fn: startNewGame.bind(this),
+      caption: "Start New Campaign",
+      fn: startNewCampaign.bind(this),
+    },
+    {
+      caption: "Sandbox Mode",
+      fn: startSandboxMode.bind(this),
     },
     {
       caption: "Credits",
@@ -32,9 +36,14 @@ function toggleMusic(option) {
   option.label.text = "Music: " + (this.game.musicOn ? "On": "Off");
 }
 
-function startNewGame() {
+function startSandboxMode() {
   this.delete();
-  this.game.startNewGame();
+  this.game.startSandboxMode();
+}
+
+function startNewCampaign() {
+  this.delete();
+  this.game.startNewCampaign();
 }
 
 function goToCredits() {

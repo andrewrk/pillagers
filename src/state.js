@@ -4,7 +4,7 @@ var v = chem.vec2d;
 var ShipAi = require('./ship_ai');
 var Fx = require('./fx');
 var sfx = require('./sfx');
-var Team = require('./team');
+var team = require('./team');
 var Meteor = require('./meteor');
 var Portal = require('./portal');
 var Squad = require('./squad');
@@ -12,6 +12,7 @@ var shipTypes = require('./ship_types');
 
 var SCROLL_SPEED = 12;
 
+var shipTypeList = toList(shipTypes);
 
 module.exports = State;
 
@@ -26,10 +27,15 @@ function State(game) {
   this.cashEffects = [];
   this.timers = [];
   this.manualOverride = null;
+  this.scroll = v();
   this.batchBgBack = new chem.Batch();
   this.batchBgFore = new chem.Batch();
   this.batch = new chem.Batch();
   this.batchStatic = new chem.Batch();
+
+  this.sandboxMode = false;
+  this.sandboxDrawMode = 'select';
+  this.sandboxDrawModeShipIndex = 0;
 
   this.bgBackFactor = 0.10; // scrolls 10x slower than normal
   this.bgForeFactor = 0.15;
@@ -37,6 +43,8 @@ function State(game) {
   this.mouseDownOnMiniMap = false;
   this.mouseDownOnUi = false;
   this.mouseDownOnButton = null;
+  this.mouseRightDownUi = false;
+  this.mouseRightDownOnButton = null;
   this.mapSize = null; // set when loading map
   this.uiPaneImg = chem.resources.images['ui-pane.png'];
   this.uiPanePos = v(0, this.engine.size.y - this.uiPaneImg.height);
@@ -63,8 +71,8 @@ function State(game) {
     shipsGained: 0,
     enemiesDestroyed: 0,
   };
-  this.playerTeam = Team.get(0);
-  this.enemyTeam = Team.get(1);
+  this.playerTeam = team.get(0);
+  this.enemyTeam = team.get(1);
 
 }
 
@@ -206,12 +214,21 @@ State.prototype.clearUiButtons = function() {
   this.uiButtons = [];
 };
 
+State.prototype.sandboxModeUpdateUiPane = function() {
+  if (this.selectedCount === 0) {
+    this.createSandboxButtons();
+  }
+};
+
+State.prototype.campaignUpdateUiPane = function() {
+  this.skippableLevelLabel.setVisible(this.skippable);
+};
+
 State.prototype.updateUiPane = function () {
   this.clearDockedShipSprites();
   this.clearUiButtons();
   this.selectionUiLabel.setVisible(false);
   this.selectionUiSprite.setVisible(false);
-  this.skippableLevelLabel.setVisible(false);
   if (this.selectedCount === 1) {
     var obj = this.getFirstSelected();
     this.selectionUiLabel.text = obj.name;
@@ -227,10 +244,17 @@ State.prototype.updateUiPane = function () {
 
     if (obj.canBeEntered) this.setUpDockedShipsUi(obj);
     if (obj.uiButtons) this.setUpObjectButtonsUi(obj);
-  } else if (this.selectedCount === 0) {
-    this.skippableLevelLabel.setVisible(this.skippable);
+  }
+  if (this.sandboxMode) {
+    this.sandboxModeUpdateUiPane();
+  } else {
+    this.campaignUpdateUiPane();
   }
 };
+
+State.prototype.isShipUnlocked = function(shipTypeName) {
+  return this.sandboxMode || this.game.unlockedShips[shipTypeName];
+}
 
 State.prototype.setUpObjectButtonsUi = function(obj) {
   var buttonSize = v(120, 30);
@@ -239,7 +263,7 @@ State.prototype.setUpObjectButtonsUi = function(obj) {
   for (var i in obj.uiButtons) {
     var uiButton = obj.uiButtons[i];
     if (uiButton.shipTypeLock) {
-      if (!this.game.unlockedShips[uiButton.shipTypeLock]) {
+      if (!this.isShipUnlocked(uiButton.shipTypeLock)) {
         // ship is locked. don't show the button
         continue
       }
@@ -301,12 +325,12 @@ function clearSelection(state) {
   });
 }
 
-function manualOverrideClick(state) {
-  var aiShip = clickedAiShip(state, state.mousePos());
+State.prototype.manualOverrideClick = function() {
+  var aiShip = clickedAiShip(this, this.mousePos());
   if (aiShip) {
-    state.beginManualOverride(aiShip);
+    this.beginManualOverride(aiShip);
   } else {
-    state.endManualOverride();
+    this.endManualOverride();
   }
 }
 
@@ -315,10 +339,10 @@ State.prototype.togglePause = function() {
   this.pausedLabel.setVisible(this.paused);
 }
 
-function placeShipAtCursor(state) {
-  var team = state.engine.buttonState(chem.button.Key2) ? state.enemyTeam : state.playerTeam;
-  var ship = new shipTypes.Ranger(state, {team: team, pos: state.mousePos()});
-  state.addShip(ship);
+State.prototype.placeShipAtCursor = function(state) {
+  var ShipType = shipTypeList[this.sandboxDrawModeShipIndex].value;
+  var ship = new ShipType(this, {team: this.playerTeam, pos: this.mousePos()});
+  this.addShip(ship);
 }
 
 function sendUnitsToCursor(state) {
@@ -338,29 +362,43 @@ function onButtonDown(button) {
         this.mouseDownOnMiniMap = true;
         this.mouseDownOnUi = true;
         this.setScrollFromMiniMap();
-      } else if (this.engine.mousePos.y >= this.uiPanePos.y) {
+        return;
+      }
+      if (this.engine.mousePos.y >= this.uiPanePos.y) {
         this.mouseDownOnUi = true;
         this.mouseDownOnButton = this.getMouseOverButton();
-      } else if (this.engine.buttonState(chem.button.Key0)) {
-        manualOverrideClick(this);
-      } else if (this.engine.buttonState(chem.button.KeyN)) {
-        this.cheatSkipLevel();
-      } else if (this.engine.buttonState(chem.button.KeyC)) {
-        this.game.cash += 101;
-      } else if (this.engine.buttonState(chem.button.KeyU)) {
-        this.cheatUnlockEverything();
-      } else {
-        startBoundingBox(this);
+        return;
       }
+      if (this.engine.buttonState(chem.button.Key0)) {
+        this.toggleSandboxMode();
+        return;
+      }
+      if (this.sandboxMode) {
+        this.sandboxLeftClick();
+        return;
+      }
+      if (this.engine.buttonState(chem.button.KeyU)) {
+        this.cheatUnlockEverything();
+        return;
+      }
+      if (this.engine.buttonState(chem.button.KeyC)) {
+        this.game.cash += 500;
+        return;
+      }
+      if (this.engine.buttonState(chem.button.KeyN)) {
+        this.cheatSkipLevel();
+        return;
+      }
+      startBoundingBox(this);
       break;
     case chem.button.MouseRight:
-      if (this.engine.buttonState(chem.button.Key4)) {
-        for (var i =0; i < 500; i += 1 ) {
-          placeShipAtCursor(this);
-        }
+      if (this.engine.mousePos.y >= this.uiPanePos.y) {
+        this.mouseRightDownUi = true;
+        this.mouseRightDownOnButton = this.getMouseOverButton();
+        return;
       }
       if (this.engine.buttonState(chem.button.Key1) || this.engine.buttonState(chem.button.Key2)) {
-        placeShipAtCursor(this);
+        this.placeShipAtCursor();
         return;
       }
       var obj = clickedAttackableObject(this, this.mousePos());
@@ -399,8 +437,33 @@ function onButtonUp(button) {
       this.mouseDownOnUi = false;
       this.mouseDownOnButton = null;
       break;
+    case chem.button.MouseRight:
+      if (this.mouseRightDownOnButton) {
+        this.maybeMouseRightUpButton();
+      }
+      this.mouseRightDownUi = false;
+      this.mouseRightDownOnButton = null;
+      break;
     case chem.button.KeyEscape:
       if (this.skippable) this.cheatSkipLevel();
+  }
+}
+
+State.prototype.sandboxLeftClick = function() {
+  switch (this.sandboxDrawMode) {
+    case 'ship1':
+      this.placeShipAtCursor();
+      break;
+    case 'ship10':
+      break;
+    case 'select':
+      startBoundingBox(this);
+      break;
+    case 'pilot':
+      this.manualOverrideClick();
+      break;
+    default:
+      throw new Error("unknown draw mode: " + this.sandboxDrawMode);
   }
 }
 
@@ -420,17 +483,27 @@ State.prototype.getConvoy = function() {
   }.bind(this));
 };
 
+State.prototype.maybeMouseRightUpButton = function() {
+  var upButton = this.getMouseOverButton();
+  if (this.mouseRightDownOnButton && upButton.button === this.mouseRightDownOnButton.button) {
+    var help = upButton.button.help || "There is no help text for that button.";
+    this.announce(help);
+  }
+};
+
 State.prototype.maybeMouseUpButton = function() {
   var upButton = this.getMouseOverButton();
-  if (upButton.button === this.mouseDownOnButton.button) {
-    if (upButton.button.cost) {
-      if (this.game.cash < upButton.button.cost) {
-        this.announce("This is not enough Golds.");
-        return;
+  if (this.mouseDownOnButton && upButton.caption === this.mouseDownOnButton.caption) {
+    if (!this.sandboxMode) {
+      if (upButton.button.cost) {
+        if (this.game.cash < upButton.button.cost) {
+          this.announce("This is not enough Golds.");
+          return;
+        }
+        this.spendCash(upButton.button.cost);
       }
-      this.spendCash(upButton.button.cost);
     }
-    upButton.button.fn();
+    upButton.button.fn(upButton);
   }
 };
 
@@ -640,6 +713,18 @@ function onUpdate(dt, dx) {
     timer.update(dt, dx);
   }
 
+  if (this.sandboxMode) {
+    this.sandboxModeUpdate(dt, dx);
+  } else {
+    this.campaignOnUpdate(dt, dx);
+  }
+}
+
+State.prototype.sandboxModeUpdate = function(dt, dx) {
+  // nothing to do
+};
+
+State.prototype.campaignOnUpdate = function(dt, dx) {
   this.cashLabel.text = this.game.cash.toString();
 }
 
@@ -684,6 +769,9 @@ State.prototype.capScrollPosition = function() {
 };
 
 State.prototype.generateStars = function() {
+  this.batchBgBack.clear();
+  this.batchBgFore.clear();
+
   var unseenMapSize = this.mapSize.minus(this.viewSize);
   this.bgBackSize = unseenMapSize.scaled(this.bgBackFactor).add(this.viewSize);
   this.bgForeSize = unseenMapSize.scaled(this.bgForeFactor).add(this.viewSize);
@@ -763,7 +851,7 @@ State.prototype.spawnObject = function(obj) {
   var props = obj.properties;
   switch (obj.type) {
     case "ShipCluster":
-      props.team = Team.get(props.team || 0);
+      props.team = team.get(props.team || 0);
       this.addShipCluster(props);
       break;
     case "TriggerShip":
@@ -786,14 +874,28 @@ State.prototype.spawnObject = function(obj) {
   }
 }
 
+State.prototype.startSandboxMode = function() {
+  this.sandboxMode = true;
+  // init some default map properties
+  this.setMapSize(this.viewSize.clone());
+  this.setUpUi();
+  this.start();
+  this.announce("Right click a button to display help information.");
+};
+
+State.prototype.setMapSize = function(size) {
+  size.boundMin(this.viewSize);
+  this.mapSize = size;
+  this.generateStars();
+};
+
 State.prototype.load = function(level, convoy) {
-  this.mapSize = v(level.size);
+  this.setMapSize(v(level.size));
+
   this.scroll = level.scroll ? v(level.scroll) : v();
   this.victoryRewards = level.rewards;
   this.skippable = level.skippable;
   this.events = level.events;
-
-  this.generateStars();
 
   for (var i = 0; i < level.objects.length; i += 1) {
     this.spawnObject(level.objects[i]);
@@ -817,17 +919,118 @@ State.prototype.insertConvoyAtStartPoint = function(convoy, o) {
   }.bind(this));
 };
 
-State.prototype.setUpUi = function() {
-  // calculate mini map coordinates
-  this.uiPaneMargin = 10;
-  this.miniMapSize = v();
-  // choose the height and calculate the width 
-  this.miniMapSize.y = this.uiPaneSize.y - this.uiPaneMargin - this.uiPaneMargin;
-  this.miniMapSize.x = this.miniMapSize.y / this.mapSize.y * this.mapSize.x;
-  this.miniMapPos = this.uiPanePos.offset(this.uiPaneSize.x - this.uiPaneMargin - this.miniMapSize.x, this.uiPaneMargin);
+State.prototype.sandboxModeSetUpUi = function() {
 
-  this.uiPaneCashPos = this.uiPanePos.offset(this.uiPaneMargin, this.uiPaneMargin);
-  this.uiPaneCashSize = v(60, this.uiPaneSize.y - this.uiPaneMargin * 2);
+};
+
+State.prototype.createSandboxButtons = function() {
+  var btns = [
+    {
+      caption: "-width",
+      help: "Decrease the map width by 100.",
+      fn: this.uiSizeFn(v(-100, 0)),
+    },
+    {
+      caption: "+width",
+      help: "Increase the map width by 100.",
+      fn: this.uiSizeFn(v(+100, 0)),
+    },
+    {
+      caption: "-height",
+      help: "Decrease the map height by 100.",
+      fn: this.uiSizeFn(v(0, -100)),
+    },
+    {
+      caption: "+height",
+      help: "Increase the map height by 100.",
+      fn: this.uiSizeFn(v(0, 100)),
+    },
+    {
+      caption: "team " + (this.playerTeam.number + 1),
+      help: "Switch which team you are playing as.",
+      fn: this.switchToNextTeam.bind(this),
+    },
+    {
+      caption: shipTypeList[this.sandboxDrawModeShipIndex].key,
+      help: "Switch which ship you will draw with ship 1 and ship 10 buttons.",
+      fn: this.sandboxSelectNextShipType.bind(this),
+    },
+    {
+      caption: "ship 1",
+      help: "Press this button, then create ships by left clicking. Keys 1-9 determine what ship to create.",
+      fn: this.setPaintModeFn("ship1"),
+    },
+    {
+      caption: "ship 10",
+      help: "Same as ship 1 but creates 10 instead of 1.",
+      fn: this.setPaintModeFn("ship10"),
+    },
+    {
+      caption: "select",
+      help: "Left clicking acts like normal - selecting ships.",
+      fn: this.setPaintModeFn("select"),
+    },
+    {
+      caption: "manual",
+      help: "Left click to manually pilot a ship.",
+      fn: this.setPaintModeFn("pilot"),
+    },
+  ];
+  var nextPos = this.uiPanePos.offset(this.uiPaneMargin, this.uiPaneMargin);
+  this.uiButtons = btns.map(function(btn) {
+    var size = v(50, 20);
+    if (nextPos.y + size.y >= this.uiPanePos.y + this.uiPaneSize.y - this.uiPaneMargin) {
+      nextPos.y = this.uiPanePos.y + this.uiPaneMargin;
+      nextPos.x += size.x + 4;
+    }
+    var pos = nextPos.clone();
+    nextPos.y += size.y + 4;
+    var label = new chem.Label(btn.caption, {
+      pos: pos.plus(size.scaled(0.5)),
+      fillStyle: "#000000",
+      font: "14px sans-serif",
+      textAlign: "center",
+      textBaseline: "middle",
+      batch: this.batchStatic,
+    });
+    return {
+      pos: pos,
+      size: size,
+      button: btn,
+      label: label,
+      mouseOver: false,
+    };
+  }.bind(this));
+  this.computeHoverForUiButtons();
+};
+
+State.prototype.sandboxSelectNextShipType = function(button) {
+  var newIndex = (this.sandboxDrawModeShipIndex + 1) % shipTypeList.length;
+  this.sandboxDrawModeShipIndex = newIndex;
+  button.label.text = shipTypeList[newIndex].key;
+  this.sandboxDrawMode = 'ship1';
+};
+
+State.prototype.setPaintModeFn = function(name) {
+  return function(button) {
+    this.sandboxDrawMode = name;
+  }.bind(this);
+}
+
+State.prototype.uiSizeFn = function(delta) {
+  return function(button) {
+    this.setMapSize(this.mapSize.plus(delta));
+  }.bind(this);
+}
+
+State.prototype.switchToNextTeam = function(button) {
+  var maxTeams = 4;
+  var newTeamIndex = (this.playerTeam.number + 1) % maxTeams;
+  this.playerTeam = team.get(newTeamIndex);
+  button.label.text = "team " + (newTeamIndex + 1);
+};
+
+State.prototype.campaignSetUpUi = function() {
   this.coinSprite = new chem.Sprite('coin', {
     pos: this.uiPaneCashPos.offset(4, 4),
     batch: this.batchStatic,
@@ -851,6 +1054,19 @@ State.prototype.setUpUi = function() {
     batch: this.batchStatic,
     visible: false,
   });
+}
+
+State.prototype.setUpUi = function() {
+  // calculate mini map coordinates
+  this.uiPaneMargin = 10;
+  this.miniMapSize = v();
+  // choose the height and calculate the width 
+  this.miniMapSize.y = this.uiPaneSize.y - this.uiPaneMargin - this.uiPaneMargin;
+  this.miniMapSize.x = this.miniMapSize.y / this.mapSize.y * this.mapSize.x;
+  this.miniMapPos = this.uiPanePos.offset(this.uiPaneSize.x - this.uiPaneMargin - this.miniMapSize.x, this.uiPaneMargin);
+
+  this.uiPaneCashPos = this.uiPanePos.offset(this.uiPaneMargin, this.uiPaneMargin);
+  this.uiPaneCashSize = v(60, this.uiPaneSize.y - this.uiPaneMargin * 2);
 
   // info pane
   this.uiPaneInfoPos = this.uiPaneCashPos.offset(this.uiPaneCashSize.x, 0);
@@ -879,6 +1095,11 @@ State.prototype.setUpUi = function() {
   // ui buttons
   this.uiButtons = [];
 
+  if (this.sandboxMode) {
+    this.sandboxModeSetUpUi();
+  } else {
+    this.campaignSetUpUi();
+  }
   this.updateUiPane();
 };
 
@@ -933,7 +1154,7 @@ State.prototype.addMeteor = function(o) {
 State.prototype.addTriggerShip = function(o) {
   var ShipType = shipTypes[o.ship.type];
   var ship = new ShipType(this, {
-    team: Team.get(o.ship.team),
+    team: team.get(o.ship.team),
     pos: v(o.ship.pos),
   });
   ship.once(o.condition, function() {
@@ -1081,6 +1302,8 @@ State.prototype.gameOver = function() {
 };
 
 State.prototype.flagShipDestroyed = function(ship) {
+  if (this.sandboxMode) return;
+
   if (ship.team === this.playerTeam) {
     this.gameOver();
   } else {
@@ -1186,3 +1409,12 @@ Timer.prototype.update = function(dt, dx) {
     this.state.triggerEvent(this.eventName);
   }
 };
+
+function toList(o) {
+  var arr = [];
+  for (var key in o) {
+    arr.push({key: key, value: o[key]});
+  }
+  return arr;
+}
+

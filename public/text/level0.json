@@ -60,8 +60,8 @@
         "minRotVel" : -0.01,
         "maxRotVel" : 0.01,
         "minRadius": 32,
-        "maxRadius": 64,
-        "count": 10
+        "maxRadius": 54,
+        "count": 8
       }
     },
     {
@@ -71,7 +71,7 @@
         "pos": {"x": 2000, "y": 300},
         "vel": {"x": -0.1, "y": 0.04},
         "rotVel" : -0.001,
-        "radius": 200
+        "radius": 150
       }
     },
     {
@@ -81,7 +81,7 @@
         "pos": {"x": 1000, "y": 300},
         "vel": {"x": -0.5, "y": -0.2},
         "rotVel" : 0.01,
-        "radius": 128
+        "radius": 108
       }
     },
     {
