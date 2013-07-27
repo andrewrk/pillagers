@@ -518,6 +518,7 @@ MeleeCommand.prototype.execute = function(ai, dt, dx) {
   this.sprite.setVisible(ai.ship.selected);
   this.sprite.pos = this.target.pos;
   ai.ship.meleeInput = this.target;
+  ai.ship.meleeInputOn = false; // never fire and miss on purpose.
 };
 
 MeleeCommand.prototype.draw = function(ai, context) {};

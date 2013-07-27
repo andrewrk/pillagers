@@ -760,7 +760,17 @@ function onUpdate(dt, dx) {
       if (ship.hasBackwardsThrusters && goDown) thrust -= 1;
       ship.setThrustInput(thrust, thrust === 0);
 
-      ship.shootInput = this.engine.buttonState(chem.button.KeySpace) || this.engine.buttonState(chem.button.KeyJ);
+      var primaryFire = this.engine.buttonState(chem.button.KeySpace) || this.engine.buttonState(chem.button.KeyJ);
+      if (ship.hasBullets) {
+        ship.shootInput = primaryFire;
+      } else if (ship.hasMelee) {
+        ship.meleeInputOn = primaryFire;
+        if (primaryFire) {
+          ship.meleeInput = this.nearestMeleeableShip(ship);
+        } else {
+          ship.meleeInput = null;
+        }
+      }
 
       this.scroll = ship.pos.minus(this.viewSize.scaled(0.5));
       this.scroll.boundMin(v());
@@ -794,6 +804,22 @@ function onUpdate(dt, dx) {
     this.campaignOnUpdate(dt, dx);
   }
 }
+
+State.prototype.nearestMeleeableShip = function(ship) {
+  var target = null;
+  var closestDist;
+  for (var i = 0; i < this.physicsObjects.length; i += 1) {
+    var obj = this.physicsObjects[i];
+    if (!obj.canBeShot) continue;
+    if (obj.team == null || obj.team === ship.team) continue;
+    var dist = obj.pos.distanceSqrd(ship.pos);
+    if (target == null || dist < closestDist) {
+      closestDist = dist;
+      target = obj;
+    }
+  }
+  return target;
+};
 
 State.prototype.sandboxModeUpdate = function(dt, dx) {
   // nothing to do

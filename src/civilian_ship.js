@@ -15,6 +15,7 @@ function CivilianShip(state, o) {
   this.rankOrder = 9;
   this.sensorRange = 300;
   this.bounty = 20;
+  this.defense = 4;
   this.hostile = false;
 }
 

@@ -18,6 +18,7 @@ function MilitiaShip(state, o) {
 
   this.hasMelee = true;
   this.meleeInput = null; // set to a ship to attack it
+  this.meleeInputOn = false; // so you can fire even when it's pointless. silly humans like to do it.
   this.meleeRadius = 32;
   this.meleeDamage = 0.5;
   this.rechargeAmt = 0.40;
@@ -37,6 +38,7 @@ MilitiaShip.prototype.clearInput = function() {
   Ship.prototype.clearInput.apply(this, arguments);
 
   this.meleeInput = null;
+  this.meleeInputOn = false;
 }
 
 MilitiaShip.prototype.update = function(dt, dx) {
@@ -44,16 +46,29 @@ MilitiaShip.prototype.update = function(dt, dx) {
 
   this.recharge -= dt;
   if (this.meleeInput && this.meleeInput.deleted) this.meleeInput = null;
-  if (this.meleeInput && this.recharge <= 0 &&
-     (this.meleeInput.pos.distance(this.pos) < this.meleeRadius + this.meleeInput.radius))
-  {
-    // make sure the angle looks good
-    var actualDir = v.unit(this.rotation);
-    var targetDir = this.meleeInput.pos.minus(this.pos).normalize();
-    if (actualDir.dot(targetDir) > 0.80) {
-      this.recharge = this.rechargeAmt;
-      this.state.createElectricFx(this.pos.clone(), this.vel.clone(), this.rotation);
-      this.meleeInput.hit(this.meleeDamage, "disintegrate");
+  if (this.recharge <= 0) {
+    if (this.meleeInput && this.isTargetInRange(this.meleeInput)) {
+      this.fireMelee(this.meleeInput);
+    } else if (this.meleeInputOn) {
+      // shoot for no reason and miss everything.
+      this.fireMelee(null);
     }
   }
 }
+
+MilitiaShip.prototype.fireMelee = function(target) {
+  this.recharge = this.rechargeAmt;
+  this.state.createElectricFx(this.pos.clone(), this.vel.clone(), this.rotation);
+  if (target) target.hit(this.meleeDamage, "disintegrate");
+}
+
+MilitiaShip.prototype.isTargetInRange = function(target) {
+  // make sure distance looks good
+  var r = this.meleeRadius + target.radius;
+  if (target.pos.distanceSqrd(this.pos) >= r * r) return false;
+  // make sure the angle looks good
+  var actualDir = v.unit(this.rotation);
+  var targetDir = target.pos.minus(this.pos).normalize();
+  return actualDir.dot(targetDir) > 0.80;
+};
+
