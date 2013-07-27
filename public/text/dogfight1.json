@@ -1,5 +1,5 @@
 {
-  "size": {"x": 2000, "y": 1000},
+  "size": {"x": 1000, "y": 600},
   "scroll": {"x": 0, "y": 200},
   "rewards": [],
   "startPoint": {
@@ -13,13 +13,13 @@
         {
           "type": "Announcement",
           "properties": {
-            "text": "Dogfighting Challenge 1: Ranger VS Ranger"
+            "text": "Dogfighting Challenge 2: Environmental Hazards"
           }
         },
         {
           "type": "Announcement",
           "properties": {
-            "text": "Use the arrow keys and space or WASD and J to fly the Ranger."
+            "text": "You only have to destroy the other Ranger ship."
           }
         },
         {
@@ -80,7 +80,7 @@
               "ship": {
                 "type": "Ranger",
                 "team": 0,
-                "pos": {"x": 200, "y": 450}
+                "pos": {"x": 500, "y": 300}
               },
               "triggers": [
                 {
@@ -106,14 +106,76 @@
   ],
   "objects": [
     {
+      "type": "Ship",
+      "properties": {
+        "ship": {
+          "type": "Ranger",
+          "team": 1,
+          "pos": {"x": 800, "y": 500}
+        },
+        "triggers": [
+          {
+            "condition": "destroyed",
+            "event": "AnnounceVictory"
+          }
+        ]
+      }
+    },
+    {
       "type": "ShipCluster",
       "properties": {
-        "type": "Ranger",
+        "type": "Turret",
         "team": 1,
-        "size": {"x": 50, "y": 50},
-        "pos": {"x": 1650, "y": 400},
+        "pos": {"x": 50, "y": 50},
+        "size": {"x": 1, "y": 1},
         "count": 1
+      }
+    },
+    {
+      "type": "ShipCluster",
+      "properties": {
+        "type": "Turret",
+        "team": 1,
+        "pos": {"x": 950, "y": 50},
+        "size": {"x": 1, "y": 1},
+        "count": 1
+      }
+    },
+    {
+      "type": "ShipCluster",
+      "properties": {
+        "type": "Turret",
+        "team": 1,
+        "pos": {"x": 50, "y": 550},
+        "size": {"x": 1, "y": 1},
+        "count": 1
+      }
+    },
+    {
+      "type": "ShipCluster",
+      "properties": {
+        "type": "Turret",
+        "team": 1,
+        "pos": {"x": 950, "y": 550},
+        "size": {"x": 1, "y": 1},
+        "count": 1
+      }
+    },
+    {
+      "type": "MeteorCluster",
+      "properties": {
+        "animationNames": ["rock-b"],
+        "pos": {"x": 200, "y": 200},
+        "size": {"x": 600, "y": 200},
+        "minVel": {"x": 0, "y": 0},
+        "maxVel": {"x": 0.5, "y": 0.5},
+        "minRotVel" : -0.01,
+        "maxRotVel" : 0.01,
+        "minRadius": 10,
+        "maxRadius": 40,
+        "count": 2
       }
     }
   ]
 }
+
