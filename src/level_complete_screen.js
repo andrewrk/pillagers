@@ -169,7 +169,10 @@ function onMouseMove() {
 }
 
 function onButtonDown(button) {
-  if (this.nextLevelMouseOver) this.playNextLevel();
+  if ((this.nextLevelMouseOver && button === chem.button.MouseLeft) || button === chem.button.KeyEscape)
+  {
+    this.playNextLevel();
+  }
 }
 
 LevelCompleteScreen.prototype.delete = function() {

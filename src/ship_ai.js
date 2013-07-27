@@ -223,6 +223,7 @@ EngageCommand.prototype.execute = function(ai, dt, dx) {
     this.done = true;
     return;
   }
+  this.sprite.setVisible(ai.ship.selected);
 
   var relTargetPt = this.dest.minus(ai.ship.pos);
   var targetDir = relTargetPt.normalized();
@@ -274,9 +275,7 @@ EngageCommand.prototype.setThrustWithCap = function(ai, thrustInput) {
   ai.ship.setThrustInput(thrustInput);
 };
 
-EngageCommand.prototype.draw = function(ai, context) {
-  this.sprite.setVisible(ai.ship.selected);
-};
+EngageCommand.prototype.draw = function(ai, context) {};
 
 EngageCommand.prototype.delete = function() {
   this.sprite.delete();
@@ -286,16 +285,26 @@ function EnterCommand(ai, target) {
   this.target = target;
   this.done = false;
   this.speedCap = 9999;
+  this.sprite = new chem.Sprite('doorway', {
+    batch: ai.state.batch,
+    pos: this.target.pos,
+  });
 }
 
 EnterCommand.prototype.execute = function(ai, dt, dx) {
   interceptTarget.call(this, ai, dt, dx);
+  if (this.done) return;
+  this.sprite.pos = this.target.pos;
+  this.sprite.setVisible(ai.ship.selected);
   ai.ship.enterInput = this.target;
 };
 
 EnterCommand.prototype.draw = function(ai, context) { };
 
-EnterCommand.prototype.delete = function() { };
+EnterCommand.prototype.delete = function() {
+  this.target = null;
+  this.sprite.delete();
+};
 
 function MoveCommand(ai, dest) {
   this.dest = dest;
@@ -357,6 +366,10 @@ function ShootCommand(ai, target) {
   this.done = false;
   this.target = target;
   this.speedCap = 4;
+  this.sprite = new chem.Sprite('target', {
+    batch: ai.state.batch,
+    pos: this.target.pos,
+  });
 }
 
 ShootCommand.prototype.execute = function(ai, dt, dx) {
@@ -365,6 +378,8 @@ ShootCommand.prototype.execute = function(ai, dt, dx) {
     this.done = true;
     return;
   }
+  this.sprite.setVisible(ai.ship.selected);
+  this.sprite.pos = this.target.pos;
 
   var relTargetPt = this.target.pos.minus(ai.ship.pos);
   var targetAngle = relTargetPt.angle();
@@ -405,11 +420,17 @@ ShootCommand.prototype.draw = function(ai, context) {};
 
 ShootCommand.prototype.delete = function() {
   this.target = null;
+  this.sprite.delete();
 };
+
 function DefendGroundCommand(ai, target) {
   // stand your ground. do not move. shoot nearest target.
   this.done = false;
   this.target = target;
+  this.sprite = new chem.Sprite('target', {
+    batch: ai.state.batch,
+    pos: this.target.pos,
+  });
 }
 
 DefendGroundCommand.prototype.execute = function(ai, dt, dx) {
@@ -423,6 +444,8 @@ DefendGroundCommand.prototype.execute = function(ai, dt, dx) {
     this.done = true;
     return;
   }
+  this.sprite.pos = this.target.pos;
+  this.sprite.setVisible(ai.ship.selected);
   ai.ship.setThrustInput(0);
 
   var targetAngle = this.target.pos.minus(ai.ship.pos).angle();
@@ -440,6 +463,7 @@ DefendGroundCommand.prototype.draw = function(ai, context) {};
 
 DefendGroundCommand.prototype.delete = function() {
   this.target = null;
+  this.sprite.delete();
 };
 
 function interceptTarget(ai, dt, dx) {
@@ -482,10 +506,17 @@ function MeleeCommand(ai, target) {
   this.target = target;
   this.done = false;
   this.speedCap = 6;
+  this.sprite = new chem.Sprite('target', {
+    batch: ai.state.batch,
+    pos: this.target.pos,
+  });
 }
 
 MeleeCommand.prototype.execute = function(ai, dt, dx) {
   interceptTarget.call(this, ai, dt, dx);
+  if (this.done) return;
+  this.sprite.setVisible(ai.ship.selected);
+  this.sprite.pos = this.target.pos;
   ai.ship.meleeInput = this.target;
 };
 
@@ -493,4 +524,5 @@ MeleeCommand.prototype.draw = function(ai, context) {};
 
 MeleeCommand.prototype.delete = function() {
   this.target = null;
+  this.sprite.delete();
 };

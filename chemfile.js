@@ -192,6 +192,8 @@ exports.spritesheet = {
     },
     'knife': {},
     'coin': {},
+    'target': {},
+    'doorway': {},
 
   }
 };

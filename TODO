@@ -3,7 +3,6 @@ Next:
  * Update level 1 with a civilian and use that to explain ctrl+right-click
    vs right-click
  * Add dogfighting mode.
-   - Challenge 1: you pilot a ranger. you have a wingman. enemy is 1 ranger, who targets your wingman.
    - Challenge 2: you (ranger) vs 1 artillery
    - Challenge 3: get 5 kills in the middle of a big battle.
    - Challenge 4: the enemy has turrets all around the outside
@@ -26,8 +25,6 @@ Nice-to-have:
  * if ranger is in range, don't accelerate toward target
  * fix the thruster sound glitchiness
  * State should be renamed LevelPlayer
- * each command should draw to indicate that something is commanded
-   - target on target
  * civilian ships should wander around
 
 
