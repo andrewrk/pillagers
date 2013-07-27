@@ -10,8 +10,7 @@ function Meteor(state, o) {
   PhysicsObject.apply(this, arguments);
 
   this.sprite = new chem.Sprite(o.animationName);
-  var graphicRadius = (this.sprite.size.x + this.sprite.size.y) / 4;
-  this.sprite.scale.scale(this.radius / graphicRadius);
+  this.setRadius(this.radius);
   this.sprite.rotation = this.rotation;
   this.state.batch.add(this.sprite);
 
@@ -29,6 +28,12 @@ function Meteor(state, o) {
   this.miniMapColor = "#B59277";
   this.uiAnimationName = "rock-a";
 }
+
+Meteor.prototype.setRadius = function(radius) {
+  this.radius = radius;
+  var graphicRadius = (this.sprite.size.x + this.sprite.size.y) / 4;
+  this.sprite.scale.x = this.sprite.scale.y = this.radius / graphicRadius;
+};
 
 Meteor.prototype.name = "Meteor";
 

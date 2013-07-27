@@ -342,12 +342,48 @@ State.prototype.togglePause = function() {
 }
 
 State.prototype.placeMeteorAtCursor = function() {
-  this.addMeteor({
+  var meteor = this.addMeteor({
     pos: this.mousePos(),
     vel: v(0, 0),
     animationName: 'rock-a',
     radius: 64,
   });
+  meteor.uiButtons = [
+    {
+      caption: "+y vel",
+      fn: updateVelFn(v(0, 0.05)),
+    },
+    {
+      caption: "-y vel",
+      fn: updateVelFn(v(0, -0.05)),
+    },
+    {
+      caption: "+x vel",
+      fn: updateVelFn(v(0.05, 0)),
+    },
+    {
+      caption: "-x vel",
+      fn: updateVelFn(v(-0.05, 0)),
+    },
+    {
+      caption: "+radius",
+      fn: updateRadiusFn(10),
+    },
+    {
+      caption: "-radius",
+      fn: updateRadiusFn(-10),
+    },
+  ];
+  function updateVelFn(delta) {
+    return function() {
+      meteor.vel.add(delta);
+    }
+  }
+  function updateRadiusFn(delta) {
+    return function() {
+      meteor.setRadius(meteor.radius + delta);
+    }
+  }
 }
 
 State.prototype.placeShipClusterAtCursor = function() {
@@ -1185,6 +1221,7 @@ State.prototype.addMeteor = function(o) {
   o.vel = v(o.vel);
   var meteor = new Meteor(this, o);
   this.addPhysicsObject(meteor);
+  return meteor;
 };
 
 State.prototype.addTriggerShip = function(o) {
