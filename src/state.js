@@ -472,7 +472,9 @@ function onButtonDown(button) {
       sendUnitsToCursor(this);
       break;
     case chem.button.KeyA:
-      this.selectAll();
+      if (this.engine.buttonState(chem.button.KeyCtrl)) {
+        this.selectAll();
+      }
       break;
     case chem.button.KeyP:
       this.togglePause();
@@ -718,11 +720,16 @@ State.prototype.drawUiButtons = function(context) {
 };
 
 function onUpdate(dt, dx) {
+  var goUp = this.engine.buttonState(chem.button.KeyUp) || this.engine.buttonState(chem.button.KeyW);
+  var goDown = this.engine.buttonState(chem.button.KeyDown) || this.engine.buttonState(chem.button.KeyS);
+  var goLeft = this.engine.buttonState(chem.button.KeyLeft) || this.engine.buttonState(chem.button.KeyA);
+  var goRight = this.engine.buttonState(chem.button.KeyRight) || this.engine.buttonState(chem.button.KeyD);
+
   if (!this.manualOverride) {
-    if (this.engine.buttonState(chem.button.KeyUp)) this.scroll.y -= SCROLL_SPEED * dx;
-    if (this.engine.buttonState(chem.button.KeyDown)) this.scroll.y += SCROLL_SPEED * dx;
-    if (this.engine.buttonState(chem.button.KeyRight)) this.scroll.x += SCROLL_SPEED * dx;
-    if (this.engine.buttonState(chem.button.KeyLeft)) this.scroll.x -= SCROLL_SPEED * dx;
+    if (goUp) this.scroll.y -= SCROLL_SPEED * dx;
+    if (goDown) this.scroll.y += SCROLL_SPEED * dx;
+    if (goLeft) this.scroll.x -= SCROLL_SPEED * dx;
+    if (goRight) this.scroll.x += SCROLL_SPEED * dx;
   }
   this.capScrollPosition();
 
@@ -741,13 +748,13 @@ function onUpdate(dt, dx) {
       var ship = ai.ship;
       // rotate the ship with left and right arrow keys
       ship.rotateInput = 0;
-      if (this.engine.buttonState(chem.button.KeyLeft)) ship.rotateInput -= 1;
-      if (this.engine.buttonState(chem.button.KeyRight)) ship.rotateInput += 1;
+      if (goLeft) ship.rotateInput -= 1;
+      if (goRight) ship.rotateInput += 1;
 
       // apply forward and backward thrust with up and down arrow keys
       var thrust = 0;
-      if (this.engine.buttonState(chem.button.KeyUp)) thrust += 1;
-      if (ship.hasBackwardsThrusters && this.engine.buttonState(chem.button.KeyDown)) thrust -= 1;
+      if (goUp) thrust += 1;
+      if (ship.hasBackwardsThrusters && goDown) thrust -= 1;
       ship.setThrustInput(thrust, thrust === 0);
 
       ship.shootInput = this.engine.buttonState(chem.button.KeySpace) ? 1 : 0;

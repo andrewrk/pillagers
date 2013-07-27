@@ -3,6 +3,9 @@ Next:
  * Update level 1 with a civilian and use that to explain ctrl+right-click
    vs right-click
  * Add dogfighting mode.
+   - Challenge 1: you pilot a ranger. you have a wingman. enemy is 1 ranger, who targets your wingman.
+   - Challenge 2: you (ranger) vs 1 artillery
+   - Challenge 3: get 5 kills in the middle of a big battle.
 
 Features:
  * Add a command that tells a ship to defend another ship.
@@ -15,6 +18,7 @@ Level ideas:
    to destroy that ship to reactivate your army
 
 Nice-to-have:
+ * Fix militia for dogfighting
  * Make WASD work.
  * Ability to change controls.
  * ability to retry level when you get game over
