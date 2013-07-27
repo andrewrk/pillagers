@@ -1047,6 +1047,11 @@ State.prototype.createSandboxButtons = function() {
       help: "Press this button, then left clicking will create a meteor.",
       fn: this.setPaintModeFn("meteor"),
     },
+    {
+      caption: "title",
+      help: "Go back to the title screen.",
+      fn: this.confirmBackToTitleScreen.bind(this),
+    },
   ];
   var nextPos = this.uiPanePos.offset(this.uiPaneMargin, this.uiPaneMargin);
   this.uiButtons = btns.map(function(btn) {
@@ -1074,6 +1079,15 @@ State.prototype.createSandboxButtons = function() {
     };
   }.bind(this));
   this.computeHoverForUiButtons();
+};
+
+State.prototype.confirmBackToTitleScreen = function(button) {
+  if (!this.engine.buttonState(chem.button.KeyShift)) {
+    this.announce("Hold shift when pressing this button to confirm.");
+    return;
+  }
+  this.delete();
+  this.game.showTitleScreen();
 };
 
 State.prototype.sandboxSelectNextShipType = function(button) {
