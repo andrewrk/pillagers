@@ -339,7 +339,18 @@ State.prototype.togglePause = function() {
   this.pausedLabel.setVisible(this.paused);
 }
 
-State.prototype.placeShipAtCursor = function(state) {
+State.prototype.placeShipClusterAtCursor = function() {
+  var o = {
+    type: shipTypeList[this.sandboxDrawModeShipIndex].key,
+    pos: this.mousePos(),
+    team: this.playerTeam,
+    count: 10,
+    size: v(100, 100),
+  };
+  this.addShipCluster(o);
+}
+
+State.prototype.placeShipAtCursor = function() {
   var ShipType = shipTypeList[this.sandboxDrawModeShipIndex].value;
   var ship = new ShipType(this, {team: this.playerTeam, pos: this.mousePos()});
   this.addShip(ship);
@@ -455,12 +466,16 @@ State.prototype.sandboxLeftClick = function() {
       this.placeShipAtCursor();
       break;
     case 'ship10':
+      this.placeShipClusterAtCursor();
       break;
     case 'select':
       startBoundingBox(this);
       break;
     case 'pilot':
       this.manualOverrideClick();
+      break;
+    case 'meteor':
+      this.placeMeteorAtCursor();
       break;
     default:
       throw new Error("unknown draw mode: " + this.sandboxDrawMode);
@@ -967,13 +982,18 @@ State.prototype.createSandboxButtons = function() {
     },
     {
       caption: "select",
-      help: "Left clicking acts like normal - selecting ships.",
+      help: "Press this button, then left clicking acts like normal - selecting ships.",
       fn: this.setPaintModeFn("select"),
     },
     {
       caption: "manual",
-      help: "Left click to manually pilot a ship.",
+      help: "Press this button, then left clicking will manually pilot a ship.",
       fn: this.setPaintModeFn("pilot"),
+    },
+    {
+      caption: "meteor",
+      help: "Press this button, then left clicking will create a meteor.",
+      fn: this.setPaintModeFn("meteor"),
     },
   ];
   var nextPos = this.uiPanePos.offset(this.uiPaneMargin, this.uiPaneMargin);
