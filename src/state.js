@@ -16,6 +16,7 @@ var shipTypeList = toList(shipTypes);
 
 module.exports = State;
 
+// this class should be named LevelPlayer
 function State(game) {
   this.game = game;
   this.engine = game.engine;
@@ -181,6 +182,7 @@ State.prototype.select = function (obj) {
   obj.selected = true;
   this.selection[obj.id] = obj;
   this.selectedCount += 1;
+  this.sandboxDrawMode = 'select';
   this.updateUiPane();
 }
 
@@ -339,6 +341,15 @@ State.prototype.togglePause = function() {
   this.pausedLabel.setVisible(this.paused);
 }
 
+State.prototype.placeMeteorAtCursor = function() {
+  this.addMeteor({
+    pos: this.mousePos(),
+    vel: v(0, 0),
+    animationName: 'rock-a',
+    radius: 64,
+  });
+}
+
 State.prototype.placeShipClusterAtCursor = function() {
   var o = {
     type: shipTypeList[this.sandboxDrawModeShipIndex].key,
@@ -423,6 +434,9 @@ function onButtonDown(button) {
         return;
       }
       sendUnitsToCursor(this);
+      break;
+    case chem.button.KeyA:
+      this.selectAll();
       break;
     case chem.button.KeyP:
       this.togglePause();
@@ -761,7 +775,9 @@ function clickedEnterableObject(state, pos) {
 }
 
 function clickedSelectableObject(state, pos) {
-  return state.clickedObject(pos, function(obj) { return obj.canBeSelected; });
+  return state.clickedObject(pos, function(obj) {
+    return obj.canBeSelected || state.sandboxMode;
+  });
 }
 
 function clickedAiShip(state, pos) {
@@ -1281,12 +1297,24 @@ State.prototype.isOffscreen = function(pos) {
   return (pos.x < 0 || pos.x > this.mapSize.x || pos.y < 0 || pos.y > this.mapSize.y);
 };
 
+State.prototype.canDeleteObj = function(obj) {
+  return obj.team === this.playerTeam || this.sandboxMode;
+}
+
 State.prototype.deleteSelectedShips = function() {
   for (var id in this.selection) {
     var obj = this.selection[id];
-    if (obj.team !== this.playerTeam) continue;
+    if (! this.canDeleteObj(obj)) continue
     obj.hit(99999, "explosion");
   }
+};
+
+State.prototype.selectAll = function() {
+  this.aiObjects.forEach(function(ai) {
+    if (ai.ship.team === this.playerTeam) {
+      this.select(ai.ship);
+    }
+  }.bind(this));
 };
 
 State.prototype.commandableSelected = function(cb) {

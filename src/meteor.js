@@ -27,7 +27,10 @@ function Meteor(state, o) {
   this.canBeStruck = true;
 
   this.miniMapColor = "#B59277";
+  this.uiAnimationName = "rock-a";
 }
+
+Meteor.prototype.name = "Meteor";
 
 Meteor.prototype.hit = function(damage, explosionAnimationName) {
   this.health -= damage / this.defense;
