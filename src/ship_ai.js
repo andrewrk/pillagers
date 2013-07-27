@@ -84,8 +84,8 @@ ShipAi.prototype.decelerate = function() {
 ShipAi.prototype.attackNearbyEnemy = function() {
   var target = null;
   var closestDist;
-  for (var id in this.state.physicsObjects) {
-    var obj = this.state.physicsObjects[id];
+  for (var i = 0; i < this.state.physicsObjects.length; i += 1) {
+    var obj = this.state.physicsObjects[i];
     if (!obj.canBeShot) continue;
     if (obj.team == null || obj.team === this.ship.team) continue;
     var dist = obj.pos.distanceSqrd(this.ship.pos);

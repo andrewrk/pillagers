@@ -42,9 +42,9 @@ Meteor.prototype.update = function(dt, dx) {
   PhysicsObject.prototype.update.apply(this, arguments);
 
   // collision detection
-  for (var id in this.state.physicsObjects) {
-    if (id === this.id) continue;
-    var obj = this.state.physicsObjects[id];
+  for (var i = 0; i < this.state.physicsObjects.length; i += 1) {
+    var obj = this.state.physicsObjects[i];
+    if (obj === this) continue;
     if (!obj.canBeStruck) continue;
     var addedRadii = this.radius + obj.radius;
     if (obj.pos.distanceSqrd(this.pos) > addedRadii * addedRadii) continue;
@@ -67,7 +67,6 @@ Meteor.prototype.update = function(dt, dx) {
     var impulse = normal.scale(j);
     this.vel.sub(impulse.scaled(1 / myMass));
     obj.vel.add(impulse.scaled(1 / otherMass));
-    break;
   }
 
   this.sprite.pos = this.pos.floored();

@@ -3,7 +3,7 @@
   "scroll": {"x": 0, "y": 0},
   "startPoint": {
     "pos": {"x": 100, "y": 290},
-    "radius": 1
+    "radius": 100
   },
   "rewards": [
     {

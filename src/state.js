@@ -18,8 +18,8 @@ module.exports = State;
 function State(game) {
   this.game = game;
   this.engine = game.engine;
-  this.physicsObjects = {};
-  this.aiObjects = {};
+  this.physicsObjects = [];
+  this.aiObjects = [];
   this.selection = {};
   this.selectedCount = 0;
   this.announcements = [];
@@ -30,7 +30,7 @@ function State(game) {
   this.batchBgFore = new chem.Batch();
   this.batch = new chem.Batch();
   this.batchStatic = new chem.Batch();
-  this.bgBackObjects = {};
+
   this.bgBackFactor = 0.10; // scrolls 10x slower than normal
   this.bgForeFactor = 0.15;
   this.mouseDownStart = null;
@@ -70,8 +70,8 @@ function State(game) {
 
 State.prototype.delete = function() {
   this.clearSelection();
-  for (var id in this.physicsObjects) {
-    var obj = this.physicsObjects[id];
+  for (var i = 0; i < this.physicsObjects.length; i += 1) {
+    var obj = this.physicsObjects[i];
     obj.delete();
   }
   this.engine.removeAllListeners();
@@ -146,8 +146,8 @@ function finishBoundingBox(state) {
 
   if (start) {
     // iterate over owned objects
-    for (var id in state.aiObjects) {
-      var ai = state.aiObjects[id];
+    for (var i = 0; i < state.aiObjects.length; i += 1) {
+      var ai = state.aiObjects[i];
       if (ai.ship.team !== state.playerTeam) continue;
       if (ai.ship.pos.x >= start.x && ai.ship.pos.x < end.x &&
           ai.ship.pos.y >= start.y && ai.ship.pos.y < end.y)
@@ -296,10 +296,9 @@ State.prototype.setUpDockedShipsUi = function(obj) {
 }
 
 function clearSelection(state) {
-  for (var id in state.aiObjects) {
-    var ai = state.aiObjects[id];
+  state.aiObjects.forEach(function(ai) {
     ai.deselect();
-  }
+  });
 }
 
 function manualOverrideClick(state) {
@@ -355,6 +354,11 @@ function onButtonDown(button) {
       }
       break;
     case chem.button.MouseRight:
+      if (this.engine.buttonState(chem.button.Key4)) {
+        for (var i =0; i < 500; i += 1 ) {
+          placeShipAtCursor(this);
+        }
+      }
       if (this.engine.buttonState(chem.button.Key1) || this.engine.buttonState(chem.button.Key2)) {
         placeShipAtCursor(this);
         return;
@@ -411,14 +415,9 @@ State.prototype.cheatUnlockEverything = function() {
 };
 
 State.prototype.getConvoy = function() {
-  var convoy = {};
-  for (var id in this.physicsObjects) {
-    var obj = this.physicsObjects[id];
-    if (!obj.canBeSelected) continue;
-    if (obj.team !== this.playerTeam) continue;
-    convoy[id] = obj;
-  }
-  return convoy;
+  return this.physicsObjects.filter(function(obj) {
+    return obj.canBeSelected && obj.team === this.playerTeam;
+  }.bind(this));
 };
 
 State.prototype.maybeMouseUpButton = function() {
@@ -512,12 +511,13 @@ function onDraw(context) {
   context.translate(-this.scroll.x, -this.scroll.y);
   this.batch.draw(context);
   var id;
-  for (id in this.physicsObjects) {
-    var obj = this.physicsObjects[id];
+  for (var i = 0; i < this.physicsObjects.length; i += 1) {
+    var obj = this.physicsObjects[i];
+    if (obj.deleted) continue;
     obj.draw(context);
   }
-  for (id in this.aiObjects) {
-    var ai = this.aiObjects[id];
+  for (i = 0; i < this.aiObjects.length; i += 1) {
+    var ai = this.aiObjects[i];
     ai.draw(context);
   }
 
@@ -548,8 +548,9 @@ State.prototype.drawUiPane = function(context) {
   context.fillStyle = "#000000";
   context.fillRect(this.miniMapPos.x, this.miniMapPos.y, this.miniMapSize.x, this.miniMapSize.y);
   // draw circles for physics objects
-  for (var id in this.physicsObjects) {
-    var obj = this.physicsObjects[id];
+  for (var i = 0; i < this.physicsObjects.length; i += 1) {
+    var obj = this.physicsObjects[i];
+    if (obj.deleted) continue;
     if (!obj.miniMapColor) continue;
     var pos = obj.pos.divBy(this.mapSize).mult(this.miniMapSize).add(this.miniMapPos);
     var radius = obj.radius / this.mapSize.x * this.miniMapSize.x;
@@ -590,15 +591,14 @@ function onUpdate(dt, dx) {
   if (this.paused) return;
 
   var id;
-  for (id in this.physicsObjects) {
-    var obj = this.physicsObjects[id];
+  for (var i = 0; i < this.physicsObjects.length; i += 1) {
+    var obj = this.physicsObjects[i];
     if (obj.deleted) continue;
     obj.update(dt, dx);
   }
 
-
-  for (id in this.aiObjects) {
-    var ai = this.aiObjects[id];
+  for (i = 0; i < this.aiObjects.length; i += 1) {
+    var ai = this.aiObjects[i];
     if (this.manualOverride === ai.id) {
       var ship = ai.ship;
       // rotate the ship with left and right arrow keys
@@ -622,7 +622,7 @@ function onUpdate(dt, dx) {
     }
   }
 
-  for (var i = 0; i < this.announcements.length; i += 1) {
+  for (i = 0; i < this.announcements.length; i += 1) {
     var announcement = this.announcements[i];
     if (announcement.deleted) continue;
     announcement.addTime(dt);
@@ -644,8 +644,8 @@ function onUpdate(dt, dx) {
 }
 
 State.prototype.clickedObject = function(pos, matchFn) {
-  for (var id in this.physicsObjects) {
-    var obj = this.physicsObjects[id];
+  for (var i = 0; i < this.physicsObjects.length; i += 1) {
+    var obj = this.physicsObjects[i];
     if (! matchFn(obj)) continue;
     if (obj.pos.distance(pos) < obj.radius) return obj;
   }
@@ -665,8 +665,8 @@ function clickedSelectableObject(state, pos) {
 }
 
 function clickedAiShip(state, pos) {
-  for (var id in state.aiObjects) {
-    var ai = state.aiObjects[id];
+  for (var i = 0; i < state.aiObjects.length; i += 1) {
+    var ai = state.aiObjects[i];
     if (ai.ship.pos.distance(pos) < ai.ship.radius) {
       return ai;
     }
@@ -741,17 +741,17 @@ State.prototype.addTimer = function(o) {
   });
 };
 
-State.prototype.allEnemyShipsTargetFlagship = function(o) {
-  for (var id in this.aiObjects) {
-    var ai = this.aiObjects[id];
-    if (ai.ship.team === this.playerTeam) continue;
-    ai.commandToAttack(this.getPlayerFlagship());
-  }
+State.prototype.allEnemyShipsTargetFlagship = function() {
+  this.aiObjects.forEach(function(ai) {
+    if (ai.ship.team !== this.playerTeam) {
+      ai.commandToAttack(this.getPlayerFlagship());
+    }
+  }.bind(this));
 };
 
 State.prototype.getPlayerFlagship = function() {
-  for (var id in this.physicsObjects) {
-    var obj = this.physicsObjects[id];
+  for (var i = 0; i < this.physicsObjects.length; i += 1) {
+    var obj = this.physicsObjects[i];
     if (obj.isFlagship && obj.team === this.playerTeam) {
       return obj;
     }
@@ -805,8 +805,7 @@ State.prototype.load = function(level, convoy) {
 
 State.prototype.insertConvoyAtStartPoint = function(convoy, o) {
   var pos = v(o.pos);
-  for (var id in convoy) {
-    var ship = convoy[id];
+  convoy.forEach(function(ship) {
     var radius = Math.random() * o.radius;
     var radians = Math.random() * Math.PI * 2;
     var pt = v.unit(radians).scale(radius).plus(pos);
@@ -815,7 +814,7 @@ State.prototype.insertConvoyAtStartPoint = function(convoy, o) {
     ship.undelete(this);
     ship.rotation = 0;
     this.addShip(ship);
-  }
+  }.bind(this));
 };
 
 State.prototype.setUpUi = function() {
@@ -970,24 +969,26 @@ State.prototype.endManualOverride = function() {
 
 State.prototype.addPhysicsObject = function(o) {
   assert(o.id);
-  this.physicsObjects[o.id] = o;
+  this.physicsObjects.push(o);
 };
 
 State.prototype.deletePhysicsObject = function(o) {
   assert(o.id);
   this.unselect(o);
-  delete this.physicsObjects[o.id];
+  var index = this.physicsObjects.indexOf(o);
+  if (index >= 0) this.physicsObjects.splice(index, 1);
   this.updateUiPane();
 }
 
 State.prototype.deleteAi = function(ai) {
   if (this.manualOverride === ai.id) this.endManualOverride();
-  delete this.aiObjects[ai.id];
+  var index = this.aiObjects.indexOf(ai);
+  if (index >= 0) this.aiObjects.splice(index, 1);
 };
 
 State.prototype.addAiObject = function(o) {
   assert(o.id);
-  this.aiObjects[o.id] = o;
+  this.aiObjects.push(o);
 };
 
 State.prototype.addShip = function(ship) {
@@ -1048,12 +1049,9 @@ State.prototype.deleteSelectedShips = function() {
 };
 
 State.prototype.commandableSelected = function(cb) {
-  for (var id in this.aiObjects) {
-    var ai = this.aiObjects[id];
-    if (! ai.ship.selected) continue;
-    if (ai.ship.team !== this.playerTeam) continue;
-    cb(ai);
-  }
+  this.aiObjects.filter(function(ai) {
+    return ai.ship.selected && ai.ship.team === this.playerTeam;
+  }.bind(this)).map(cb);
 };
 
 State.prototype.selectedUnitsEnter = function(target) {

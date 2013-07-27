@@ -15,7 +15,7 @@ function Portal(state, o) {
   this.radius = 64;
   this.miniMapColor = "#6A9EA8";
   this.canBeEntered = true;
-  this.shipsInside = {};
+  this.shipsInside = [];
   this.name = "Portal";
   this.uiAnimationName = "portal";
   this.uiButtons = [
@@ -34,8 +34,7 @@ Portal.prototype.sendShipsOut = function() {
   var minRadius = 10;
   var maxRadius = this.radius;
   var count = 0;
-  for (var id in this.shipsInside) {
-    var ship = this.shipsInside[id];
+  this.shipsInside.forEach(function(ship) {
     var radians = Math.random() * Math.PI * 2;
     var radius = (maxRadius - minRadius) * Math.random() + minRadius;
     var offset = v.unit(radians).scale(radius);
@@ -44,8 +43,8 @@ Portal.prototype.sendShipsOut = function() {
     ship.undelete(this.state);
     this.state.addShip(ship);
     count += 1;
-  }
-  this.shipsInside = {};
+  }.bind(this));
+  this.shipsInside = [];
   this.state.updateUiPane();
   if (count === 0) {
     this.state.announce("There are no ships inside the Portal.");
@@ -53,11 +52,9 @@ Portal.prototype.sendShipsOut = function() {
 };
 
 Portal.prototype.isFlagshipInside = function() {
-  for (var id in this.shipsInside) {
-    var ship = this.shipsInside[id];
-    if (ship.isFlagship) return true;
-  }
-  return false;
+  return this.shipsInside.some(function(ship) {
+    return ship.isFlagship;
+  });
 };
 
 Portal.prototype.activatePortal = function() {
@@ -78,5 +75,5 @@ Portal.prototype.delete = function() {
 }
 
 Portal.prototype.enter = function(ship) {
-  this.shipsInside[ship.id] = ship;
+  this.shipsInside.push(ship);
 };

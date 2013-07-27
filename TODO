@@ -9,7 +9,7 @@ Level ideas:
    to destroy that ship to reactivate your army
 
 Bugs:
- * I suspect that physics objects are not getting deleted
+ * Performance slowdown issue.
 
 Nice-to-have:
  * ability to retry level when you get game over

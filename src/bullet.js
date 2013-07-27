@@ -36,8 +36,8 @@ Bullet.prototype.update = function (dt, dx) {
     return;
   }
   // collision detection
-  for (var id in this.state.physicsObjects) {
-    var obj = this.state.physicsObjects[id];
+  for (var i = 0; i < this.state.physicsObjects.length; i += 1) {
+    var obj = this.state.physicsObjects[i];
     if (obj.deleted) continue;
     if (! obj.canBeShot || obj.team === this.team) continue;
     if (obj.pos.distanceSqrd(this.pos) < obj.radius * obj.radius) {

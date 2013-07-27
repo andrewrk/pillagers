@@ -62,6 +62,7 @@ function createShipFn(self, ShipType) {
       rotation: radians,
     });
     self.state.addShip(ship);
+    self.state.stats.shipsGained += 1;
   };
 }
 

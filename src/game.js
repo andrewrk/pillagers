@@ -58,12 +58,10 @@ Game.prototype.startNewGame = function() {
   this.unlockedShips = {};
 
   // start game with only a flagship
-  var convoy = {};
   var flagship = new FlagShip(null, {
     team: playerTeam,
   });
-  convoy[flagship.id] = flagship;
-  this.playLevel(convoy);
+  this.playLevel([flagship]);
 };
 
 Game.prototype.playLevel = function(convoy) {

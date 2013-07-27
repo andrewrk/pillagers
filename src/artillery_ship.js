@@ -10,7 +10,7 @@ module.exports = ArtilleryShip;
 util.inherits(ArtilleryShip, RangerShip);
 function ArtilleryShip(state, o) {
   RangerShip.call(this, state, o);
-  this.radius = 45;
+  this.radius = 36;
   this.hasBackwardsThrusters = false;
   this.rotationSpeed = Math.PI * 0.01;
   this.thrustAmt = 0.01;

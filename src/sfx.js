@@ -35,6 +35,7 @@ function initList(prefix, count, volume) {
   var arr = [];
   for (var i = 1; i <= count; i += 1) {
     var snd = new chem.Sound(prefix + i + '.ogg');
+    snd.maxPoolSize = 8;
     snd.setVolume(volume);
     arr.push(snd);
   }

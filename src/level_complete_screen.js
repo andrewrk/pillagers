@@ -96,13 +96,11 @@ LevelCompleteScreen.prototype.setUpConvoy = function(convoy) {
     textBaseline: 'middle',
   });
 
-  // turn convoy into an array and sort by rankOrder
   var squad = new Squad(convoyCenter);
-  for (var id in convoy) {
-    var ship = convoy[id];
+  convoy.forEach(function(ship) {
     ship.pos = v(0, convoyCenter.y);
     squad.add(ship);
-  }
+  });
   squad.calculate();
   squad.units.forEach(function(ship) {
     var sprite = new chem.Sprite(ship.animationNames.still, {
