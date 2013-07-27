@@ -6,6 +6,7 @@ Next:
    - Challenge 1: you pilot a ranger. you have a wingman. enemy is 1 ranger, who targets your wingman.
    - Challenge 2: you (ranger) vs 1 artillery
    - Challenge 3: get 5 kills in the middle of a big battle.
+   - Challenge 4: the enemy has turrets all around the outside
 
 Features:
  * Add a command that tells a ship to defend another ship.
@@ -19,7 +20,6 @@ Level ideas:
 
 Nice-to-have:
  * Fix militia for dogfighting
- * Make WASD work.
  * Ability to change controls.
  * ability to retry level when you get game over
  * pan sound effects and volume depending on scroll
@@ -27,6 +27,7 @@ Nice-to-have:
  * fix the thruster sound glitchiness
  * State should be renamed LevelPlayer
  * each command should draw to indicate that something is commanded
+   - target on target
  * civilian ships should wander around
 
 

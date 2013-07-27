@@ -27,6 +27,8 @@ function State(game) {
   this.announcements = [];
   this.cashEffects = [];
   this.timers = [];
+  this.triggers = [];
+  this.teamCounts = {};
   this.manualOverride = null;
   this.scroll = v();
   this.batchBgBack = new chem.Batch();
@@ -35,6 +37,7 @@ function State(game) {
   this.batchStatic = new chem.Batch();
 
   this.sandboxMode = false;
+  this.campaignMode = true;
   this.sandboxDrawMode = 'select';
   this.sandboxDrawModeShipIndex = 0;
 
@@ -249,7 +252,7 @@ State.prototype.updateUiPane = function () {
   }
   if (this.sandboxMode) {
     this.sandboxModeUpdateUiPane();
-  } else {
+  } else if (this.campaignMode) {
     this.campaignUpdateUiPane();
   }
 };
@@ -561,7 +564,7 @@ State.prototype.maybeMouseRightUpButton = function() {
 State.prototype.maybeMouseUpButton = function() {
   var upButton = this.getMouseOverButton();
   if (this.mouseDownOnButton && upButton.caption === this.mouseDownOnButton.caption) {
-    if (!this.sandboxMode) {
+    if (this.campaignMode) {
       if (upButton.button.cost) {
         if (this.game.cash < upButton.button.cost) {
           this.announce("This is not enough Golds.");
@@ -757,7 +760,7 @@ function onUpdate(dt, dx) {
       if (ship.hasBackwardsThrusters && goDown) thrust -= 1;
       ship.setThrustInput(thrust, thrust === 0);
 
-      ship.shootInput = this.engine.buttonState(chem.button.KeySpace) ? 1 : 0;
+      ship.shootInput = this.engine.buttonState(chem.button.KeySpace) || this.engine.buttonState(chem.button.KeyJ);
 
       this.scroll = ship.pos.minus(this.viewSize.scaled(0.5));
       this.scroll.boundMin(v());
@@ -787,7 +790,7 @@ function onUpdate(dt, dx) {
 
   if (this.sandboxMode) {
     this.sandboxModeUpdate(dt, dx);
-  } else {
+  } else if (this.campaignMode) {
     this.campaignOnUpdate(dt, dx);
   }
 }
@@ -875,25 +878,32 @@ State.prototype.triggerEvent = function(eventName) {
   var levelEvent = this.events[eventName];
   assert(levelEvent, "Event not declared: " + eventName);
   levelEvent.actions.forEach(function(action) {
-    var props = action.properties;
-    switch (action.type) {
-      case "Announcement":
-        this.announce(props.text);
-        break;
-      case "Timer":
-        this.addTimer(props);
-        break;
-      case "EveryoneTargetThatSuckersFlagship":
-        this.allEnemyShipsTargetFlagship();
-        break;
-      case "SpawnObject":
-        this.spawnObject(props);
-        break;
-      default:
-        throw new Error("Unknown action type: " + action.type);
-    }
+    this.performAction(action);
   }.bind(this));
 };
+
+State.prototype.performAction = function(action) {
+  var props = action.properties;
+  switch (action.type) {
+    case "Announcement":
+      this.announce(props.text);
+      break;
+    case "Timer":
+      this.addTimer(props);
+      break;
+    case "EveryoneTargetThatSuckersFlagship":
+      this.allEnemyShipsTargetFlagship();
+      break;
+    case "SpawnObject":
+      this.spawnObject(props);
+      break;
+    case "LevelComplete":
+      this.cheatSkipLevel();
+      break;
+    default:
+      throw new Error("Unknown action type: " + action.type);
+  }
+}
 
 State.prototype.addTimer = function(o) {
   var timer = new Timer(this, o.timeout, o.event);
@@ -928,8 +938,8 @@ State.prototype.spawnObject = function(obj) {
       props.team = team.get(props.team || 0);
       this.addShipCluster(props);
       break;
-    case "TriggerShip":
-      this.addTriggerShip(props);
+    case "Ship":
+      this.addSpecialShip(props);
       break;
     case "Meteor":
       this.addMeteor(props);
@@ -970,11 +980,21 @@ State.prototype.load = function(level, convoy) {
   this.victoryRewards = level.rewards;
   this.skippable = level.skippable;
   this.events = level.events;
+  if (level.triggers) this.triggers = level.triggers;
 
   for (var i = 0; i < level.objects.length; i += 1) {
     this.spawnObject(level.objects[i]);
   }
-  this.insertConvoyAtStartPoint(convoy, level.startPoint);
+
+  if (convoy) {
+    this.insertConvoyAtStartPoint(convoy, level.startPoint);
+  }
+
+  if (level.immediateEvents) {
+    level.immediateEvents.forEach(function(eventName) {
+      this.triggerEvent(eventName);
+    }.bind(this));
+  }
 
   this.setUpUi();
 };
@@ -1190,7 +1210,7 @@ State.prototype.setUpUi = function() {
 
   if (this.sandboxMode) {
     this.sandboxModeSetUpUi();
-  } else {
+  } else if(this.campaignMode) {
     this.campaignSetUpUi();
   }
   this.updateUiPane();
@@ -1245,16 +1265,21 @@ State.prototype.addMeteor = function(o) {
   return meteor;
 };
 
-State.prototype.addTriggerShip = function(o) {
+State.prototype.addSpecialShip = function(o) {
   var ShipType = shipTypes[o.ship.type];
   var ship = new ShipType(this, {
     team: team.get(o.ship.team),
     pos: v(o.ship.pos),
   });
-  ship.once(o.condition, function() {
-    this.triggerEvent(o.event);
-  }.bind(this));
-  this.addShip(ship);
+  if (o.triggers) {
+    o.triggers.forEach(function(trigger) {
+      ship.once(trigger.condition, function() {
+        this.triggerEvent(trigger.event);
+      }.bind(this));
+    }.bind(this));
+  }
+  var ai = this.addShip(ship);
+  if (o.manualPilot) this.beginManualOverride(ai);
 };
 
 State.prototype.addShipCluster = function(o) {
@@ -1285,6 +1310,11 @@ State.prototype.endManualOverride = function() {
 State.prototype.addPhysicsObject = function(o) {
   assert(o.id);
   this.physicsObjects.push(o);
+  if (o.team != null) {
+    var oldCount = this.teamCounts[o.team.number];
+    if (oldCount == null) oldCount = 0;
+    this.teamCounts[o.team.number] = oldCount + 1;
+  }
 };
 
 State.prototype.deletePhysicsObject = function(o) {
@@ -1292,8 +1322,22 @@ State.prototype.deletePhysicsObject = function(o) {
   this.unselect(o);
   var index = this.physicsObjects.indexOf(o);
   if (index >= 0) this.physicsObjects.splice(index, 1);
+  if (o.team != null) {
+    this.teamCounts[o.team.number] -= 1;
+    if (this.teamCounts[o.team.number] === 0) {
+      this.triggerTeamDeathEvent(o.team.number);
+    }
+  }
   this.updateUiPane();
 }
+
+State.prototype.triggerTeamDeathEvent = function(teamNumber) {
+  this.triggers.forEach(function(trigger) {
+    if (trigger.type !== 'AllShipsDestroyed') return;
+    if (trigger.properties.team !== teamNumber) return;
+    this.triggerEvent(trigger.properties.event);
+  }.bind(this));
+};
 
 State.prototype.deleteAi = function(ai) {
   if (this.manualOverride === ai.id) this.endManualOverride();
@@ -1318,6 +1362,7 @@ State.prototype.addShip = function(ship) {
       this.gainCash(ship.pos, ship.bounty);
     }
   }.bind(this));
+  return shipAi;
 };
 
 State.prototype.createElectricFx = function(pos, vel, rotation) {
@@ -1408,7 +1453,7 @@ State.prototype.gameOver = function() {
 };
 
 State.prototype.flagShipDestroyed = function(ship) {
-  if (this.sandboxMode) return;
+  if (!this.campaignMode) return;
 
   if (ship.team === this.playerTeam) {
     this.gameOver();

@@ -141,15 +141,19 @@
       }
     },
     {
-      "type": "TriggerShip",
+      "type": "Ship",
       "properties": {
         "ship": {
           "type": "Civilian",
           "team": 1,
           "pos": {"x": 1100, "y": 700}
         },
-        "condition": "destroyed",
-        "event": "DistressSignal"
+        "triggers": [
+          {
+            "condition": "destroyed",
+            "event": "DistressSignal"
+          }
+        ]
       }
     }
   ]

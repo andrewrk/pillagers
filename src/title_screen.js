@@ -20,6 +20,10 @@ function TitleScreen(game) {
       fn: startSandboxMode.bind(this),
     },
     {
+      caption: "Dogfighting Mode",
+      fn: startDogfighting.bind(this),
+    },
+    {
       caption: "Credits",
       fn: goToCredits.bind(this),
     },
@@ -34,6 +38,11 @@ function TitleScreen(game) {
 function toggleMusic(option) {
   this.game.toggleMusic();
   option.label.text = "Music: " + (this.game.musicOn ? "On": "Off");
+}
+
+function startDogfighting() {
+  this.delete();
+  this.game.startDogfighting();
 }
 
 function startSandboxMode() {

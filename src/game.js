@@ -1,6 +1,7 @@
 var chem = require('chem');
 var Campaign = require('./campaign');
 var SandboxMode = require('./sandbox_mode');
+var DogfightingMode = require('./dogfighting_mode');
 var TitleScreen = require('./title_screen');
 var CreditsScreen = require('./credits_screen');
 
@@ -49,3 +50,9 @@ Game.prototype.startSandboxMode = function() {
   var sandbox = new SandboxMode(this);
   sandbox.start();
 };
+
+Game.prototype.startDogfighting = function() {
+  var dogfighting = new DogfightingMode(this);
+  dogfighting.start();
+};
+
