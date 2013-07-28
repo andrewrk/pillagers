@@ -1427,11 +1427,13 @@ State.prototype.deletePhysicsObject = function(o) {
   assert(o.id);
   this.unselect(o);
   var index = this.physicsObjects.indexOf(o);
-  if (index >= 0) this.physicsObjects.splice(index, 1);
-  if (o.team != null) {
-    this.teamCounts[o.team.number] -= 1;
-    if (this.teamCounts[o.team.number] === 0) {
-      this.triggerTeamDeathEvent(o.team.number);
+  if (index >= 0) {
+    this.physicsObjects.splice(index, 1);
+    if (o.team != null) {
+      this.teamCounts[o.team.number] -= 1;
+      if (this.teamCounts[o.team.number] === 0) {
+        this.triggerTeamDeathEvent(o.team.number);
+      }
     }
   }
   this.updateUiPane();
