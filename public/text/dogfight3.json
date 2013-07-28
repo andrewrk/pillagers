@@ -17,10 +17,10 @@
           }
         },
         {
-          "type": "Timer",
+          "type": "GroupAttack",
           "properties": {
-            "timeout": 0,
-            "event": "Respawn"
+            "sourceGroup": "Enemy",
+            "targetGroup": "Player"
           }
         }
       ]
@@ -67,24 +67,7 @@
     "Respawn": {
       "actions": [
         {
-          "type": "SpawnObject",
-          "properties": {
-            "type": "Ship",
-            "properties": {
-              "ship": {
-                "type": "Ranger",
-                "team": 0,
-                "pos": {"x": 200, "y": 450}
-              },
-              "triggers": [
-                {
-                  "condition": "destroyed",
-                  "event": "AnnounceDefeat"
-                }
-              ],
-              "manualPilot": true
-            }
-          }
+          "type": "ReloadLevel"
         }
       ]
     }
@@ -99,6 +82,24 @@
     }
   ],
   "objects": [
+    {
+      "type": "Ship",
+      "properties": {
+        "ship": {
+          "type": "Ranger",
+          "team": 0,
+          "group": "Player",
+          "pos": {"x": 200, "y": 450}
+        },
+        "triggers": [
+          {
+            "condition": "destroyed",
+            "event": "AnnounceDefeat"
+          }
+        ],
+        "manualPilot": true
+      }
+    },
     {
       "type": "MeteorCluster",
       "properties": {
@@ -119,6 +120,7 @@
       "properties": {
         "type": "Artillery",
         "team": 1,
+        "group": "Enemy",
         "size": {"x": 50, "y": 50},
         "pos": {"x": 1300, "y": 400},
         "count": 1

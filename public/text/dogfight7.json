@@ -17,10 +17,10 @@
           }
         },
         {
-          "type": "Timer",
+          "type": "GroupAttack",
           "properties": {
-            "timeout": 0,
-            "event": "Respawn"
+            "sourceGroup": "Enemy",
+            "targetGroup": "Player"
           }
         }
       ]
@@ -67,32 +67,7 @@
     "Respawn": {
       "actions": [
         {
-          "type": "SpawnObject",
-          "properties": {
-            "type": "Ship",
-            "properties": {
-              "ship": {
-                "type": "Artillery",
-                "group": "Player",
-                "team": 0,
-                "pos": {"x": 200, "y": 450}
-              },
-              "triggers": [
-                {
-                  "condition": "destroyed",
-                  "event": "AnnounceDefeat"
-                }
-              ],
-              "manualPilot": true
-            }
-          }
-        },
-        {
-          "type": "GroupAttack",
-          "properties": {
-            "sourceGroup": "Enemy",
-            "targetGroup": "Player"
-          }
+          "type": "ReloadLevel"
         }
       ]
     }
@@ -107,6 +82,24 @@
     }
   ],
   "objects": [
+    {
+      "type": "Ship",
+      "properties": {
+        "ship": {
+          "type": "Artillery",
+          "group": "Player",
+          "team": 0,
+          "pos": {"x": 200, "y": 450}
+        },
+        "triggers": [
+          {
+            "condition": "destroyed",
+            "event": "AnnounceDefeat"
+          }
+        ],
+        "manualPilot": true
+      }
+    },
     {
       "type": "MeteorCluster",
       "properties": {
