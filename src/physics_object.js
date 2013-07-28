@@ -86,6 +86,8 @@ PhysicsObject.prototype.update = function(dt, dx) {
 
 PhysicsObject.prototype.hit = function(damage, explosionAnimationName) {}
 
+PhysicsObject.prototype.onTargeted = function(ship, action) {}
+
 PhysicsObject.prototype.delete = function() {
   this.deleted = true;
 }

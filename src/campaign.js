@@ -21,6 +21,14 @@ Campaign.prototype.toggleMusic = function() {
   this.game.toggleMusic();
 };
 
+Campaign.prototype.endBattleMusic = function() {
+  this.game.endBattleMusic();
+};
+
+Campaign.prototype.beginBattleMusic = function() {
+  this.game.beginBattleMusic();
+};
+
 Campaign.prototype.showGameOverScreen = function() {
   var gameOverScreen = new GameOverScreen(this);
   gameOverScreen.start();

@@ -11,6 +11,8 @@ var Squad = require('./squad');
 var shipTypes = require('./ship_types');
 
 var SCROLL_SPEED = 12;
+var BATTLE_MUSIC_VIOLENCE_LEVEL = 4;
+var VIOLENCE_EXPIRE_TIME = 5;
 
 var shipTypeList = toList(shipTypes);
 
@@ -31,6 +33,11 @@ function State(game) {
   this.teamCounts = {};
   this.manualOverride = null;
   this.scroll = v();
+  // increases when violent things happen.
+  // slowly decreases over time.
+  // informs when the music changes.
+  // reset on level load.
+  this.violenceLevel = 0;
   this.batchBgBack = new chem.Batch();
   this.batchBgFore = new chem.Batch();
   this.batch = new chem.Batch();
@@ -738,6 +745,10 @@ function onUpdate(dt, dx) {
 
   if (this.paused) return;
 
+  // end battle music if no more violence is occurring
+  this.violenceTimeout -= dt;
+  if (this.violenceTimeout <= 0) this.game.endBattleMusic();
+
   var id;
   for (var i = 0; i < this.physicsObjects.length; i += 1) {
     var obj = this.physicsObjects[i];
@@ -1382,13 +1393,32 @@ State.prototype.addShip = function(ship) {
   this.addAiObject(shipAi);
   ship.on('destroyed', function() {
     if (ship.team === this.playerTeam) {
+      this.addViolence(4);
       this.stats.shipsLost += 1;
     } else {
       this.stats.enemiesDestroyed += 1;
       this.gainCash(ship.pos, ship.bounty);
     }
   }.bind(this));
+  ship.on('targeted', function(otherShip, action) {
+    if (action === 'attack' && ship.team === this.playerTeam) {
+      this.addViolence(1);
+    }
+  }.bind(this));
+  ship.on('hit', function(otherShip, action) {
+    if (action === 'attack' && ship.team === this.playerTeam) {
+      this.addViolence(2);
+    }
+  }.bind(this));
   return shipAi;
+};
+
+State.prototype.addViolence = function(amount) {
+  this.violenceTimeout = VIOLENCE_EXPIRE_TIME;
+  this.violenceLevel += amount;
+  if (this.violenceLevel >= BATTLE_MUSIC_VIOLENCE_LEVEL) {
+    this.game.beginBattleMusic();
+  }
 };
 
 State.prototype.createElectricFx = function(pos, vel, rotation) {
@@ -1419,6 +1449,7 @@ State.prototype.createExplosion = function(pos, vel, animationName) {
 };
 
 State.prototype.addBullet = function(bullet) {
+  if (bullet.team !== this.playerTeam) this.addViolence(1);
   this.addPhysicsObject(bullet);
 };
 

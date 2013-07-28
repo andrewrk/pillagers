@@ -55,3 +55,11 @@ DogfightingMode.prototype.showCredits = function() {
   credits.start();
 };
 
+DogfightingMode.prototype.endBattleMusic = function() {
+  this.game.endBattleMusic();
+};
+
+DogfightingMode.prototype.beginBattleMusic = function() {
+  this.game.beginBattleMusic();
+};
+

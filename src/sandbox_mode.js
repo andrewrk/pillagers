@@ -22,3 +22,12 @@ SandboxMode.prototype.start = function() {
   var state = new State(this);
   state.startSandboxMode();
 };
+
+SandboxMode.prototype.endBattleMusic = function() {
+  this.game.endBattleMusic();
+};
+
+SandboxMode.prototype.beginBattleMusic = function() {
+  this.game.beginBattleMusic();
+};
+

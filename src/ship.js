@@ -46,6 +46,10 @@ function Ship(state, o) {
 
 Ship.prototype.name = "Ship";
 
+Ship.prototype.onTargeted = function(ship, action) {
+  this.emit('targeted', ship, action);
+}
+
 Ship.prototype.clearInput = function() {
   this.setThrustInput(0);
   this.setRotateInput(0);

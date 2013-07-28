@@ -289,6 +289,7 @@ function EnterCommand(ai, target) {
     batch: ai.state.batch,
     pos: this.target.pos,
   });
+  this.target.onTargeted(ai.ship, 'enter');
 }
 
 EnterCommand.prototype.execute = function(ai, dt, dx) {
@@ -370,6 +371,7 @@ function ShootCommand(ai, target) {
     batch: ai.state.batch,
     pos: this.target.pos,
   });
+  this.target.onTargeted(ai.ship, 'attack');
 }
 
 ShootCommand.prototype.execute = function(ai, dt, dx) {
@@ -431,6 +433,7 @@ function DefendGroundCommand(ai, target) {
     batch: ai.state.batch,
     pos: this.target.pos,
   });
+  this.target.onTargeted(ai.ship, 'attack');
 }
 
 DefendGroundCommand.prototype.execute = function(ai, dt, dx) {
@@ -510,6 +513,7 @@ function MeleeCommand(ai, target) {
     batch: ai.state.batch,
     pos: this.target.pos,
   });
+  this.target.onTargeted(ai.ship, 'attack');
 }
 
 MeleeCommand.prototype.execute = function(ai, dt, dx) {

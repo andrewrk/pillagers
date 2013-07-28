@@ -21,6 +21,13 @@
   ],
   "objects": [
     {
+      "type": "Text",
+      "properties": {
+        "text": "You may pause the game with P and issue\ncommands. This may help achieve a better attack vector.",
+        "pos": {"x": 20, "y": 150}
+      }
+    },
+    {
       "type": "ShipCluster",
       "properties": {
         "type": "Ranger",

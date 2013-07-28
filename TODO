@@ -1,4 +1,6 @@
 Next:
+ * Ship AI: self directed shootcommands have expire time
+ * If your flagship is all that is left, everyone targets it.
  * Add a turret to flagship
  * Update level 1 with a civilian and use that to explain ctrl+right-click
    vs right-click
