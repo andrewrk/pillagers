@@ -973,6 +973,7 @@ State.prototype.performAction = function(action) {
 }
 
 State.prototype.reloadLevel = function(o) {
+  this.delete();
   this.game.playLevel();
 }
 

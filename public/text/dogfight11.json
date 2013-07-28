@@ -113,14 +113,7 @@
           },
           "group": "Blue",
           "team": 0
-        },
-        "triggers": [
-          {
-            "condition": "destroyed",
-            "event": "AnnounceDefeat"
-          }
-        ],
-        "manualPilot": true
+        }
       }
     },
     {
@@ -640,7 +633,6 @@
             "x": 0,
             "y": 0
           },
-          "group": "Red",
           "team": 1
         }
       }
@@ -678,7 +670,14 @@
           },
           "group": "Blue",
           "team": 0
-        }
+        },
+        "triggers": [
+          {
+            "condition": "destroyed",
+            "event": "AnnounceDefeat"
+          }
+        ],
+        "manualPilot": true
       }
     },
     {

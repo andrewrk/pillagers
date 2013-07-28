@@ -28,6 +28,7 @@ function Ship(state, o) {
   this.initResources(state);
 
   this.canBeSelected = true;
+  this.canKeepTeamAlive = true;
   this.sensorRange = 400; // radius of ability to detect ships
   this.thrustInput = 0;
   this.brakeInput = false; // lets you brake at low velocities
