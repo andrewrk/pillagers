@@ -18,6 +18,7 @@ function Ship(state, o) {
 
   this.team = o.team;
   this.health = o.health || 1;
+  this.group = o.group;
 
   this.canBeShot = true;
   this.bounty = 5;

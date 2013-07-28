@@ -936,8 +936,8 @@ State.prototype.performAction = function(action) {
     case "Timer":
       this.addTimer(props);
       break;
-    case "EveryoneTargetThatSuckersFlagship":
-      this.allEnemyShipsTargetFlagship();
+    case "GroupAttack":
+      this.groupAttack(props);
       break;
     case "SpawnObject":
       this.spawnObject(props);
@@ -958,22 +958,19 @@ State.prototype.addTimer = function(o) {
   });
 };
 
-State.prototype.allEnemyShipsTargetFlagship = function() {
+State.prototype.groupAttack = function(o) {
+  var attackableShipList = this.physicsObjects.filter(function(ship) {
+    return ship.canBeShot && ship.group === o.targetGroup;
+  });
+  if (attackableShipList.length === 0) return;
+  var nextIndex = 0;
   this.aiObjects.forEach(function(ai) {
-    if (ai.ship.team !== this.playerTeam) {
-      ai.commandToAttack(this.getPlayerFlagship());
+    if (ai.ship.group === o.sourceGroup) {
+      var target = attackableShipList[nextIndex];
+      nextIndex = (nextIndex + 1) % attackableShipList.length;
+      ai.commandToAttack(target);
     }
   }.bind(this));
-};
-
-State.prototype.getPlayerFlagship = function() {
-  for (var i = 0; i < this.physicsObjects.length; i += 1) {
-    var obj = this.physicsObjects[i];
-    if (obj.isFlagship && obj.team === this.playerTeam) {
-      return obj;
-    }
-  }
-  return null;
 };
 
 State.prototype.spawnObject = function(obj) {
@@ -1315,6 +1312,7 @@ State.prototype.addSpecialShip = function(o) {
   var ship = new ShipType(this, {
     team: team.get(o.ship.team),
     pos: v(o.ship.pos),
+    group: o.ship.group,
   });
   if (o.triggers) {
     o.triggers.forEach(function(trigger) {
@@ -1330,6 +1328,7 @@ State.prototype.addSpecialShip = function(o) {
 State.prototype.addShipCluster = function(o) {
   var pos = v(o.pos);
   var size = v(o.size);
+  var vel = v(o.vel || v());
   var ShipType = shipTypes[o.type];
   assert(ShipType, "Invalid ship type: " + o.type);
   for (var i = 0; i < o.count; i += 1) {
@@ -1338,6 +1337,8 @@ State.prototype.addShipCluster = function(o) {
       team: o.team,
       pos: thisPos,
       rotation: Math.random() * 2 * Math.PI,
+      vel: vel,
+      group: o.group,
     });
     this.addShip(ship);
   }

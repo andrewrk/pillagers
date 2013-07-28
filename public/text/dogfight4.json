@@ -1,0 +1,129 @@
+{
+  "size": {"x": 1500, "y": 1000},
+  "scroll": {"x": 0, "y": 200},
+  "rewards": [],
+  "startPoint": {
+    "radius": 100,
+    "pos": {"x": 150, "y": 400}
+  },
+  "immediateEvents": [ "AnnounceChallenge" ],
+  "events": {
+    "AnnounceChallenge": {
+      "actions": [
+        {
+          "type": "Announcement",
+          "properties": {
+            "text": "Dogfighting Challenge 5: Ranger VS Artillery"
+          }
+        },
+        {
+          "type": "Timer",
+          "properties": {
+            "timeout": 0,
+            "event": "Respawn"
+          }
+        }
+      ]
+    },
+    "AnnounceVictory": {
+      "actions": [
+        {
+          "type": "Announcement",
+          "properties": {
+            "text": "Nice shooting!"
+          }
+        },
+        {
+          "type": "Timer",
+          "properties": {
+            "timeout": 2,
+            "event": "Victory"
+          }
+        }
+      ]
+    },
+    "AnnounceDefeat": {
+      "actions": [
+        {
+          "type": "Announcement",
+          "properties": {
+            "text": "You were destroyed. Respawning in 1 second."
+          }
+        },
+        {
+          "type": "Timer",
+          "properties": {
+            "timeout": 1,
+            "event": "Respawn"
+          }
+        }
+      ]
+    },
+    "Victory": {
+      "actions": [
+        { "type": "LevelComplete" }
+      ]
+    },
+    "Respawn": {
+      "actions": [
+        {
+          "type": "SpawnObject",
+          "properties": {
+            "type": "Ship",
+            "properties": {
+              "ship": {
+                "type": "Ranger",
+                "team": 0,
+                "pos": {"x": 200, "y": 450}
+              },
+              "triggers": [
+                {
+                  "condition": "destroyed",
+                  "event": "AnnounceDefeat"
+                }
+              ],
+              "manualPilot": true
+            }
+          }
+        }
+      ]
+    }
+  },
+  "triggers": [
+    {
+      "type": "AllShipsDestroyed",
+      "properties": {
+        "team": 1,
+        "event": "AnnounceVictory"
+      }
+    }
+  ],
+  "objects": [
+    {
+      "type": "MeteorCluster",
+      "properties": {
+        "animationNames": ["rock-a", "rock-b", "rock-c"],
+        "pos": {"x": 200, "y": 200},
+        "size": {"x": 600, "y": 200},
+        "minVel": {"x": 0, "y": 0},
+        "maxVel": {"x": 0.5, "y": 0.5},
+        "minRotVel" : -0.01,
+        "maxRotVel" : 0.01,
+        "minRadius": 10,
+        "maxRadius": 40,
+        "count": 4
+      }
+    },
+    {
+      "type": "ShipCluster",
+      "properties": {
+        "type": "Artillery",
+        "team": 1,
+        "size": {"x": 50, "y": 50},
+        "pos": {"x": 1300, "y": 400},
+        "count": 1
+      }
+    }
+  ]
+}
+

@@ -46,6 +46,7 @@ Campaign.prototype.start = function() {
   // start campaign with only a flagship
   var flagship = new FlagShip(null, {
     team: playerTeam,
+    group: "PlayerFlagship",
   });
   this.playLevel([flagship]);
 };
