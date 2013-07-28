@@ -16,12 +16,12 @@ function TitleScreen(game) {
       fn: startNewCampaign.bind(this),
     },
     {
-      caption: "Sandbox Mode",
-      fn: startSandboxMode.bind(this),
-    },
-    {
       caption: "Dogfighting Mode",
       fn: startDogfighting.bind(this),
+    },
+    {
+      caption: "Sandbox Mode",
+      fn: startSandboxMode.bind(this),
     },
     {
       caption: "Credits",
