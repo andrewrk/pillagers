@@ -21,7 +21,7 @@ DogfightingMode.prototype.showTitleScreen = function() {
 };
 
 DogfightingMode.prototype.start = function() {
-  this.levelIndex = 10;
+  this.levelIndex = 0;
   this.playLevel();
 };
 
