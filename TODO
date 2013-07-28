@@ -1,5 +1,4 @@
 Next:
- * Ship AI: self directed shootcommands have expire time
  * If your flagship is all that is left, everyone targets it.
  * Add a turret to flagship
  * Update level 1 with a civilian and use that to explain ctrl+right-click
@@ -8,6 +7,7 @@ Next:
    - Challenge 2: you (ranger) vs 1 artillery
    - Challenge 3: get 5 kills in the middle of a big battle.
    - Challenge 4: the enemy has turrets all around the outside
+ * pan sound effects and volume depending on scroll
 
 Features:
  * Add a command that tells a ship to defend another ship.
@@ -20,10 +20,9 @@ Level ideas:
    to destroy that ship to reactivate your army
 
 Nice-to-have:
- * Fix militia for dogfighting
+ * Ship AI: self directed shootcommands have expire time
  * Ability to change controls.
  * ability to retry level when you get game over
- * pan sound effects and volume depending on scroll
  * if ranger is in range, don't accelerate toward target
  * fix the thruster sound glitchiness
  * State should be renamed LevelPlayer

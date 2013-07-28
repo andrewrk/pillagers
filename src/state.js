@@ -11,7 +11,7 @@ var Squad = require('./squad');
 var shipTypes = require('./ship_types');
 
 var SCROLL_SPEED = 12;
-var BATTLE_MUSIC_VIOLENCE_LEVEL = 4;
+var BATTLE_MUSIC_VIOLENCE_LEVEL = 8;
 var VIOLENCE_EXPIRE_TIME = 3;
 
 var shipTypeList = toList(shipTypes);
@@ -746,8 +746,16 @@ function onUpdate(dt, dx) {
   if (this.paused) return;
 
   // end battle music if no more violence is occurring
+  this.violenceLevel -= dx * 0.01;
   this.violenceTimeout -= dt;
-  if (this.violenceTimeout <= 0) this.game.endBattleMusic();
+  if (this.violenceTimeout <= 0) {
+    this.game.endBattleMusic();
+    this.violenceLevel = 0;
+  } else if (this.violenceLevel >= BATTLE_MUSIC_VIOLENCE_LEVEL) {
+    this.game.beginBattleMusic();
+  } else if (this.violenceLevel < 0) {
+    this.violenceLevel = 0;
+  }
 
   var id;
   for (var i = 0; i < this.physicsObjects.length; i += 1) {
@@ -1401,7 +1409,7 @@ State.prototype.addShip = function(ship) {
     }
   }.bind(this));
   ship.on('targeted', function(otherShip, action) {
-    if (action === 'attack' && ship.team === this.playerTeam) {
+    if (action === 'attack') {
       this.addViolence(1);
     }
   }.bind(this));
@@ -1416,9 +1424,6 @@ State.prototype.addShip = function(ship) {
 State.prototype.addViolence = function(amount) {
   this.violenceTimeout = VIOLENCE_EXPIRE_TIME;
   this.violenceLevel += amount;
-  if (this.violenceLevel >= BATTLE_MUSIC_VIOLENCE_LEVEL) {
-    this.game.beginBattleMusic();
-  }
 };
 
 State.prototype.createElectricFx = function(pos, vel, rotation) {

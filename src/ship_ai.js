@@ -223,8 +223,6 @@ EngageCommand.prototype.execute = function(ai, dt, dx) {
     this.done = true;
     return;
   }
-  this.sprite.setVisible(ai.ship.selected);
-
   var relTargetPt = this.dest.minus(ai.ship.pos);
   var targetDir = relTargetPt.normalized();
   var actualDir = v.unit(ai.ship.rotation);
@@ -275,7 +273,9 @@ EngageCommand.prototype.setThrustWithCap = function(ai, thrustInput) {
   ai.ship.setThrustInput(thrustInput);
 };
 
-EngageCommand.prototype.draw = function(ai, context) {};
+EngageCommand.prototype.draw = function(ai, context) {
+  this.sprite.setVisible(ai.ship.selected);
+};
 
 EngageCommand.prototype.delete = function() {
   this.sprite.delete();
@@ -296,11 +296,12 @@ EnterCommand.prototype.execute = function(ai, dt, dx) {
   interceptTarget.call(this, ai, dt, dx);
   if (this.done) return;
   this.sprite.pos = this.target.pos;
-  this.sprite.setVisible(ai.ship.selected);
   ai.ship.enterInput = this.target;
 };
 
-EnterCommand.prototype.draw = function(ai, context) { };
+EnterCommand.prototype.draw = function(ai, context) {
+  this.sprite.setVisible(ai.ship.selected);
+};
 
 EnterCommand.prototype.delete = function() {
   this.target = null;
@@ -380,7 +381,6 @@ ShootCommand.prototype.execute = function(ai, dt, dx) {
     this.done = true;
     return;
   }
-  this.sprite.setVisible(ai.ship.selected);
   this.sprite.pos = this.target.pos;
 
   var relTargetPt = this.target.pos.minus(ai.ship.pos);
@@ -418,7 +418,9 @@ ShootCommand.prototype.execute = function(ai, dt, dx) {
   ai.ship.setThrustInput(thrust);
 };
 
-ShootCommand.prototype.draw = function(ai, context) {};
+ShootCommand.prototype.draw = function(ai, context) {
+  this.sprite.setVisible(ai.ship.selected);
+};
 
 ShootCommand.prototype.delete = function() {
   this.target = null;
@@ -448,7 +450,6 @@ DefendGroundCommand.prototype.execute = function(ai, dt, dx) {
     return;
   }
   this.sprite.pos = this.target.pos;
-  this.sprite.setVisible(ai.ship.selected);
   ai.ship.setThrustInput(0);
 
   var targetAngle = this.target.pos.minus(ai.ship.pos).angle();
@@ -462,7 +463,9 @@ DefendGroundCommand.prototype.execute = function(ai, dt, dx) {
   ai.ship.setRotateInput(delta / ai.ship.rotationSpeed);
 };
 
-DefendGroundCommand.prototype.draw = function(ai, context) {};
+DefendGroundCommand.prototype.draw = function(ai, context) {
+  this.sprite.setVisible(ai.ship.selected);
+};
 
 DefendGroundCommand.prototype.delete = function() {
   this.target = null;
@@ -519,13 +522,14 @@ function MeleeCommand(ai, target) {
 MeleeCommand.prototype.execute = function(ai, dt, dx) {
   interceptTarget.call(this, ai, dt, dx);
   if (this.done) return;
-  this.sprite.setVisible(ai.ship.selected);
   this.sprite.pos = this.target.pos;
   ai.ship.meleeInput = this.target;
   ai.ship.meleeInputOn = false; // never fire and miss on purpose.
 };
 
-MeleeCommand.prototype.draw = function(ai, context) {};
+MeleeCommand.prototype.draw = function(ai, context) {
+  this.sprite.setVisible(ai.ship.selected);
+};
 
 MeleeCommand.prototype.delete = function() {
   this.target = null;
