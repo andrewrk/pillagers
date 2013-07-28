@@ -1337,7 +1337,7 @@ State.prototype.addShipCluster = function(o) {
       team: o.team,
       pos: thisPos,
       rotation: Math.random() * 2 * Math.PI,
-      vel: vel,
+      vel: vel.clone(),
       group: o.group,
     });
     this.addShip(ship);
