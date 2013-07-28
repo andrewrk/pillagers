@@ -1,5 +1,5 @@
 {
-  "size": {"x": 2000, "y": 1000},
+  "size": {"x": 1500, "y": 1000},
   "scroll": {"x": 0, "y": 200},
   "rewards": [],
   "startPoint": {
@@ -13,7 +13,7 @@
         {
           "type": "Announcement",
           "properties": {
-            "text": "Dogfighting Challenge 3: Militia VS Ranger"
+            "text": "Dogfighting Challenge 4: Ranger VS Militia"
           }
         },
         {
@@ -30,7 +30,7 @@
         {
           "type": "Announcement",
           "properties": {
-            "text": "You got him!"
+            "text": "Boom. You win."
           }
         },
         {
@@ -72,7 +72,7 @@
             "type": "Ship",
             "properties": {
               "ship": {
-                "type": "Militia",
+                "type": "Ranger",
                 "team": 0,
                 "pos": {"x": 200, "y": 450}
               },
@@ -100,12 +100,27 @@
   ],
   "objects": [
     {
+      "type": "MeteorCluster",
+      "properties": {
+        "animationNames": ["rock-a", "rock-b", "rock-c"],
+        "pos": {"x": 200, "y": 200},
+        "size": {"x": 600, "y": 200},
+        "minVel": {"x": 0, "y": 0},
+        "maxVel": {"x": 0.5, "y": 0.5},
+        "minRotVel" : -0.01,
+        "maxRotVel" : 0.01,
+        "minRadius": 10,
+        "maxRadius": 40,
+        "count": 4
+      }
+    },
+    {
       "type": "ShipCluster",
       "properties": {
-        "type": "Ranger",
+        "type": "Militia",
         "team": 1,
         "size": {"x": 50, "y": 50},
-        "pos": {"x": 1650, "y": 400},
+        "pos": {"x": 1450, "y": 400},
         "count": 1
       }
     }

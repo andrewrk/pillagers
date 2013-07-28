@@ -21,13 +21,6 @@
           "properties": {
             "text": "Use the arrow keys and space or WASD and J to fly the Ranger."
           }
-        },
-        {
-          "type": "Timer",
-          "properties": {
-            "timeout": 0,
-            "event": "Respawn"
-          }
         }
       ]
     },
@@ -73,24 +66,7 @@
     "Respawn": {
       "actions": [
         {
-          "type": "SpawnObject",
-          "properties": {
-            "type": "Ship",
-            "properties": {
-              "ship": {
-                "type": "Ranger",
-                "team": 0,
-                "pos": {"x": 200, "y": 450}
-              },
-              "triggers": [
-                {
-                  "condition": "destroyed",
-                  "event": "AnnounceDefeat"
-                }
-              ],
-              "manualPilot": true
-            }
-          }
+          "type": "ReloadLevel"
         }
       ]
     }
@@ -105,6 +81,23 @@
     }
   ],
   "objects": [
+    {
+      "type": "Ship",
+      "properties": {
+        "ship": {
+          "type": "Ranger",
+          "team": 0,
+          "pos": {"x": 200, "y": 450}
+        },
+        "triggers": [
+          {
+            "condition": "destroyed",
+            "event": "AnnounceDefeat"
+          }
+        ],
+        "manualPilot": true
+      }
+    },
     {
       "type": "ShipCluster",
       "properties": {

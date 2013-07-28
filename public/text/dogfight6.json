@@ -1,5 +1,5 @@
 {
-  "size": {"x": 1500, "y": 1000},
+  "size": {"x": 1300, "y": 1000},
   "scroll": {"x": 0, "y": 200},
   "rewards": [],
   "startPoint": {
@@ -13,7 +13,7 @@
         {
           "type": "Announcement",
           "properties": {
-            "text": "Dogfighting Challenge 7: Artillery VS Ranger"
+            "text": "Dogfighting Challenge 8: Artillery VS 3 Rangers"
           }
         },
         {
@@ -120,11 +120,12 @@
         "type": "Ranger",
         "team": 1,
         "size": {"x": 50, "y": 50},
-        "pos": {"x": 1300, "y": 400},
-        "count": 1
+        "pos": {"x": 1100, "y": 400},
+        "count": 3
       }
     }
   ]
 }
+
 
 

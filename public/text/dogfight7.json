@@ -13,7 +13,7 @@
         {
           "type": "Announcement",
           "properties": {
-            "text": "Dogfighting Challenge 8: Artillery VS 3 Rangers"
+            "text": "Dogfighting Challenge 9: Artillery VS 2 Ranger, 2 Militia"
           }
         },
         {
@@ -73,6 +73,7 @@
             "properties": {
               "ship": {
                 "type": "Artillery",
+                "group": "Player",
                 "team": 0,
                 "pos": {"x": 200, "y": 450}
               },
@@ -84,6 +85,13 @@
               ],
               "manualPilot": true
             }
+          }
+        },
+        {
+          "type": "GroupAttack",
+          "properties": {
+            "sourceGroup": "Enemy",
+            "targetGroup": "Player"
           }
         }
       ]
@@ -103,8 +111,8 @@
       "type": "MeteorCluster",
       "properties": {
         "animationNames": ["rock-a", "rock-b", "rock-c"],
-        "pos": {"x": 200, "y": 200},
-        "size": {"x": 600, "y": 200},
+        "pos": {"x": 0, "y": 0},
+        "size": {"x": 1300, "y": 1000},
         "minVel": {"x": 0, "y": 0},
         "maxVel": {"x": 0.5, "y": 0.5},
         "minRotVel" : -0.01,
@@ -119,13 +127,24 @@
       "properties": {
         "type": "Ranger",
         "team": 1,
+        "group": "Enemy",
         "size": {"x": 50, "y": 50},
         "pos": {"x": 1100, "y": 400},
-        "count": 3
+        "vel": {"x": -1, "y": -1},
+        "count": 2
+      }
+    },
+    {
+      "type": "ShipCluster",
+      "properties": {
+        "type": "Militia",
+        "team": 1,
+        "group": "Enemy",
+        "size": {"x": 50, "y": 50},
+        "pos": {"x": 1100, "y": 400},
+        "vel": {"x": -1, "y": 1},
+        "count": 2
       }
     }
   ]
 }
-
-
-

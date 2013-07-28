@@ -46,6 +46,7 @@ DogfightingMode.prototype.playLevel = function() {
 };
 
 DogfightingMode.prototype.showLevelComplete = function(o) {
+  this.game.endBattleMusic();
   var levelCompleteScreen = new LevelCompleteScreen(this, o);
   levelCompleteScreen.start();
 };

@@ -284,7 +284,7 @@ EngageCommand.prototype.delete = function() {
 function EnterCommand(ai, target) {
   this.target = target;
   this.done = false;
-  this.speedCap = 9999;
+  this.minSpeedCap = 9999;
   this.sprite = new chem.Sprite('doorway', {
     batch: ai.state.batch,
     pos: this.target.pos,
@@ -479,6 +479,7 @@ function interceptTarget(ai, dt, dx) {
     return;
   }
 
+  var speedCapSqrd = Math.max(this.minSpeedCap * this.minSpeedCap, this.target.vel.lengthSqrd() * 2);
   var relTargetPt = this.target.pos.minus(ai.ship.pos);
   var targetDir = relTargetPt.normalized();
   var actualDir = v.unit(ai.ship.rotation);
@@ -499,7 +500,7 @@ function interceptTarget(ai, dt, dx) {
   var thrust = (actualDir.dot(targetDir) > 0.99) ? 1 : 0;
   if (thrust > 0) {
     var speedSqrd = ai.ship.vel.lengthSqrd();
-    var atSpeedcap = speedSqrd > this.speedCap * this.speedCap;
+    var atSpeedcap = speedSqrd > speedCapSqrd;
     if (atSpeedcap) {
       var thrustWouldIncreaseSpeed = actualDir.dot(ai.ship.vel) > 0;
       if (thrustWouldIncreaseSpeed) thrust = 0;
@@ -511,7 +512,7 @@ function interceptTarget(ai, dt, dx) {
 function MeleeCommand(ai, target) {
   this.target = target;
   this.done = false;
-  this.speedCap = 6;
+  this.minSpeedCap = 6;
   this.sprite = new chem.Sprite('target', {
     batch: ai.state.batch,
     pos: this.target.pos,

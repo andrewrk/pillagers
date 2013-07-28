@@ -13,7 +13,7 @@
         {
           "type": "Announcement",
           "properties": {
-            "text": "Dogfighting Challenge 5: Ranger VS Artillery"
+            "text": "Dogfighting Challenge 6: Militia VS Artillery"
           }
         },
         {
@@ -72,7 +72,7 @@
             "type": "Ship",
             "properties": {
               "ship": {
-                "type": "Ranger",
+                "type": "Militia",
                 "team": 0,
                 "pos": {"x": 200, "y": 450}
               },

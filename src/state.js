@@ -945,9 +945,16 @@ State.prototype.performAction = function(action) {
     case "LevelComplete":
       this.cheatSkipLevel();
       break;
+    case "ReloadLevel":
+      this.reloadLevel();
+      break;
     default:
       throw new Error("Unknown action type: " + action.type);
   }
+}
+
+State.prototype.reloadLevel = function(o) {
+  this.game.playLevel();
 }
 
 State.prototype.addTimer = function(o) {

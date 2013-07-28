@@ -1,5 +1,5 @@
 {
-  "size": {"x": 1000, "y": 600},
+  "size": {"x": 2000, "y": 1000},
   "scroll": {"x": 0, "y": 200},
   "rewards": [],
   "startPoint": {
@@ -13,20 +13,14 @@
         {
           "type": "Announcement",
           "properties": {
-            "text": "Dogfighting Challenge 2: Environmental Hazards"
+            "text": "Dogfighting Challenge 3: Militia VS Ranger"
           }
         },
         {
-          "type": "Announcement",
+          "type": "GroupAttack",
           "properties": {
-            "text": "You only have to destroy the other Ranger ship."
-          }
-        },
-        {
-          "type": "Timer",
-          "properties": {
-            "timeout": 0,
-            "event": "Respawn"
+            "sourceGroup": "Enemy",
+            "targetGroup": "Player"
           }
         }
       ]
@@ -36,7 +30,7 @@
         {
           "type": "Announcement",
           "properties": {
-            "text": "Nice shooting!"
+            "text": "You got him!"
           }
         },
         {
@@ -73,24 +67,7 @@
     "Respawn": {
       "actions": [
         {
-          "type": "SpawnObject",
-          "properties": {
-            "type": "Ship",
-            "properties": {
-              "ship": {
-                "type": "Ranger",
-                "team": 0,
-                "pos": {"x": 500, "y": 300}
-              },
-              "triggers": [
-                {
-                  "condition": "destroyed",
-                  "event": "AnnounceDefeat"
-                }
-              ],
-              "manualPilot": true
-            }
-          }
+          "type": "ReloadLevel"
         }
       ]
     }
@@ -109,73 +86,30 @@
       "type": "Ship",
       "properties": {
         "ship": {
-          "type": "Ranger",
-          "team": 1,
-          "pos": {"x": 800, "y": 500}
+          "type": "Militia",
+          "group": "Player",
+          "team": 0,
+          "pos": {"x": 200, "y": 450}
         },
         "triggers": [
           {
             "condition": "destroyed",
-            "event": "AnnounceVictory"
+            "event": "AnnounceDefeat"
           }
-        ]
+        ],
+        "manualPilot": true
       }
     },
     {
       "type": "ShipCluster",
       "properties": {
-        "type": "Turret",
+        "type": "Ranger",
         "team": 1,
-        "pos": {"x": 50, "y": 50},
-        "size": {"x": 1, "y": 1},
+        "group": "Enemy",
+        "size": {"x": 50, "y": 50},
+        "pos": {"x": 1650, "y": 400},
         "count": 1
-      }
-    },
-    {
-      "type": "ShipCluster",
-      "properties": {
-        "type": "Turret",
-        "team": 1,
-        "pos": {"x": 950, "y": 50},
-        "size": {"x": 1, "y": 1},
-        "count": 1
-      }
-    },
-    {
-      "type": "ShipCluster",
-      "properties": {
-        "type": "Turret",
-        "team": 1,
-        "pos": {"x": 50, "y": 550},
-        "size": {"x": 1, "y": 1},
-        "count": 1
-      }
-    },
-    {
-      "type": "ShipCluster",
-      "properties": {
-        "type": "Turret",
-        "team": 1,
-        "pos": {"x": 950, "y": 550},
-        "size": {"x": 1, "y": 1},
-        "count": 1
-      }
-    },
-    {
-      "type": "MeteorCluster",
-      "properties": {
-        "animationNames": ["rock-b"],
-        "pos": {"x": 200, "y": 200},
-        "size": {"x": 600, "y": 200},
-        "minVel": {"x": 0, "y": 0},
-        "maxVel": {"x": 0.5, "y": 0.5},
-        "minRotVel" : -0.01,
-        "maxRotVel" : 0.01,
-        "minRadius": 10,
-        "maxRadius": 40,
-        "count": 2
       }
     }
   ]
 }
-

@@ -13,7 +13,7 @@
         {
           "type": "Announcement",
           "properties": {
-            "text": "Dogfighting Challenge 4: Ranger VS Militia"
+            "text": "Dogfighting Challenge 5: Ranger VS Artillery"
           }
         },
         {
@@ -30,7 +30,7 @@
         {
           "type": "Announcement",
           "properties": {
-            "text": "Boom. You win."
+            "text": "Nice shooting!"
           }
         },
         {
@@ -117,12 +117,13 @@
     {
       "type": "ShipCluster",
       "properties": {
-        "type": "Militia",
+        "type": "Artillery",
         "team": 1,
         "size": {"x": 50, "y": 50},
-        "pos": {"x": 1450, "y": 400},
+        "pos": {"x": 1300, "y": 400},
         "count": 1
       }
     }
   ]
 }
+

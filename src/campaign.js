@@ -71,6 +71,7 @@ Campaign.prototype.playLevel = function(convoy) {
 };
 
 Campaign.prototype.showLevelComplete = function(o) {
+  this.game.endBattleMusic();
   var levelCompleteScreen = new LevelCompleteScreen(this, o);
   levelCompleteScreen.start();
 };
