@@ -12,7 +12,7 @@ var shipTypes = require('./ship_types');
 
 var SCROLL_SPEED = 12;
 var BATTLE_MUSIC_VIOLENCE_LEVEL = 4;
-var VIOLENCE_EXPIRE_TIME = 5;
+var VIOLENCE_EXPIRE_TIME = 3;
 
 var shipTypeList = toList(shipTypes);
 

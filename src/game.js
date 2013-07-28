@@ -111,11 +111,13 @@ Game.prototype.toggleMusic = function() {
 };
 
 Game.prototype.showTitleScreen = function() {
+  this.endBattleMusic();
   var title = new TitleScreen(this);
   title.start();
 };
 
 Game.prototype.showCredits = function() {
+  this.endBattleMusic();
   var credits = new CreditsScreen(this);
   credits.start();
 };

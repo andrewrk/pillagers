@@ -35,13 +35,7 @@ Campaign.prototype.showGameOverScreen = function() {
 };
 
 Campaign.prototype.showTitleScreen = function() {
-  var title = new TitleScreen(this.game);
-  title.start();
-};
-
-Campaign.prototype.showCredits = function() {
-  var credits = new CreditsScreen(this.game);
-  credits.start();
+  this.game.showTitleScreen();
 };
 
 Campaign.prototype.start = function() {
@@ -61,7 +55,7 @@ Campaign.prototype.playLevel = function(convoy) {
   var levelText = chem.resources.text["level" + this.levelIndex + ".json"];
   if (levelText == null) {
     // user beat all the levels
-    this.showCredits();
+    this.game.showCredits();
     return;
   }
   var level;
