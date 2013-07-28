@@ -87,7 +87,7 @@ MilitiaShip.prototype.drawState = function(context) {
     context.lineTo(this.pos.x, this.pos.y);
     context.closePath();
     context.fillStyle = "#ffffff";
-    context.globalAlpha = (this.recharge > 0) ? 0.1 : 0.4;
+    context.globalAlpha = 0.4;
     context.fill();
     context.globalAlpha = 1;
   }
