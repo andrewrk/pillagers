@@ -19,7 +19,7 @@ function MilitiaShip(state, o) {
   this.hasMelee = true;
   this.meleeInput = null; // set to a ship to attack it
   this.meleeInputOn = false; // so you can fire even when it's pointless. silly humans like to do it.
-  this.meleeRadius = 32;
+  this.meleeRadius = 40;
   this.meleeDamage = 0.5;
   this.rechargeAmt = 0.40;
   this.recharge = 0;
