@@ -92,6 +92,10 @@ Ship.prototype.draw = function(context) {
   this.drawTeamColor(context);
 }
 
+Ship.prototype.drawState = function(context) {
+  // call this method in draw when manually piloting it.
+}
+
 Ship.prototype.drawTeamColor = function(context) {
   context.beginPath();
   context.arc(this.sprite.pos.x, this.sprite.pos.y, 4, 0, 2 * Math.PI);

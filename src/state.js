@@ -669,6 +669,7 @@ function onDraw(context) {
   for (i = 0; i < this.aiObjects.length; i += 1) {
     var ai = this.aiObjects[i];
     ai.draw(context);
+    if (this.manualOverride === ai) ai.ship.drawState(context);
   }
 
   // draw a selection box
@@ -766,7 +767,7 @@ function onUpdate(dt, dx) {
 
   for (i = 0; i < this.aiObjects.length; i += 1) {
     var ai = this.aiObjects[i];
-    if (this.manualOverride === ai.id) {
+    if (this.manualOverride === ai) {
       var ship = ai.ship;
       // rotate the ship with left and right arrow keys
       ship.rotateInput = 0;
@@ -1352,8 +1353,7 @@ State.prototype.addShipCluster = function(o) {
 };
 
 State.prototype.beginManualOverride = function(ai) {
-  assert(ai.id);
-  this.manualOverride = ai.id;
+  this.manualOverride = ai;
 }
 
 State.prototype.endManualOverride = function() {
@@ -1393,7 +1393,7 @@ State.prototype.triggerTeamDeathEvent = function(teamNumber) {
 };
 
 State.prototype.deleteAi = function(ai) {
-  if (this.manualOverride === ai.id) this.endManualOverride();
+  if (this.manualOverride === ai) this.endManualOverride();
   var index = this.aiObjects.indexOf(ai);
   if (index >= 0) this.aiObjects.splice(index, 1);
 };
