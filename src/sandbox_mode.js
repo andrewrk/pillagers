@@ -31,3 +31,15 @@ SandboxMode.prototype.beginBattleMusic = function() {
   this.game.beginBattleMusic();
 };
 
+SandboxMode.prototype.loadSavedLevel = function() {
+  var level;
+  try {
+    level = JSON.parse(localStorage.getItem("sandboxSavedLevel"));
+  } catch (err) {
+    console.error("Error parsing sandbox saved level:", err.stack);
+  }
+  var state = new State(this);
+  state.sandboxMode = true;
+  state.load(level);
+  state.start();
+};

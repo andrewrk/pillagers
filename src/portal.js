@@ -11,6 +11,8 @@ function Portal(state, o) {
   this.sprite = new chem.Sprite('portal');
   this.sprite.pos = this.pos.floored();
   this.state.batch.add(this.sprite);
+  this.requireFlagship = o.requireFlagship == null ? true : false;
+  this.autoActivate = o.autoActivate == null ? false: true;
   this.canBeSelected = true;
   this.radius = 64;
   this.miniMapColor = "#6A9EA8";
@@ -58,7 +60,7 @@ Portal.prototype.isFlagshipInside = function() {
 };
 
 Portal.prototype.activatePortal = function() {
-  if (!this.isFlagshipInside()) {
+  if (this.requireFlagship && !this.isFlagshipInside()) {
     this.state.announce("Your Flagship must be inside the Portal to activate it.");
     return;
   }
@@ -76,4 +78,5 @@ Portal.prototype.delete = function() {
 
 Portal.prototype.enter = function(ship) {
   this.shipsInside.push(ship);
+  if (this.autoActivate) this.activatePortal();
 };

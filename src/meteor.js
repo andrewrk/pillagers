@@ -29,6 +29,19 @@ function Meteor(state, o) {
   this.uiAnimationName = "rock-a";
 }
 
+Meteor.prototype.serialize = function() {
+  return {
+    type: "Meteor",
+    properties: {
+      animationName: this.sprite.animationName,
+      pos: this.pos.clone(),
+      vel: this.vel.clone(),
+      rotVel : this.rotVel,
+      radius: this.radius,
+    },
+  };
+};
+
 Meteor.prototype.setRadius = function(radius) {
   this.radius = radius;
   var graphicRadius = (this.sprite.size.x + this.sprite.size.y) / 4;

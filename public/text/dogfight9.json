@@ -1,0 +1,345 @@
+{
+  "size": {
+    "x": 3667,
+    "y": 504
+  },
+  "scroll": {
+    "x": 0,
+    "y": 0
+  },
+  "rewards": [],
+  "startPoint": {
+    "radius": 100,
+    "pos": {"x": 150, "y": 400}
+  },
+  "immediateEvents": [ "AnnounceChallenge" ],
+  "events": {
+    "AnnounceChallenge": {
+      "actions": [
+        {
+          "type": "Announcement",
+          "properties": {
+            "text": "Dogfighting Challenge 10: Helplessness"
+          }
+        },
+        {
+          "type": "Announcement",
+          "properties": {
+            "text": "Civilian ships are unarmed. Get to one of the portals."
+          }
+        }
+      ]
+    },
+    "AnnounceVictory": {
+      "actions": [
+        {
+          "type": "Announcement",
+          "properties": {
+            "text": "That wasn't supposed to be possible..."
+          }
+        },
+        {
+          "type": "Timer",
+          "properties": {
+            "timeout": 2,
+            "event": "Victory"
+          }
+        }
+      ]
+    },
+    "AnnounceDefeat": {
+      "actions": [
+        {
+          "type": "Announcement",
+          "properties": {
+            "text": "You were destroyed. Respawning in 1 second."
+          }
+        },
+        {
+          "type": "Timer",
+          "properties": {
+            "timeout": 1,
+            "event": "Respawn"
+          }
+        }
+      ]
+    },
+    "Victory": {
+      "actions": [
+        { "type": "LevelComplete" }
+      ]
+    },
+    "Respawn": {
+      "actions": [
+        {
+          "type": "ReloadLevel"
+        }
+      ]
+    }
+  },
+  "triggers": [
+    {
+      "type": "AllShipsDestroyed",
+      "properties": {
+        "team": 1,
+        "event": "AnnounceVictory"
+      }
+    }
+  ],
+  "objects": [
+      {
+          "type": "Meteor",
+          "properties": {
+              "animationName": "rock-a",
+              "pos": {
+                  "x": 820,
+                  "y": 380
+              },
+              "vel": {
+                  "x": 0,
+                  "y": 0
+              },
+              "rotVel": 0,
+              "radius": 64
+          }
+      },
+      {
+          "type": "Meteor",
+          "properties": {
+              "animationName": "rock-a",
+              "pos": {
+                  "x": 1310.9999999999998,
+                  "y": 150
+              },
+              "vel": {
+                  "x": 0,
+                  "y": 0
+              },
+              "rotVel": 0,
+              "radius": 64
+          }
+      },
+      {
+          "type": "Meteor",
+          "properties": {
+              "animationName": "rock-a",
+              "pos": {
+                  "x": 1736.2399999999993,
+                  "y": 394
+              },
+              "vel": {
+                  "x": 0,
+                  "y": 0
+              },
+              "rotVel": 0,
+              "radius": 64
+          }
+      },
+      {
+          "type": "Ship",
+          "properties": {
+              "ship": {
+                  "type": "Turret",
+                  "pos": {
+                      "x": 718.48,
+                      "y": 350
+                  },
+                  "vel": {
+                      "x": 0,
+                      "y": 0
+                  },
+                  "team": 1
+              }
+          }
+      },
+      {
+          "type": "Ship",
+          "properties": {
+              "ship": {
+                  "type": "Turret",
+                  "pos": {
+                      "x": 712.48,
+                      "y": 397
+                  },
+                  "vel": {
+                      "x": 0,
+                      "y": 0
+                  },
+                  "team": 1
+              }
+          }
+      },
+      {
+          "type": "Ship",
+          "properties": {
+              "ship": {
+                  "type": "Turret",
+                  "pos": {
+                      "x": 1217.2399999999998,
+                      "y": 98
+                  },
+                  "vel": {
+                      "x": 0,
+                      "y": 0
+                  },
+                  "team": 1
+              }
+          }
+      },
+      {
+          "type": "Ship",
+          "properties": {
+              "ship": {
+                  "type": "Turret",
+                  "pos": {
+                      "x": 1217.2399999999998,
+                      "y": 148
+                  },
+                  "vel": {
+                      "x": 0,
+                      "y": 0
+                  },
+                  "team": 1
+              }
+          }
+      },
+      {
+          "type": "Ship",
+          "properties": {
+              "ship": {
+                  "type": "Turret",
+                  "pos": {
+                      "x": 1627.1999999999996,
+                      "y": 367
+                  },
+                  "vel": {
+                      "x": 0,
+                      "y": 0
+                  },
+                  "team": 1
+              }
+          }
+      },
+      {
+          "type": "Ship",
+          "properties": {
+              "ship": {
+                  "type": "Turret",
+                  "pos": {
+                      "x": 1631.1999999999996,
+                      "y": 415
+                  },
+                  "vel": {
+                      "x": 0,
+                      "y": 0
+                  },
+                  "team": 1
+              }
+          }
+      },
+      {
+          "type": "Ship",
+          "properties": {
+              "ship": {
+                  "type": "Civilian",
+                  "pos": {
+                      "x": 99,
+                      "y": 390
+                  },
+                  "vel": {
+                      "x": 0,
+                      "y": 0
+                  },
+                  "team": 0
+              },
+              "triggers": [
+                {
+                  "condition": "destroyed",
+                  "event": "AnnounceDefeat"
+                }
+              ],
+              "manualPilot": true
+          }
+      },
+      {
+          "type": "Ship",
+          "properties": {
+              "ship": {
+                  "type": "Artillery",
+                  "pos": {
+                      "x": 1850.0399999999988,
+                      "y": 465
+                  },
+                  "vel": {
+                      "x": 0,
+                      "y": 0
+                  },
+                  "team": 1
+              }
+          }
+      },
+      {
+          "type": "Meteor",
+          "properties": {
+              "animationName": "rock-a",
+              "pos": {
+                  "x": 2131.7599999999993,
+                  "y": 119
+              },
+              "vel": {
+                  "x": 0,
+                  "y": 0
+              },
+              "rotVel": 0,
+              "radius": 64
+          }
+      },
+      {
+          "type": "Meteor",
+          "properties": {
+              "animationName": "rock-a",
+              "pos": {
+                  "x": 2506.9599999999996,
+                  "y": 229
+              },
+              "vel": {
+                  "x": 0,
+                  "y": 0
+              },
+              "rotVel": 0,
+              "radius": 64
+          }
+      },
+      {
+          "type": "Meteor",
+          "properties": {
+              "animationName": "rock-a",
+              "pos": {
+                  "x": 2132.959999999999,
+                  "y": 389
+              },
+              "vel": {
+                  "x": 0,
+                  "y": 0
+              },
+              "rotVel": 0,
+              "radius": 64
+          }
+      },
+      {
+        "type": "Text",
+        "properties": {
+          "text": "Key to enter things: 'K'",
+          "pos": {"x": 3184, "y": 150}
+        }
+      },
+      {
+        "type": "Portal",
+        "properties": {
+          "pos": {"x": 3384, "y": 250},
+          "requireFlagship": false,
+          "autoActivate": true
+        }
+      }
+  ]
+}

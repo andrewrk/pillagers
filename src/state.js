@@ -780,6 +780,13 @@ function onUpdate(dt, dx) {
       if (ship.hasBackwardsThrusters && goDown) thrust -= 1;
       ship.setThrustInput(thrust, thrust === 0);
 
+      var wantToEnter = this.engine.buttonState(chem.button.KeyK);
+      if (wantToEnter) {
+        ship.enterInput = this.nearestEnterableThing(ship);
+      } else {
+        ship.enterInput = null;
+      }
+
       var primaryFire = this.engine.buttonState(chem.button.KeySpace) || this.engine.buttonState(chem.button.KeyJ);
       if (ship.hasBullets) {
         ship.shootInput = primaryFire;
@@ -825,20 +832,31 @@ function onUpdate(dt, dx) {
   }
 }
 
-State.prototype.nearestMeleeableShip = function(ship) {
+State.prototype.nearestQualifyingObject = function(pos, qualifier) {
   var target = null;
   var closestDist;
   for (var i = 0; i < this.physicsObjects.length; i += 1) {
     var obj = this.physicsObjects[i];
-    if (!obj.canBeShot) continue;
-    if (obj.team == null || obj.team === ship.team) continue;
-    var dist = obj.pos.distanceSqrd(ship.pos);
+    if (!qualifier(obj)) continue;
+    var dist = obj.pos.distanceSqrd(pos);
     if (target == null || dist < closestDist) {
       closestDist = dist;
       target = obj;
     }
   }
   return target;
+};
+
+State.prototype.nearestEnterableThing = function(ship) {
+  return this.nearestQualifyingObject(ship.pos, function(obj) {
+    return obj.canBeEntered;
+  });
+};
+
+State.prototype.nearestMeleeableShip = function(ship) {
+  return this.nearestQualifyingObject(ship.pos, function(obj) {
+    return obj.canBeShot && obj.team !== ship.team;
+  });
 };
 
 State.prototype.sandboxModeUpdate = function(dt, dx) {
@@ -1129,6 +1147,16 @@ State.prototype.createSandboxButtons = function() {
       help: "Go back to the title screen.",
       fn: this.confirmBackToTitleScreen.bind(this),
     },
+    {
+      caption: "save",
+      help: "Save the level JSON to localStorage.sandboxSavedLevel",
+      fn: this.sandboxSave.bind(this),
+    },
+    {
+      caption: "load",
+      help: "Load the level JSON from localStorage.sandboxSavedLevel",
+      fn: this.sandboxLoad.bind(this),
+    },
   ];
   var nextPos = this.uiPanePos.offset(this.uiPaneMargin, this.uiPaneMargin);
   this.uiButtons = btns.map(function(btn) {
@@ -1156,6 +1184,29 @@ State.prototype.createSandboxButtons = function() {
     };
   }.bind(this));
   this.computeHoverForUiButtons();
+};
+
+State.prototype.sandboxSave = function(button) {
+  var objects = [];
+  this.physicsObjects.forEach(function(obj) {
+    if (obj.serialize) objects.push(obj.serialize());
+  }.bind(this));
+  var level = {
+    size: this.mapSize,
+    scroll: this.scroll.floored(),
+    startPoint: {
+      pos: v(50, 50),
+      radius: 1,
+    },
+    rewards: [],
+    objects: objects,
+  };
+  localStorage.setItem("sandboxSavedLevel", JSON.stringify(level, null, 2));
+};
+
+State.prototype.sandboxLoad = function(button) {
+  this.delete();
+  this.game.loadSavedLevel();
 };
 
 State.prototype.confirmBackToTitleScreen = function(button) {
@@ -1286,6 +1337,8 @@ State.prototype.addText = function(o) {
 State.prototype.addPortal = function(o) {
   this.addPhysicsObject(new Portal(this, {
     pos: v(o.pos),
+    requireFlagship: o.requireFlagship,
+    autoActivate: o.autoActivate,
   }));
 };
 

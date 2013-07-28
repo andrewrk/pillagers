@@ -47,6 +47,20 @@ function Ship(state, o) {
 
 Ship.prototype.name = "Ship";
 
+Ship.prototype.serialize = function() {
+  return {
+    type: "Ship",
+    properties: {
+      ship: {
+        type: this.name,
+        pos: this.pos.clone(),
+        vel: this.vel.clone(),
+        team: this.team.number,
+      },
+    },
+  };
+};
+
 Ship.prototype.onTargeted = function(ship, action) {
   this.emit('targeted', ship, action);
 }
@@ -106,6 +120,8 @@ Ship.prototype.drawTeamColor = function(context) {
 
 Ship.prototype.enter = function(other) {
   other.enter(this);
+  // we might get deleted by entering something.
+  if (this.deleted) return;
   this.state.deletePhysicsObject(this);
   this.delete();
 };
