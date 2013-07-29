@@ -37,23 +37,6 @@ RangerShip.prototype.animationNames = {
   still: 'ship_ranger_still',
 };
 
-RangerShip.prototype.drawState = function(context) {
-  // draw a line representing where we're aiming
-  var actualDir = v.unit(this.rotation);
-  var beginPos = this.pos.plus(actualDir.scaled(this.radius));
-  var adjustedBulletVel = actualDir.scaled(this.bulletSpeed);
-  var bulletRange = adjustedBulletVel.length() * this.bulletLife * 60;
-  var endPos = beginPos.plus(actualDir.scaled(bulletRange));
-  context.beginPath();
-  context.moveTo(beginPos.x, beginPos.y);
-  context.lineTo(endPos.x, endPos.y);
-  context.closePath();
-  context.fillStyle = "#ffffff";
-  context.globalAlpha = this.recharge <= 0 ? 0.2 : 0.1;
-  context.stroke();
-  context.globalAlpha = 1;
-}
-
 RangerShip.prototype.update = function(dt, dx) {
   Ship.prototype.update.apply(this, arguments);
   this.recharge -= dt;
