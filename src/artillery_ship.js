@@ -22,8 +22,6 @@ function ArtilleryShip(state, o) {
   this.bulletDamage = 4;
   this.rechargeAmt = 2;
   this.bulletAnimationName = 'bullet/large';
-
-  this.calcGunPositions();
 }
 
 ArtilleryShip.prototype.name = "Artillery";
