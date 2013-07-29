@@ -13,14 +13,21 @@
         {
           "type": "Announcement",
           "properties": {
-            "text": "Dogfighting Challenge 3: Ranger VS Militia"
+            "text": "Dogfighting Challenge 3: 2 Ranger VS 1 Militia"
+          }
+        },
+        {
+          "type": "GroupAttack",
+          "properties": {
+            "sourceGroup": "Wingmen",
+            "targetGroup": "Enemy"
           }
         },
         {
           "type": "GroupAttack",
           "properties": {
             "sourceGroup": "Enemy",
-            "targetGroup": "Player"
+            "targetGroup": "Wingmen"
           }
         }
       ]
@@ -82,6 +89,17 @@
     }
   ],
   "objects": [
+    {
+      "type": "Ship",
+      "properties": {
+        "ship": {
+          "type": "Ranger",
+          "group": "Wingmen",
+          "team": 0,
+          "pos": {"x": 200, "y": 420}
+        }
+      }
+    },
     {
       "type": "Ship",
       "properties": {
