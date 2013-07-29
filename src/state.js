@@ -226,6 +226,10 @@ State.prototype.clearUiButtons = function() {
   this.uiButtons = [];
 };
 
+State.prototype.toggleSandboxMode = function() {
+  this.sandboxMode = !this.sandboxMode;
+};
+
 State.prototype.sandboxModeUpdateUiPane = function() {
   if (this.selectedCount === 0) {
     this.createSandboxButtons();

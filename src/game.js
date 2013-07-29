@@ -11,6 +11,7 @@ module.exports = Game;
 var BG_MUSIC_VOL = 0.80;
 var BATTLE_MUSIC_VOL = 0.80;
 var MUSIC_TRANSITION_TIME = 5 * 1000;
+var FADE_IN_TIME = 3 * 1000;
 
 function Game(engine) {
   this.engine = engine;
@@ -31,6 +32,7 @@ function initMusic(self) {
   self.battleMusic.play();
 
   self.whichMusic = 'bg';
+  self.fadeInDate = new Date();
   self.musicUpdateInterval = setInterval(self.updateMusicVolume.bind(self), 20);
 }
 
@@ -71,37 +73,39 @@ Game.prototype.updateMusicVolume = function() {
     this.battleMusic.volume = 0;
     return;
   }
-  var now, percent;
+  var now = new Date();
+  var percentFadeIn = (now - this.fadeInDate) / FADE_IN_TIME;
+  if (percentFadeIn > 1) percentFadeIn = 1;
+  if (percentFadeIn < 0) percentFadeIn = 0;
+  var percent;
   switch (this.whichMusic) {
     case "bg":
-      this.bgMusic.volume = BG_MUSIC_VOL;
+      this.bgMusic.volume = percentFadeIn * BG_MUSIC_VOL;
       this.battleMusic.volume = 0;
       break;
     case "toBattle":
-      now = new Date();
       percent = (now - this.transitionDate) / MUSIC_TRANSITION_TIME;
       if (percent >= 1) {
         this.whichMusic = "battle";
         this.updateMusicVolume();
         return;
       }
-      this.battleMusic.volume = percent * BATTLE_MUSIC_VOL;
-      this.bgMusic.volume = (1 - percent) * BG_MUSIC_VOL;
+      this.battleMusic.volume = percent * BATTLE_MUSIC_VOL * percentFadeIn;
+      this.bgMusic.volume = (1 - percent) * BG_MUSIC_VOL * percentFadeIn;
       break;
     case "toBg":
-      now = new Date();
       percent = (now - this.transitionDate) / MUSIC_TRANSITION_TIME;
       if (percent >= 1) {
         this.whichMusic = "bg";
         this.updateMusicVolume();
         return;
       }
-      this.bgMusic.volume = percent * BG_MUSIC_VOL;
-      this.battleMusic.volume = (1 - percent) * BATTLE_MUSIC_VOL;
+      this.bgMusic.volume = percent * BG_MUSIC_VOL * percentFadeIn;
+      this.battleMusic.volume = (1 - percent) * BATTLE_MUSIC_VOL * percentFadeIn;
       break;
     case "battle":
       this.bgMusic.volume = 0;
-      this.battleMusic.volume = BATTLE_MUSIC_VOL;
+      this.battleMusic.volume = BATTLE_MUSIC_VOL * percentFadeIn;
       break;
   }
 };
@@ -143,3 +147,9 @@ Game.prototype.showLevelComplete = function(gameMode, o) {
   var levelCompleteScreen = new LevelCompleteScreen(gameMode, o);
   levelCompleteScreen.start();
 }
+
+Game.prototype.stallMusic = function(seconds) {
+  var resumeDate = new Date();
+  resumeDate.setTime(resumeDate.getTime() + seconds * 1000);
+  this.fadeInDate = resumeDate;
+};

@@ -73,10 +73,6 @@ Campaign.prototype.showLevelComplete = function(o) {
   this.game.showLevelComplete(this, o);
 };
 
-Campaign.prototype.pauseMusic = function() {
-  this.game.pauseMusic();
-};
-
-Campaign.prototype.resumeMusic = function() {
-  this.game.resumeMusic();
+Campaign.prototype.stallMusic = function(seconds) {
+  this.game.stallMusic(seconds);
 };

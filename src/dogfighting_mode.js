@@ -61,11 +61,6 @@ DogfightingMode.prototype.beginBattleMusic = function() {
   this.game.beginBattleMusic();
 };
 
-DogfightingMode.prototype.pauseMusic = function() {
-  this.game.pauseMusic();
+DogfightingMode.prototype.stallMusic = function(seconds) {
+  this.game.stallMusic(seconds);
 };
-
-DogfightingMode.prototype.resumeMusic = function() {
-  this.game.resumeMusic();
-};
-

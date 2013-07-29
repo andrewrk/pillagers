@@ -30,6 +30,7 @@ function LevelCompleteScreen(game, o) {
   });
 
   sfx.missionComplete();
+  this.game.stallMusic(3.5);
 }
 
 LevelCompleteScreen.prototype.setUpRewards = function(rewards) {
