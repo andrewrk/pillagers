@@ -32,18 +32,35 @@ ArtilleryShip.prototype.animationNames = {
   still: 'ship_artillery_still',
 };
 
+ArtilleryShip.prototype.update = function(dt, dx) {
+  RangerShip.prototype.update.apply(this, arguments);
+  this.calcGunPositions();
+};
+
+ArtilleryShip.prototype.drawState = function(context) {
+  // draw a line representing where we're aiming
+  context.beginPath();
+  for (var i = 0; i < this.gunPositions.length; i += 1) {
+    context.moveTo(this.gunPositions[i].x, this.gunPositions[i].y);
+    context.lineTo(this.bulletEndPos[i].x, this.bulletEndPos[i].y);
+  }
+  context.closePath();
+  context.globalAlpha = this.recharge <= 0 ? 0.3 : 0.05;
+  context.lineWidth = 1;
+  context.fillStyle = "#ffffff";
+  context.stroke();
+  context.globalAlpha = 1;
+}
+
+
 ArtilleryShip.prototype.createProjectile = function() {
   sfx.shootStrongBullet();
-  var unit = v.unit(this.rotation);
-  var positions = [
-    this.pos.plus(v.unit(this.rotation + Math.PI / 2).scaled(22)),
-    this.pos.plus(v.unit(this.rotation - Math.PI / 2).scaled(22)),
-  ];
+  this.calcGunPositions();
   for (var i = 0; i < 2; i += 1) {
-    var pos = positions[i];
+    var pos = this.gunPositions[i];
     var bullet = new Bullet(this.state, {
       pos: pos,
-      vel: unit.scaled(this.bulletSpeed).add(this.vel),
+      vel: this.actualDir.scaled(this.bulletSpeed).add(this.vel),
       team: this.team,
       damage: this.bulletDamage,
       life: this.bulletLife,
@@ -52,3 +69,18 @@ ArtilleryShip.prototype.createProjectile = function() {
     this.state.addBullet(bullet);
   }
 }
+
+ArtilleryShip.prototype.calcGunPositions = function() {
+  this.actualDir = v.unit(this.rotation);
+  this.gunPositions = [
+    this.pos.plus(v.unit(this.rotation + Math.PI / 2).scaled(22)),
+    this.pos.plus(v.unit(this.rotation - Math.PI / 2).scaled(22)),
+  ];
+  var adjustedBulletVel = this.actualDir.scaled(this.bulletSpeed);
+  var bulletRange = adjustedBulletVel.length() * this.bulletLife * 60;
+  this.bulletEndPos = new Array(this.gunPositions.length);
+  for (var i = 0; i < this.gunPositions.length; i += 1) {
+    var beginPos = this.gunPositions[i];
+    this.bulletEndPos[i] = beginPos.plus(this.actualDir.scaled(bulletRange));
+  }
+};
