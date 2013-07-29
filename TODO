@@ -1,12 +1,7 @@
 Next:
- * If your flagship is all that is left, everyone targets it.
- * Add a turret to flagship
- * Update level 1 with a civilian and use that to explain ctrl+right-click
-   vs right-click
- * Add dogfighting mode.
-   - get 5 kills in the middle of a big battle.
- * Escort mission.
- * pan sound effects and volume depending on scroll
+ * add new sfx
+ * make level3 easier
+ * pressing escape when there are ships in the portal is a bug
 
 Features:
  * Add a command that tells a ship to defend another ship.
@@ -19,6 +14,12 @@ Level ideas:
    to destroy that ship to reactivate your army
 
 Nice-to-have:
+ * If your flagship is all that is left, everyone targets it.
+ * Add a turret to flagship
+ * Update level 1 with a civilian and use that to explain ctrl+right-click
+   vs right-click
+ * Escort mission.
+ * pan sound effects and volume depending on scroll
  * Ship AI: self directed shootcommands have expire time
  * Ability to change controls.
  * ability to retry level when you get game over
@@ -26,7 +27,6 @@ Nice-to-have:
  * fix the thruster sound glitchiness
  * State should be renamed LevelPlayer
  * civilian ships should wander around
-
 
 Ship Classes:
  * ResearchFacility: allows you to research upgrades

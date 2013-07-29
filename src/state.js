@@ -1556,12 +1556,14 @@ State.prototype.selectedUnitsEnter = function(target) {
   this.commandableSelected(function(ai) {
     ai.commandToEnter(target);
   });
+  sfx.youWantMeTo();
 };
 
 State.prototype.selectedUnitsAttack = function(target) {
   this.commandableSelected(function(ai) {
     ai.commandToAttack(target);
   });
+  sfx.attackingTarget();
 };
 
 State.prototype.sendSelectedUnitsTo = function(pt, queue, loose) {
@@ -1611,6 +1613,11 @@ ScatterSquad.prototype.command = function(queue) {
     var unit = this.shipToAi[ship.id];
     unit.commandToMove(this.squad.positions[ship.id], queue, this.loose);
     if (! this.loose) unit.commandToPoint(this.squad.direction, true);
+  }
+  if (this.loose) {
+    sfx.headingToDest();
+  } else {
+    sfx.yesSir();
   }
 };
 

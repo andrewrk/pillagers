@@ -3,7 +3,6 @@ var State = require('./state');
 var team = require('./team');
 var FlagShip = require('./flag_ship');
 var TitleScreen = require('./title_screen');
-var LevelCompleteScreen = require('./level_complete_screen');
 var CreditsScreen = require('./credits_screen');
 var GameOverScreen = require('./game_over_screen');
 
@@ -71,8 +70,13 @@ Campaign.prototype.playLevel = function(convoy) {
 };
 
 Campaign.prototype.showLevelComplete = function(o) {
-  this.game.endBattleMusic();
-  var levelCompleteScreen = new LevelCompleteScreen(this, o);
-  levelCompleteScreen.start();
+  this.game.showLevelComplete(this, o);
 };
 
+Campaign.prototype.pauseMusic = function() {
+  this.game.pauseMusic();
+};
+
+Campaign.prototype.resumeMusic = function() {
+  this.game.resumeMusic();
+};

@@ -1,7 +1,6 @@
 var chem = require('chem');
 var State = require('./state');
 var TitleScreen = require('./title_screen');
-var LevelCompleteScreen = require('./level_complete_screen');
 var CreditsScreen = require('./credits_screen');
 
 module.exports = DogfightingMode;
@@ -46,9 +45,7 @@ DogfightingMode.prototype.playLevel = function() {
 };
 
 DogfightingMode.prototype.showLevelComplete = function(o) {
-  this.game.endBattleMusic();
-  var levelCompleteScreen = new LevelCompleteScreen(this, o);
-  levelCompleteScreen.start();
+  this.game.showLevelComplete(this, o);
 };
 
 DogfightingMode.prototype.showCredits = function() {
@@ -62,5 +59,13 @@ DogfightingMode.prototype.endBattleMusic = function() {
 
 DogfightingMode.prototype.beginBattleMusic = function() {
   this.game.beginBattleMusic();
+};
+
+DogfightingMode.prototype.pauseMusic = function() {
+  this.game.pauseMusic();
+};
+
+DogfightingMode.prototype.resumeMusic = function() {
+  this.game.resumeMusic();
 };
 

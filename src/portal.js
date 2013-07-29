@@ -1,4 +1,5 @@
 var PhysicsObject = require('./physics_object');
+var sfx = require('./sfx');
 var util = require('util');
 var chem = require('chem');
 var v = chem.vec2d;
@@ -77,6 +78,7 @@ Portal.prototype.delete = function() {
 }
 
 Portal.prototype.enter = function(ship) {
+  sfx.enterPortal();
   this.shipsInside.push(ship);
   if (this.autoActivate) this.activatePortal();
 };

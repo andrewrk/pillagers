@@ -1,4 +1,5 @@
 var chem = require('chem');
+var LevelCompleteScreen = require('./level_complete_screen');
 var Campaign = require('./campaign');
 var SandboxMode = require('./sandbox_mode');
 var DogfightingMode = require('./dogfighting_mode');
@@ -7,8 +8,8 @@ var CreditsScreen = require('./credits_screen');
 
 module.exports = Game;
 
-var BG_MUSIC_VOL = 0.90;
-var BATTLE_MUSIC_VOL = 0.90;
+var BG_MUSIC_VOL = 0.80;
+var BATTLE_MUSIC_VOL = 0.80;
 var MUSIC_TRANSITION_TIME = 5 * 1000;
 
 function Game(engine) {
@@ -137,3 +138,8 @@ Game.prototype.startDogfighting = function() {
   dogfighting.start();
 };
 
+Game.prototype.showLevelComplete = function(gameMode, o) {
+  this.endBattleMusic();
+  var levelCompleteScreen = new LevelCompleteScreen(gameMode, o);
+  levelCompleteScreen.start();
+}

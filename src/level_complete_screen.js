@@ -1,6 +1,7 @@
 var chem = require('chem');
 var v = chem.vec2d;
 var Squad = require('./squad');
+var sfx = require('./sfx');
 var shipTypes = require('./ship_types');
 
 module.exports = LevelCompleteScreen;
@@ -27,6 +28,8 @@ function LevelCompleteScreen(game, o) {
     textAlign: 'center',
     textBaseline: 'middle',
   });
+
+  sfx.missionComplete();
 }
 
 LevelCompleteScreen.prototype.setUpRewards = function(rewards) {
@@ -169,7 +172,8 @@ function onMouseMove() {
 }
 
 function onButtonDown(button) {
-  if ((this.nextLevelMouseOver && button === chem.button.MouseLeft) || button === chem.button.KeyEscape)
+  if ((this.nextLevelMouseOver && button === chem.button.MouseLeft) ||
+      button === chem.button.KeyEscape || button === chem.button.KeyEnter)
   {
     this.playNextLevel();
   }

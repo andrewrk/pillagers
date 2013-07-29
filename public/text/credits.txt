@@ -6,7 +6,6 @@ Music & Sound Effects:
 ======================
 Michael Weber | http://brokensounds.com
 
-Art Credits:
-============
-Bonsaiheld | http://bonsaiheld.org
+Art:
+====
 opengameart.org
