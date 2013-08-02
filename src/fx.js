@@ -1,6 +1,7 @@
 var PhysicsObject = require('./physics_object');
 var util = require('util');
 var chem = require('chem');
+var ani = chem.resources.animations;
 var v = chem.vec2d;
 
 module.exports = Fx;
@@ -8,7 +9,7 @@ module.exports = Fx;
 util.inherits(Fx, PhysicsObject);
 function Fx(state, o) {
   PhysicsObject.apply(this, arguments);
-  this.sprite = new chem.Sprite(o.animationName);
+  this.sprite = new chem.Sprite(ani[o.animationName]);
   if (this.rotation != null) this.sprite.rotation = this.rotation;
   this.state.batch.add(this.sprite);
   this.timeLeft = o.duration;

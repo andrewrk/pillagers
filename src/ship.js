@@ -3,6 +3,7 @@ var util = require('util');
 var chem = require('chem');
 var EventEmitter = require('events').EventEmitter;
 var v = chem.vec2d;
+var ani = chem.resources.animations;
 
 var MINIMUM_VELOCITY_SQRD = 0.001 * 0.001;
 var MIN_BRAKE_VEL = 0.2;
@@ -81,16 +82,16 @@ Ship.prototype.setThrustInput = function(value, brake) {
   if (value === 0) {
     this.thrustAudio.pause();
     if (this.thrustInput > 0) {
-      this.sprite.setAnimationName(this.animationNames.decel);
+      this.sprite.setAnimation(ani[this.animationNames.decel]);
     } else {
-      this.sprite.setAnimationName(this.animationNames.backwardsDecel);
+      this.sprite.setAnimation(ani[this.animationNames.backwardsDecel]);
     }
   } else if (value > 0) {
     this.thrustAudio.play();
-    this.sprite.setAnimationName(this.animationNames.accel);
+    this.sprite.setAnimation(ani[this.animationNames.accel]);
   } else if (value < 0) {
     this.thrustAudio.play();
-    this.sprite.setAnimationName(this.animationNames.backwardsAccel);
+    this.sprite.setAnimation(ani[this.animationNames.backwardsAccel]);
   }
   this.sprite.setFrameIndex(0);
   this.thrustInput = value;
@@ -174,7 +175,7 @@ Ship.prototype.initResources = function(state) {
   this.thrustAudio = new Audio("sfx/thruster.ogg");
   this.thrustAudio.loop = true;
 
-  this.sprite = new chem.Sprite(this.animationNames.still);
+  this.sprite = new chem.Sprite(ani[this.animationNames.still]);
   this.state.batch.add(this.sprite);
 }
 

@@ -1,5 +1,6 @@
 var chem = require('chem');
 var v = chem.vec2d;
+var ani = chem.resources.animations;
 var createId = require('./uuid').createId;
 
 module.exports = ShipAi;
@@ -204,7 +205,7 @@ function EngageCommand(ai, dest) {
   this.dest = dest;
   this.done = false;
   this.speedCap = 3;
-  this.sprite = new chem.Sprite('knife', {
+  this.sprite = new chem.Sprite(ani.knife, {
     batch: ai.state.batch,
     pos: this.dest,
   });
@@ -285,7 +286,7 @@ function EnterCommand(ai, target) {
   this.target = target;
   this.done = false;
   this.minSpeedCap = 9999;
-  this.sprite = new chem.Sprite('doorway', {
+  this.sprite = new chem.Sprite(ani.doorway, {
     batch: ai.state.batch,
     pos: this.target.pos,
   });
@@ -312,7 +313,7 @@ function MoveCommand(ai, dest) {
   this.dest = dest;
   this.done = false;
   this.threshold = Math.pow(6, 2); // stop when distanceSqrd < this
-  this.sprite = new chem.Sprite('flag', {
+  this.sprite = new chem.Sprite(ani.flag, {
     batch: ai.state.batch,
     pos: this.dest,
   });
@@ -368,7 +369,7 @@ function ShootCommand(ai, target) {
   this.done = false;
   this.target = target;
   this.speedCap = 4;
-  this.sprite = new chem.Sprite('target', {
+  this.sprite = new chem.Sprite(ani.target, {
     batch: ai.state.batch,
     pos: this.target.pos,
   });
@@ -431,7 +432,7 @@ function DefendGroundCommand(ai, target) {
   // stand your ground. do not move. shoot nearest target.
   this.done = false;
   this.target = target;
-  this.sprite = new chem.Sprite('target', {
+  this.sprite = new chem.Sprite(ani.target, {
     batch: ai.state.batch,
     pos: this.target.pos,
   });
@@ -513,7 +514,7 @@ function MeleeCommand(ai, target) {
   this.target = target;
   this.done = false;
   this.minSpeedCap = 6;
-  this.sprite = new chem.Sprite('target', {
+  this.sprite = new chem.Sprite(ani.target, {
     batch: ai.state.batch,
     pos: this.target.pos,
   });

@@ -1,5 +1,6 @@
 var chem = require('chem');
 var v = chem.vec2d;
+var ani = chem.resources.animations;
 var Squad = require('./squad');
 var sfx = require('./sfx');
 var shipTypes = require('./ship_types');
@@ -44,7 +45,7 @@ LevelCompleteScreen.prototype.setUpRewards = function(rewards) {
         // give reward
         this.game.cash += props.amount;
 
-        sprite = new chem.Sprite("coin", {
+        sprite = new chem.Sprite(ani.coin, {
           pos: nextPt.clone(),
           zOrder: 1,
           batch: this.batch,
@@ -67,7 +68,7 @@ LevelCompleteScreen.prototype.setUpRewards = function(rewards) {
 
         var ShipType = shipTypes[props.shipType];
         var animationName = ShipType.prototype.animationNames.still;
-        sprite = new chem.Sprite(animationName, {
+        sprite = new chem.Sprite(ani[animationName], {
           pos: nextPt.clone(),
           zOrder: 1,
           batch: this.batch,
@@ -107,7 +108,7 @@ LevelCompleteScreen.prototype.setUpConvoy = function(convoy) {
   });
   squad.calculate();
   squad.units.forEach(function(ship) {
-    var sprite = new chem.Sprite(ship.animationNames.still, {
+    var sprite = new chem.Sprite(ani[ship.animationNames.still], {
       pos: squad.positions[ship.id],
       rotation: squad.direction.angle() + Math.PI / 2,
       batch: this.batch,

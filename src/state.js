@@ -1,5 +1,6 @@
 var chem = require('chem');
 var v = chem.vec2d;
+var ani = chem.resources.animations;
 
 var ShipAi = require('./ship_ai');
 var Fx = require('./fx');
@@ -250,7 +251,7 @@ State.prototype.updateUiPane = function () {
     this.selectionUiLabel.text = obj.name;
     this.selectionUiLabel.setVisible(true);
 
-    this.selectionUiSprite.setAnimationName(obj.uiAnimationName);
+    this.selectionUiSprite.setAnimation(ani[obj.uiAnimationName]);
     var desiredSize = this.uiPaneInfoSize.scaled(0.75);
     var scale = desiredSize.div(this.selectionUiSprite.size);
     scale.x = Math.min(scale.x, scale.y);
@@ -315,7 +316,7 @@ State.prototype.setUpDockedShipsUi = function(obj) {
   var nextPos = this.uiPaneDockedPos.plus(dockItemSize.scaled(0.5));
   for (var id in obj.shipsInside) {
     var dockedShip = obj.shipsInside[id];
-    var sprite = new chem.Sprite(dockedShip.animationNames.still, {
+    var sprite = new chem.Sprite(ani[dockedShip.animationNames.still], {
       batch: this.batchStatic,
       loop: false,
       pos: nextPos.clone(),
@@ -923,7 +924,7 @@ State.prototype.generateStars = function() {
   generateStars(this, this.bgBackSize, 0.00025, this.batchBgBack);
   generateStars(this, this.bgForeSize, 0.00005, this.batchBgFore);
   // put in a planet
-  var sprite = new chem.Sprite("planet-red", {
+  var sprite = new chem.Sprite(ani["planet-red"], {
     batch: this.batchBgFore,
     zOrder: 1,
     pos: v(Math.random() * this.bgForeSize.x, Math.random() * this.bgForeSize.y),
@@ -935,7 +936,7 @@ function generateStars(self, size, density, batch) {
   var count = density * area;
   for (var i = 0; i < count; i += 1) {
     var name = Math.random() > 0.50 ? "star/small" : "star/large";
-    var sprite = new chem.Sprite(name, {
+    var sprite = new chem.Sprite(ani[name], {
       batch: batch,
       pos: v(Math.random() * size.x, Math.random() * size.y),
     });
@@ -1250,7 +1251,7 @@ State.prototype.switchToNextTeam = function(button) {
 };
 
 State.prototype.campaignSetUpUi = function() {
-  this.coinSprite = new chem.Sprite('coin', {
+  this.coinSprite = new chem.Sprite(ani.coin, {
     pos: this.uiPaneCashPos.offset(4, 4),
     batch: this.batchStatic,
     scale: v(0.40, 0.40),
@@ -1290,7 +1291,7 @@ State.prototype.setUpUi = function() {
   // info pane
   this.uiPaneInfoPos = this.uiPaneCashPos.offset(this.uiPaneCashSize.x, 0);
   this.uiPaneInfoSize = v(80, this.uiPaneSize.y - this.uiPaneMargin * 2);
-  this.selectionUiSprite = new chem.Sprite("knife", {
+  this.selectionUiSprite = new chem.Sprite(ani.knife, {
     pos: this.uiPaneInfoPos.plus(this.uiPaneInfoSize.scaled(0.5)),
     batch: this.batchStatic,
     visible: false,

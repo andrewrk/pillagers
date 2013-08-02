@@ -2,6 +2,7 @@ var PhysicsObject = require('./physics_object');
 var util = require('util');
 var chem = require('chem');
 var v = chem.vec2d;
+var ani = chem.resources.animations;
 
 module.exports = Meteor;
 
@@ -9,7 +10,7 @@ util.inherits(Meteor, PhysicsObject);
 function Meteor(state, o) {
   PhysicsObject.apply(this, arguments);
 
-  this.sprite = new chem.Sprite(o.animationName);
+  this.sprite = new chem.Sprite(ani[o.animationName]);
   this.setRadius(this.radius);
   this.sprite.rotation = this.rotation;
   this.state.batch.add(this.sprite);

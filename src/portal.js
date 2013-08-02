@@ -3,13 +3,14 @@ var sfx = require('./sfx');
 var util = require('util');
 var chem = require('chem');
 var v = chem.vec2d;
+var ani = chem.resources.animations;
 
 module.exports = Portal;
 
 util.inherits(Portal, PhysicsObject);
 function Portal(state, o) {
   PhysicsObject.apply(this, arguments);
-  this.sprite = new chem.Sprite('portal');
+  this.sprite = new chem.Sprite(ani.portal);
   this.sprite.pos = this.pos.floored();
   this.state.batch.add(this.sprite);
   this.requireFlagship = o.requireFlagship == null ? true : false;

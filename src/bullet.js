@@ -1,4 +1,5 @@
 var chem = require('chem');
+var ani = chem.resources.animations;
 var sfx = require('./sfx');
 var PhysicsObject = require('./physics_object');
 var util = require('util');
@@ -12,7 +13,7 @@ function Bullet(state, o) {
   this.team = o.team;
   this.damage = o.damage;
   this.life = o.life;
-  this.sprite = new chem.Sprite(o.animationName || 'bullet/circle');
+  this.sprite = new chem.Sprite(ani[o.animationName || 'bullet/circle']);
   this.sprite.rotation = this.vel.angle() + Math.PI / 2;
   this.state.batch.add(this.sprite);
   this.radius = 2;
