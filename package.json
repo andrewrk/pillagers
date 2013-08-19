@@ -2,10 +2,9 @@
   "name": "pillagers-game",
   "version": "0.0.0",
   "description": "space-physics real time strategy game made for 7dRTS",
-  "main": "chemfile.js",
   "dependencies": {
-    "chem": "~3.0.0",
-    "chem-cli": "~1.0.9"
+    "chem": "~3.1.0",
+    "chem-cli": "~1.0.10"
   },
   "scripts": {
     "dev": "npm install && chem dev"
