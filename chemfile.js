@@ -110,6 +110,41 @@ exports.spritesheet = {
         "ship/flag0.png",
       ],
     },
+    ship_shield_still: {
+      frames: ["ship/shield0.png"],
+    },
+    ship_shield_accel: {
+      loop: false,
+      frames: [
+        "ship/shield1.png",
+        "ship/shield2.png",
+        "ship/shield3.png",
+      ],
+    },
+    ship_shield_decel: {
+      loop: false,
+      frames: [
+        "ship/shield2.png",
+        "ship/shield1.png",
+        "ship/shield0.png",
+      ],
+    },
+    ship_shield_accel_back: {
+      loop: false,
+      frames: [
+        "ship/shield4.png",
+        "ship/shield5.png",
+        "ship/shield6.png",
+      ],
+    },
+    ship_shield_decel_back: {
+      loop: false,
+      frames: [
+        "ship/shield5.png",
+        "ship/shield4.png",
+        "ship/shield0.png",
+      ],
+    },
     ship_turret_still: {
       frames: ["ship/turret0.png"],
     },
@@ -191,9 +226,9 @@ exports.spritesheet = {
       anchor: 'bottomleft',
     },
     'knife': {},
+    'shield': {},
     'coin': {},
     'target': {},
     'doorway': {},
-
   }
 };

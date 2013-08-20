@@ -60,7 +60,7 @@ MilitiaShip.prototype.update = function(dt, dx) {
 MilitiaShip.prototype.fireMelee = function(target) {
   this.recharge = this.rechargeAmt;
   this.state.createElectricFx(this.pos.clone(), this.vel.clone(), this.rotation);
-  if (target) target.hit(this.meleeDamage, "disintegrate");
+  if (target) target.damage(this.meleeDamage, "disintegrate");
 }
 
 MilitiaShip.prototype.isTargetInRange = function(target) {

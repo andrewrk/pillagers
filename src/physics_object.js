@@ -84,7 +84,30 @@ PhysicsObject.prototype.update = function(dt, dx) {
   if (!this.canGoOffscreen) this.checkOutOfBounds();
 };
 
-PhysicsObject.prototype.hit = function(damage, explosionAnimationName) {}
+PhysicsObject.prototype.damage = function(damage, explosionAnimationName) {}
+PhysicsObject.prototype.hitShield = function(shieldObject) {}
+
+PhysicsObject.prototype.collide = function(other) {
+  // calculate normal
+  var normal = other.pos.minus(this.pos).normalize();
+  // calculate relative velocity
+  var rv = other.vel.minus(this.vel);
+  // calculate relative velocity in terms of the normal direction
+  var velAlongNormal = rv.dot(normal);
+  // do not resolve if velocities are separating
+  if (velAlongNormal > 0) return;
+  // calculate restitution
+  var e = Math.min(this.collisionDamping, other.collisionDamping);
+  // calculate impulse scalar
+  var j = -(1 + e) * velAlongNormal;
+  var myMass = this.mass();
+  var otherMass = other.mass();
+  j /= 1 / myMass + 1 / otherMass;
+  // apply impulse
+  var impulse = normal.scale(j);
+  this.vel.sub(impulse.scaled(1 / myMass));
+  other.vel.add(impulse.scaled(1 / otherMass));
+}
 
 PhysicsObject.prototype.onTargeted = function(ship, action) {}
 

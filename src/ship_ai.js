@@ -40,7 +40,9 @@ ShipAi.prototype.update = function (dt, dx) {
     return;
   }
 
-  if (this.ship.hostile) {
+  if (this.ship.hasShield) {
+    if (! this.shieldNearbyFriendly()) this.decelerate();
+  } else if (this.ship.hostile) {
     if (! this.attackNearbyEnemy()) this.decelerate();
   } else {
     this.decelerate();
@@ -80,6 +82,32 @@ ShipAi.prototype.decelerate = function() {
   var thrustInput = Math.min(speed / this.ship.thrustAmt, 1);
   if (!negativeTarget) thrustInput = -thrustInput;
   this.ship.setThrustInput(thrustInput, true);
+};
+
+ShipAi.prototype.shieldNearbyFriendly = function() {
+  var target = null;
+  var sensorRangeSqrd = this.ship.sensorRange * this.ship.sensorRange;
+  var closestDist;
+
+  for (var i = 0; i < this.state.physicsObjects.length; i += 1) {
+    var obj = this.state.physicsObjects[i];
+    if (obj.deleted) continue;
+    if (obj.hasShield) continue;
+    if (! obj.canBeShot) continue;
+    if (obj.team !== this.ship.team) continue;
+    var dist = obj.pos.distanceSqrd(this.ship.pos);
+    if (dist > sensorRangeSqrd) continue;
+    if (target == null || dist < closestDist) {
+      closestDist = dist;
+      target = obj;
+    }
+  }
+  if (target) {
+    this.commandToDefend(target, false);
+    return true;
+  }
+
+  return false;
 };
 
 ShipAi.prototype.attackNearbyEnemy = function() {
@@ -146,6 +174,15 @@ ShipAi.prototype.commandToAttack = function(target, queue) {
     }
   } else if (this.ship.hasMelee) {
     this.commands.push(new MeleeCommand(this, target));
+  }
+};
+
+ShipAi.prototype.commandToDefend = function(target, queue) {
+  if (! queue) this.clearCommands();
+  if (this.ship.hasShield) {
+    this.commands.push(new ShieldCommand(this, target));
+  } else {
+    throw new Error("ship has no defense capabilities");
   }
 };
 
@@ -309,21 +346,43 @@ EnterCommand.prototype.delete = function() {
   this.sprite.delete();
 };
 
-function MoveCommand(ai, dest) {
-  this.dest = dest;
+function ShieldCommand(ai, target) {
+  this.target = target;
   this.done = false;
-  this.threshold = Math.pow(6, 2); // stop when distanceSqrd < this
-  this.sprite = new chem.Sprite(ani.flag, {
+  this.threshold = Math.pow(target.radius + ai.ship.radius, 2);
+  this.sprite = new chem.Sprite(ani.shield, {
     batch: ai.state.batch,
-    pos: this.dest,
+    pos: this.target.pos,
   });
 }
 
-MoveCommand.prototype.execute = function(ai, dt, dx) {
-  var relTargetPt = this.dest.minus(ai.ship.pos);
+ShieldCommand.prototype.execute = function(ai, dt, dx) {
+  // un-target dead ships
+  if (this.target.deleted) {
+    this.done = true;
+    return;
+  }
+  // un-target myself
+  if (this.target === ai.ship) {
+    this.done = true;
+    return;
+  }
+  moveToLocation.call(this, ai, this.target.pos);
+};
+
+ShieldCommand.prototype.draw = function(ai, context) {
+  this.sprite.setVisible(ai.ship.selected);
+};
+
+ShieldCommand.prototype.delete = function() {
+  this.sprite.delete();
+};
+
+function moveToLocation(ai, dest) {
+  var relTargetPt = dest.minus(ai.ship.pos);
   var targetDir = relTargetPt.normalized();
   var actualDir = v.unit(ai.ship.rotation);
-  var closeEnough = ai.ship.pos.distanceSqrd(this.dest) < this.threshold;
+  var closeEnough = ai.ship.pos.distanceSqrd(dest) < this.threshold;
 
   // consider the distance we would travel if we tried to stop right now.
   // if that distance is further than the destination, stop now.
@@ -352,7 +411,21 @@ MoveCommand.prototype.execute = function(ai, dt, dx) {
     ai.pointTowardDirection(targetDir);
   }
   var stopped = ai.ship.vel.lengthSqrd() === 0;
-  this.done = stopped && closeEnough;
+  return stopped && closeEnough;
+}
+
+function MoveCommand(ai, dest) {
+  this.dest = dest;
+  this.done = false;
+  this.threshold = Math.pow(6, 2); // stop when distanceSqrd < this
+  this.sprite = new chem.Sprite(ani.flag, {
+    batch: ai.state.batch,
+    pos: this.dest,
+  });
+}
+
+MoveCommand.prototype.execute = function(ai, dt, dx) {
+  this.done = moveToLocation.call(this, ai, this.dest);
 };
 
 MoveCommand.prototype.draw = function(ai, context) {

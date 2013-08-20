@@ -478,6 +478,9 @@ function onButtonDown(button) {
       if (obj && obj.team !== this.playerTeam) {
         this.selectedUnitsAttack(obj);
         return;
+      } else if (obj && obj.team === this.playerTeam) {
+        this.selectedUnitsDefend(obj);
+        return;
       }
       obj = clickedEnterableObject(this, this.mousePos());
       if (obj) {
@@ -1539,7 +1542,7 @@ State.prototype.deleteSelectedShips = function() {
   for (var id in this.selection) {
     var obj = this.selection[id];
     if (! this.canDeleteObj(obj)) continue
-    obj.hit(99999, "explosion");
+    obj.damage(99999, "explosion");
   }
 };
 
@@ -1562,6 +1565,12 @@ State.prototype.selectedUnitsEnter = function(target) {
     ai.commandToEnter(target);
   });
   sfx.youWantMeTo();
+};
+
+State.prototype.selectedUnitsDefend = function(target) {
+  this.commandableSelected(function(ai) {
+    ai.commandToDefend(target);
+  });
 };
 
 State.prototype.selectedUnitsAttack = function(target) {

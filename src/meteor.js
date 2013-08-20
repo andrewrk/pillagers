@@ -10,7 +10,8 @@ util.inherits(Meteor, PhysicsObject);
 function Meteor(state, o) {
   PhysicsObject.apply(this, arguments);
 
-  this.sprite = new chem.Sprite(ani[o.animationName]);
+  var animationName = o.animationName || 'rock-a';
+  this.sprite = new chem.Sprite(ani[animationName]);
   this.setRadius(this.radius);
   this.sprite.rotation = this.rotation;
   this.state.batch.add(this.sprite);
@@ -51,7 +52,7 @@ Meteor.prototype.setRadius = function(radius) {
 
 Meteor.prototype.name = "Meteor";
 
-Meteor.prototype.hit = function(damage, explosionAnimationName) {
+Meteor.prototype.damage = function(damage, explosionAnimationName) {
   this.health -= damage / this.defense;
   if (this.health <= 0) {
     this.state.createExplosion(this.pos, this.vel, explosionAnimationName);
@@ -70,25 +71,7 @@ Meteor.prototype.update = function(dt, dx) {
     if (!obj.canBeStruck) continue;
     var addedRadii = this.radius + obj.radius;
     if (obj.pos.distanceSqrd(this.pos) > addedRadii * addedRadii) continue;
-    // calculate normal
-    var normal = obj.pos.minus(this.pos).normalize();
-    // calculate relative velocity
-    var rv = obj.vel.minus(this.vel);
-    // calculate relative velocity in terms of the normal direction
-    var velAlongNormal = rv.dot(normal);
-    // do not resolve if velocities are separating
-    if (velAlongNormal > 0) continue;
-    // calculate restitution
-    var e = Math.min(this.collisionDamping, obj.collisionDamping);
-    // calculate impulse scalar
-    var j = -(1 + e) * velAlongNormal;
-    var myMass = this.mass();
-    var otherMass = obj.mass();
-    j /= 1 / myMass + 1 / otherMass;
-    // apply impulse
-    var impulse = normal.scale(j);
-    this.vel.sub(impulse.scaled(1 / myMass));
-    obj.vel.add(impulse.scaled(1 / otherMass));
+    this.collide(obj);
   }
 
   this.sprite.pos = this.pos.floored();

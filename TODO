@@ -1,8 +1,11 @@
 Next:
- * pressing escape when there are ships in the portal is a bug
+ * more ship classes
+ * more campaign levels
+ * multiplayer vs AI
 
 Features:
  * Add a command that tells a ship to defend another ship.
+ * Network Multiplayer
 
 Level ideas:
  * portals that enemies come out of
@@ -22,20 +25,18 @@ Nice-to-have:
  * Ship AI: self directed shootcommands have expire time
  * Ability to change controls.
  * ability to retry level when you get game over
- * if ranger is in range, don't accelerate toward target
  * fix the thruster sound glitchiness
  * State should be renamed LevelPlayer
  * civilian ships should wander around
+ * pressing escape when there are ships in the portal is a bug
 
 Ship Classes:
  * ResearchFacility: allows you to research upgrades
  * EnergyBooster: ship which provides increased stats to ships within its radius.
  * ShieldProvider: ship which provides shield coverage to ships within its radius.
  * Carrier: has no attack. slow. very high defense. can contain other ships.
- * Artillery: slower, shoots big lazers. slow moving, weak defense.
- * TurretLevel1: stationary, weak lazers.
- * TurretLevel2: stationary, strong lazers.
- * TurretLevel3: stationary heavy artillery
+ * HeavyTurret: stationary, strong lazers.
+ * CannonTurret: stationary shoots heavy balls that displace enemies. Pierces shields.
  * Medic: heals ships within its radius
 
 Upgrades:
@@ -56,3 +57,16 @@ Upgrades:
    - Smarter aiming.
  * Economy
    - Gain more scrap money from destroying ships.
+ * Shield
+   - Shield recharge rate
+   - Shield max charge
+   - Bullets are not absorbed but actually *reflected* (still affects shield charge)
+   - Same as above but for heavy artillery
+ * Cannon
+   - Increase cannon ball damage
+ * Medic
+   - heal rate
+   - heal range
+ * Defense
+   - damage rate
+   - resistance to displacement

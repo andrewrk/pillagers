@@ -44,6 +44,7 @@ ArtilleryShip.prototype.createProjectile = function() {
     var bullet = new Bullet(this.state, {
       pos: pos,
       vel: unit.scaled(this.bulletSpeed).add(this.vel),
+      density: 0.10,
       team: this.team,
       damage: this.bulletDamage,
       life: this.bulletLife,

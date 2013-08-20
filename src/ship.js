@@ -29,7 +29,6 @@ function Ship(state, o) {
   this.initResources(state);
 
   this.canBeSelected = true;
-  this.canKeepTeamAlive = true;
   this.sensorRange = 400; // radius of ability to detect ships
   this.thrustInput = 0;
   this.brakeInput = false; // lets you brake at low velocities
@@ -42,6 +41,7 @@ function Ship(state, o) {
   this.hasBullets = false;
   this.canBeStruck = true;
   this.hostile = true;
+  this.hasShield = false;
 
   this.miniMapColor = this.team.color;
   this.uiAnimationName = this.animationNames.still;
@@ -155,7 +155,7 @@ Ship.prototype.update = function(dt, dx) {
   this.sprite.pos = this.pos.floored();
 };
 
-Ship.prototype.hit = function(damage, explosionAnimationName) {
+Ship.prototype.damage = function(damage, explosionAnimationName) {
   this.health -= damage / this.defense;
   this.emit('hit');
   if (this.health <= 0) {
