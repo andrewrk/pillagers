@@ -44,6 +44,7 @@ ShieldShip.prototype.draw = function(context) {
 ShieldShip.prototype.update = function(dt, dx) {
   Ship.prototype.update.call(this, dt, dx);
 
+  if (this.deleted) return;
   for (var i = 0; i < this.state.physicsObjects.length; i += 1) {
     var obj = this.state.physicsObjects[i];
     if (obj.deleted) continue;

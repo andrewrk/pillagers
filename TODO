@@ -33,7 +33,6 @@ Nice-to-have:
 Ship Classes:
  * ResearchFacility: allows you to research upgrades
  * EnergyBooster: ship which provides increased stats to ships within its radius.
- * ShieldProvider: ship which provides shield coverage to ships within its radius.
  * Carrier: has no attack. slow. very high defense. can contain other ships.
  * HeavyTurret: stationary, strong lazers.
  * CannonTurret: stationary shoots heavy balls that displace enemies. Pierces shields.
