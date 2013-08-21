@@ -15,6 +15,7 @@ function ShieldShip(state, o) {
   this.rotationSpeed = Math.PI * 0.019;
   this.thrustAmt = 0.04;
   this.rankOrder = 2;
+  this.defense = 2;
 
   this.hasShield = true;
   this.shieldRadius = 120;
