@@ -18,7 +18,7 @@ function CannonShip(state, o) {
   this.rankOrder = 3;
   this.defense = 2;
   this.bulletDamage = 0.05;
-  this.bulletSpeed = 8;
+  this.bulletSpeed = 6;
   this.bulletLife = 2;
   this.bulletAnimationName = 'bullet/cannonball';
   this.rechargeAmt = 1.5;

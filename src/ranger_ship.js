@@ -41,11 +41,17 @@ RangerShip.prototype.animationNames = {
 RangerShip.prototype.update = function(dt, dx) {
   Ship.prototype.update.apply(this, arguments);
   this.recharge -= dt;
-  if (this.shootInput && this.recharge <= 0) {
+  if (this.shootInput && this.readyToFire()) {
     this.recharge = this.rechargeAmt;
     this.createProjectile();
   }
 }
+
+RangerShip.prototype.readyToFire = function() {
+  if (this.recharge > 0) return false;
+  if (this.standGround && this.vel.lengthSqrd() > 0) return false;
+  return true;
+};
 
 RangerShip.prototype.clearInput = function() {
   Ship.prototype.clearInput.apply(this, arguments);

@@ -242,7 +242,7 @@ function EngageCommand(ai, dest) {
   this.thresholdSqrd = 100 * 100; // stop when distanceSqrd < this
   this.dest = dest;
   this.done = false;
-  this.speedCap = 3;
+  this.speedCap = ai.ship.standGround ? 1 : 3;
   this.sprite = new chem.Sprite(ani.knife, {
     batch: ai.state.batch,
     pos: this.dest,
@@ -525,11 +525,16 @@ DefendGroundCommand.prototype.execute = function(ai, dt, dx) {
     return;
   }
   this.sprite.pos = this.target.pos;
-  ai.ship.setThrustInput(0);
+
+  if (ai.ship.vel.lengthSqrd() > 0) {
+    // decelerate - we can't shoot unless stopped
+    ai.decelerate();
+    return;
+  }
 
   var targetAngle = this.target.pos.minus(ai.ship.pos).angle();
   var delta = angleSubtract(targetAngle, ai.ship.rotation);
-  var goodShot = Math.abs(delta) < Math.PI / 10;
+  var goodShot = Math.abs(delta) < Math.PI / 20;
 
   // shoot at target
   ai.ship.shootInput = goodShot ? 1 : 0;
