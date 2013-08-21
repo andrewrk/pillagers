@@ -16,6 +16,7 @@ function ArtilleryShip(state, o) {
   this.thrustAmt = 0.01;
   this.rankOrder = 3;
   this.sensorRange = 400;
+  this.defense = 2;
 
   this.bulletSpeed = 8;
   this.bulletLife = 0.8;
@@ -46,7 +47,7 @@ ArtilleryShip.prototype.createProjectile = function() {
       vel: unit.scaled(this.bulletSpeed).add(this.vel),
       density: 0.10,
       team: this.team,
-      damage: this.bulletDamage,
+      damageAmount: this.bulletDamage,
       life: this.bulletLife,
       animationName: this.bulletAnimationName,
     });

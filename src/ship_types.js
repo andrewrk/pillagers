@@ -7,4 +7,5 @@ module.exports = {
   Civilian: require('./civilian_ship'),
   Artillery: require('./artillery_ship'),
   Shield: require('./shield_ship'),
+  Cannon: require('./cannon_ship'),
 };

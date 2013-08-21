@@ -12,16 +12,20 @@ function Bullet(state, o) {
   o = o || {};
   this.resistShieldTeamSwitch = false;
   this.team = o.team;
-  this.damage = o.damage;
+  this.damageAmount = o.damageAmount;
   this.life = o.life;
   this.density = o.density || 0.002;
-  this.sprite = new chem.Sprite(ani[o.animationName || 'bullet/circle']);
+  this.radius = o.radius || 2;
+  this.canHitShield = o.canHitShield == null ? true : o.canHitShield;
+  this.surviveHit = !!o.surviveHit;
+  this.canBeStruck = !!o.canBeStruck;
+  this.canBeShot = !!o.canBeShot;
+  this.collisionDamping = o.collisionDamping || 1;
+  var animationName = o.animationName || 'bullet/circle';
+  this.sprite = new chem.Sprite(ani[animationName]);
   this.updateRotation();
   this.state.batch.add(this.sprite);
-  this.radius = 2;
   this.canGoOffscreen = true;
-  this.canHitShield = true;
-  this.collisionDamping = 1;
 }
 
 Bullet.prototype.delete = function() {
@@ -51,10 +55,12 @@ Bullet.prototype.update = function (dt, dx) {
     if (obj.deleted) continue;
     if (! obj.canBeShot || obj.team === this.team) continue;
     if (obj.pos.distanceSqrd(this.pos) < obj.radius * obj.radius + this.radius * this.radius) {
-      this.delete();
+      if (!this.surviveHit) {
+        this.delete();
+        sfx.weakHit();
+      }
       obj.collide(this);
-      obj.damage(this.damage, "explosion");
-      sfx.weakHit();
+      obj.damage(this.damageAmount, "explosion");
       return;
     }
   }
@@ -63,3 +69,4 @@ Bullet.prototype.update = function (dt, dx) {
 Bullet.prototype.hitShield = function(shieldObject) {
   if (!this.resistShieldTeamSwitch) this.team = shieldObject.team;
 };
+

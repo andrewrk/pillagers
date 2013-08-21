@@ -208,6 +208,27 @@ exports.spritesheet = {
         "ship/artillery0.png",
       ],
     },
+    ship_cannon_still: {
+      frames: ["ship/cannon0.png"],
+    },
+    ship_cannon_accel: {
+      loop: false,
+      frames: [
+        "ship/cannon1.png",
+        "ship/cannon2.png",
+        "ship/cannon3.png",
+        "ship/cannon4.png",
+      ],
+    },
+    ship_cannon_decel: {
+      loop: false,
+      frames: [
+        "ship/cannon3.png",
+        "ship/cannon2.png",
+        "ship/cannon1.png",
+        "ship/cannon0.png",
+      ],
+    },
     explosion: {
       loop: false,
     },
@@ -222,6 +243,7 @@ exports.spritesheet = {
     'bullet/circle': {},
     'bullet/small': {},
     'bullet/large': {},
+    'bullet/cannonball': {},
     'flag': {
       anchor: 'bottomleft',
     },

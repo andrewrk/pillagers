@@ -22,7 +22,6 @@ function TurretShip(state, o) {
   this.recharge = 0;
 
   this.standGround = true;
-
 }
 
 TurretShip.prototype.name = "Turret";

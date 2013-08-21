@@ -27,6 +27,7 @@ function RangerShip(state, o) {
   this.rechargeAmt = 0.20;
   this.recharge = 0;
 
+  this.standGround = false; // true if can only fire when moving
 }
 
 RangerShip.prototype.name = "Ranger";
@@ -59,7 +60,7 @@ RangerShip.prototype.createProjectile = function() {
     pos: this.pos.plus(unit.scaled(this.radius)),
     vel: unit.scaled(this.bulletSpeed).add(this.vel),
     team: this.team,
-    damage: this.bulletDamage,
+    damageAmount: this.bulletDamage,
     life: this.bulletLife,
     animationName: this.bulletAnimationName,
   });

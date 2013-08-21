@@ -116,6 +116,7 @@ ShipAi.prototype.attackNearbyEnemy = function() {
   for (var i = 0; i < this.state.physicsObjects.length; i += 1) {
     var obj = this.state.physicsObjects[i];
     if (!obj.canBeShot) continue;
+    if (!obj.isShip) continue;
     if (obj.team == null || obj.team === this.ship.team) continue;
     var dist = obj.pos.distanceSqrd(this.ship.pos);
     if (dist > this.ship.sensorRange * this.ship.sensorRange) continue;

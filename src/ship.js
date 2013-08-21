@@ -42,6 +42,7 @@ function Ship(state, o) {
   this.canBeStruck = true;
   this.hostile = true;
   this.hasShield = false;
+  this.isShip = true;
 
   this.miniMapColor = this.team.color;
   this.uiAnimationName = this.animationNames.still;

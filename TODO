@@ -6,6 +6,8 @@ Next:
 Features:
  * Add a command that tells a ship to defend another ship.
  * Network Multiplayer
+ * Gravity well gun. shoots "black holes" which temporarily create a large gravitational
+   force toward it, but only for the enemy team.
 
 Level ideas:
  * portals that enemies come out of
