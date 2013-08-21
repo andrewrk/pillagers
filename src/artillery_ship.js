@@ -24,6 +24,7 @@ function ArtilleryShip(state, o) {
   this.rechargeAmt = 2;
   this.bulletDensity = 0.02;
   this.bulletAnimationName = 'bullet/large';
+  this.bulletSfx = sfx.shootStrongBullet;
 }
 
 ArtilleryShip.prototype.name = "Artillery";
@@ -34,24 +35,9 @@ ArtilleryShip.prototype.animationNames = {
   still: 'ship_artillery_still',
 };
 
-ArtilleryShip.prototype.createProjectile = function() {
-  sfx.shootStrongBullet();
-  var unit = v.unit(this.rotation);
-  var positions = [
+ArtilleryShip.prototype.gunPositions = function() {
+  return [
     this.pos.plus(v.unit(this.rotation + Math.PI / 2).scaled(22)),
     this.pos.plus(v.unit(this.rotation - Math.PI / 2).scaled(22)),
   ];
-  for (var i = 0; i < 2; i += 1) {
-    var pos = positions[i];
-    var bullet = new Bullet(this.state, {
-      pos: pos,
-      vel: unit.scaled(this.bulletSpeed).add(this.vel),
-      density: this.bulletDensity,
-      team: this.team,
-      damageAmount: this.bulletDamage,
-      life: this.bulletLife,
-      animationName: this.bulletAnimationName,
-    });
-    this.state.addBullet(bullet);
-  }
-}
+};

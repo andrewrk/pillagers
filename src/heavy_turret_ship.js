@@ -1,4 +1,5 @@
 var util = require('util');
+var sfx = require('./sfx');
 var TurretShip = require('./turret_ship');
 var chem = require('chem');
 var v = chem.vec2d;
@@ -19,6 +20,7 @@ function HeavyTurretShip(state, o) {
   this.rechargeAmt = 2;
   this.bulletDensity = 0.02;
   this.bulletAnimationName = 'bullet/large';
+  this.bulletSfx = sfx.shootStrongBullet;
 }
 
 HeavyTurretShip.prototype.name = "HeavyTurret";

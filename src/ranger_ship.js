@@ -25,6 +25,7 @@ function RangerShip(state, o) {
   this.bulletDensity = 0.002;
   this.bulletDamage = 0.05;
   this.bulletAnimationName = 'bullet/small';
+  this.bulletSfx = sfx.shootWeakBullet;
   this.rechargeAmt = 0.20;
   this.recharge = 0;
 
@@ -60,17 +61,24 @@ RangerShip.prototype.clearInput = function() {
   this.shootInput = false;
 }
 
+RangerShip.prototype.gunPositions = function() {
+  return [this.pos.plus(v.unit(this.rotation).scaled(this.radius))];
+};
+
 RangerShip.prototype.createProjectile = function() {
-  sfx.shootWeakBullet();
-  var unit = v.unit(this.rotation);
-  var bullet = new Bullet(this.state, {
-    pos: this.pos.plus(unit.scaled(this.radius)),
-    vel: unit.scaled(this.bulletSpeed).add(this.vel),
-    team: this.team,
-    density: this.bulletDensity,
-    damageAmount: this.bulletDamage,
-    life: this.bulletLife,
-    animationName: this.bulletAnimationName,
-  });
-  this.state.addBullet(bullet);
+  this.bulletSfx();
+  var positions = this.gunPositions();
+  for (var i = 0; i < positions.length; i += 1) {
+    var pos = positions[i];
+    var bullet = new Bullet(this.state, {
+      pos: pos,
+      vel: v.unit(this.rotation).scaled(this.bulletSpeed).add(this.vel),
+      team: this.team,
+      density: this.bulletDensity,
+      damageAmount: this.bulletDamage,
+      life: this.bulletLife,
+      animationName: this.bulletAnimationName,
+    });
+    this.state.addBullet(bullet);
+  }
 }
