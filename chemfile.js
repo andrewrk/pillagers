@@ -241,8 +241,12 @@ exports.spritesheet = {
       loop: false,
     },
     'bullet/circle': {},
-    'bullet/small': {},
-    'bullet/large': {},
+    'bullet/small': {
+      anchor: 'top',
+    },
+    'bullet/large': {
+      anchor: 'top',
+    },
     'bullet/cannonball': {},
     'flag': {
       anchor: 'bottomleft',
