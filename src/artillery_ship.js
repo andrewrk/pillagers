@@ -22,6 +22,7 @@ function ArtilleryShip(state, o) {
   this.bulletLife = 0.8;
   this.bulletDamage = 4;
   this.rechargeAmt = 2;
+  this.bulletDensity = 0.02;
   this.bulletAnimationName = 'bullet/large';
 }
 
@@ -45,7 +46,7 @@ ArtilleryShip.prototype.createProjectile = function() {
     var bullet = new Bullet(this.state, {
       pos: pos,
       vel: unit.scaled(this.bulletSpeed).add(this.vel),
-      density: 0.02,
+      density: this.bulletDensity,
       team: this.team,
       damageAmount: this.bulletDamage,
       life: this.bulletLife,

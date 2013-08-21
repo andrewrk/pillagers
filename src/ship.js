@@ -59,6 +59,7 @@ Ship.prototype.serialize = function() {
         pos: this.pos.clone(),
         vel: this.vel.clone(),
         team: this.team.number,
+        rotation: this.rotation,
       },
     },
   };

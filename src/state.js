@@ -1382,6 +1382,8 @@ State.prototype.addSpecialShip = function(o) {
   var ship = new ShipType(this, {
     team: team.get(o.ship.team),
     pos: v(o.ship.pos),
+    vel: v(o.ship.vel),
+    rotation: o.ship.rotation,
     group: o.ship.group,
   });
   if (o.triggers) {

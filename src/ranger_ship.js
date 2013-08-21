@@ -22,6 +22,7 @@ function RangerShip(state, o) {
   this.hasBullets = true;
   this.bulletSpeed = 10;
   this.bulletLife = 0.5;
+  this.bulletDensity = 0.002;
   this.bulletDamage = 0.05;
   this.bulletAnimationName = 'bullet/small';
   this.rechargeAmt = 0.20;
@@ -66,6 +67,7 @@ RangerShip.prototype.createProjectile = function() {
     pos: this.pos.plus(unit.scaled(this.radius)),
     vel: unit.scaled(this.bulletSpeed).add(this.vel),
     team: this.team,
+    density: this.bulletDensity,
     damageAmount: this.bulletDamage,
     life: this.bulletLife,
     animationName: this.bulletAnimationName,

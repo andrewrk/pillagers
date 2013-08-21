@@ -1,4 +1,5 @@
 Next:
+ * when telling a group to move, cap max thrust to lowest common
  * more ship classes
  * more campaign levels
  * multiplayer vs AI

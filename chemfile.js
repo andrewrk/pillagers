@@ -229,6 +229,23 @@ exports.spritesheet = {
         "ship/cannon0.png",
       ],
     },
+    ship_heavyturret_still: {
+      frames: ["ship/heavyturret0.png"],
+    },
+    ship_heavyturret_accel: {
+      loop: false,
+      frames: [
+        "ship/heavyturret1.png",
+        "ship/heavyturret2.png",
+      ],
+    },
+    ship_heavyturret_decel: {
+      loop: false,
+      frames: [
+        "ship/heavyturret1.png",
+        "ship/heavyturret0.png",
+      ],
+    },
     explosion: {
       loop: false,
     },

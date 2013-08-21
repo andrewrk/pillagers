@@ -12,7 +12,7 @@ function TurretShip(state, o) {
   this.hasBackwardsThrusters = false;
   this.rotationSpeed = Math.PI * 0.02;
   this.thrustAmt = 0.02;
-  this.rankOrder = 1;
+  this.rankOrder = 2;
   this.sensorRange = 400;
 
   this.bulletSpeed = 10;
