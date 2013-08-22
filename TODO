@@ -18,13 +18,9 @@ Level ideas:
    to destroy that ship to reactivate your army
 
 Nice-to-have:
- * If your flagship is all that is left, everyone targets it.
- * Add a turret to flagship
  * Update level 1 with a civilian and use that to explain ctrl+right-click
    vs right-click
- * Escort mission.
  * pan sound effects and volume depending on scroll
- * Ship AI: self directed shootcommands have expire time
  * Ability to change controls.
  * ability to retry level when you get game over
  * fix the thruster sound glitchiness
@@ -36,7 +32,6 @@ Ship Classes:
  * ResearchFacility: allows you to research upgrades
  * EnergyBooster: ship which provides increased stats to ships within its radius.
  * Carrier: has no attack. slow. very high defense. can contain other ships.
- * HeavyTurret: stationary, strong lazers.
  * Medic: heals ships within its radius
 
 Upgrades:

@@ -73,8 +73,8 @@ ShipAi.prototype.decelerate = function() {
   }
   var targetAngle = targetDir.angle();
   var delta = angleSubtract(targetAngle, this.ship.rotation);
+  this.ship.setRotateInput(delta / this.ship.rotationSpeed);
   if (Math.abs(delta) !== 0) {
-    this.ship.setRotateInput(delta / this.ship.rotationSpeed);
     this.ship.setThrustInput(0, true);
     return;
   }
