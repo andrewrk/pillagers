@@ -87,7 +87,7 @@ function createShipFn(self, ShipType) {
   };
 }
 
-FlagShip.prototype.name = "Flagship";
+FlagShip.prototype.name = "Flag";
 
 FlagShip.prototype.animationNames = {
   accel: 'ship_flag_accel',
