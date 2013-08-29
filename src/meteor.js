@@ -29,6 +29,8 @@ function Meteor(state, o) {
 
   this.miniMapColor = "#B59277";
   this.uiAnimationName = "rock-a";
+
+  this.canBeSelected = true;
 }
 
 Meteor.prototype.serialize = function() {

@@ -893,7 +893,7 @@ function clickedEnterableObject(state, pos) {
 
 function clickedSelectableObject(state, pos) {
   return state.clickedObject(pos, function(obj) {
-    return obj.canBeSelected || state.sandboxMode;
+    return obj.canBeSelected;
   });
 }
 

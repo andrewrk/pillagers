@@ -10,12 +10,11 @@ function PhysicsObject(state, o) {
   this.reflectBullets = false;
   this.vel = o.vel || v();
   this.pos = o.pos || v();
+  this.collisionTarget = o.collisionTarget || this;
   this.rotation = o.rotation == null ? Math.PI / 2 : o.rotation;
   this.id = createId();
   this.selected = false;
   this.canBeSelected = false;
-  this.isAttackable = false;
-  this.isDefendable = false;
 
   this.canGoOffscreen = false;
   this.defense = 1;
@@ -108,8 +107,8 @@ PhysicsObject.prototype.collide = function(other) {
   j /= 1 / myMass + 1 / otherMass;
   // apply impulse
   var impulse = normal.scale(j);
-  this.vel.sub(impulse.scaled(1 / myMass));
-  other.vel.add(impulse.scaled(1 / otherMass));
+  this.collisionTarget.vel.sub(impulse.scaled(1 / myMass));
+  other.collisionTarget.vel.add(impulse.scaled(1 / otherMass));
 }
 
 PhysicsObject.prototype.onTargeted = function(ship, action) {}

@@ -1,6 +1,4 @@
 var util = require('util');
-var parasiticInherits = require('./parasitic_inherits');
-var EventEmitter = require('events').EventEmitter;
 var PhysicsObject = require('./physics_object');
 
 var chem = require('chem');
@@ -9,10 +7,8 @@ var v = chem.vec2d;
 module.exports = Shield;
 
 util.inherits(Shield, PhysicsObject);
-parasiticInherits(Shield, EventEmitter);
 function Shield(state, o) {
   PhysicsObject.call(this, state, o);
-  EventEmitter.call(this);
 
   this.team = o.team;
   this.radius = o.radius || 120;
@@ -20,7 +16,8 @@ function Shield(state, o) {
   this.healthRechargeAmt = o.healthRechargeAmt || 0.002;
 
   this.canBeStruck = false;
-  this.canBeShot = true;
+  this.canBeShot = false;
+  this.canGoOffscreen = true;
   this.reflectBullets = true;
 }
 
@@ -47,6 +44,16 @@ Shield.prototype.draw = function(context) {
 Shield.prototype.update = function(dt, dx) {
   PhysicsObject.prototype.update.call(this, dt, dx);
   this.health = Math.min(1, this.health + dx * this.healthRechargeAmt);
+
+  // collide with other shields
+  for (var i = 0; i < this.state.physicsObjects.length; i += 1) {
+    var obj = this.state.physicsObjects[i];
+    if (obj.team === this.team) continue;
+    if (!obj.reflectBullets) continue;
+    var addedRadii = this.radius + obj.radius;
+    if (obj.pos.distanceSqrd(this.pos) > addedRadii * addedRadii) continue;
+    this.collide(obj);
+  }
 };
 
 Shield.prototype.reflect = function(bullet) {
@@ -57,6 +64,9 @@ Shield.prototype.reflect = function(bullet) {
   if (bullet.pos.distanceSqrd(this.pos) > withinRangeDistSqrd) return false;
   bullet.collide(this);
   this.health = Math.max(0, this.health - downShieldAmt);
-  this.emit('reflect', bullet);
   return true;
 }
+
+Shield.prototype.mass = function() {
+  return this.density * Math.PI * this.radius * this.radius * this.health;
+};

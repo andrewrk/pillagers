@@ -24,8 +24,8 @@ function ShieldShip(state, o) {
     pos: this.pos.clone(),
     radius: 120,
     team: this.team,
+    collisionTarget: this,
   });
-  this.shield.on('reflect', onShieldReflect.bind(this));
   this.state.addPhysicsObject(this.shield);
 }
 
@@ -47,14 +47,7 @@ ShieldShip.prototype.update = function(dt, dx) {
 };
 
 ShieldShip.prototype._delete = function() {
-  Ship.prototype._delete.call(this);
   this.state.deletePhysicsObject(this.shield);
   this.shield.delete();
+  Ship.prototype._delete.call(this);
 };
-
-function onShieldReflect(obj) {
-  // when an object bounces off a shield generator's shield, apply the
-  // collision to the shield generator
-  obj.collide(this);
-}
-

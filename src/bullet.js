@@ -51,11 +51,16 @@ Bullet.prototype.update = function (dt, dx) {
   for (var i = 0; i < this.state.physicsObjects.length; i += 1) {
     var obj = this.state.physicsObjects[i];
     if (obj.deleted) continue;
-    if (! obj.canBeShot || obj.team === this.team) continue;
+    if (! obj.canBeShot && ! obj.reflectBullets) continue;
+    if (obj.team === this.team) continue;
     if (obj.pos.distanceSqrd(this.pos) < obj.radius * obj.radius + this.radius * this.radius) {
-      if (obj.reflectBullets && obj.reflect(this)) {
-        if (!this.resistShieldTeamSwitch) this.team = obj.team;
-        return;
+      if (obj.reflectBullets) {
+        if (obj.reflect(this)) {
+          if (!this.resistShieldTeamSwitch) this.team = obj.team;
+          return;
+        } else {
+          continue;
+        }
       }
       if (!this.surviveHit) {
         this.delete();

@@ -94,7 +94,6 @@ ShipAi.prototype.shieldNearbyFriendly = function() {
     if (obj.deleted) continue;
     if (obj.shield) continue;
     if (! obj.canBeShot) continue;
-    if (obj.isDefendable) continue;
     if (obj.team !== this.ship.team) continue;
     var dist = obj.pos.distanceSqrd(this.ship.pos);
     if (dist > sensorRangeSqrd) continue;
@@ -117,7 +116,7 @@ ShipAi.prototype.attackNearbyEnemy = function() {
   for (var i = 0; i < this.state.physicsObjects.length; i += 1) {
     var obj = this.state.physicsObjects[i];
     if (!obj.canBeShot) continue;
-    if (!obj.isAttackable) continue;
+    if (!obj.hostile) continue;
     if (obj.team == null || obj.team === this.ship.team) continue;
     var dist = obj.pos.distanceSqrd(this.ship.pos);
     if (dist > this.ship.sensorRange * this.ship.sensorRange) continue;
