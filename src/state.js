@@ -668,7 +668,6 @@ function onDraw(context) {
   context.setTransform(1, 0, 0, 1, 0, 0); // load identity
   context.translate(-this.scroll.x, -this.scroll.y);
   this.batch.draw(context);
-  var id;
   for (var i = 0; i < this.physicsObjects.length; i += 1) {
     var obj = this.physicsObjects[i];
     if (obj.deleted) continue;
@@ -1169,7 +1168,7 @@ State.prototype.createSandboxButtons = function() {
   ];
   var nextPos = this.uiPanePos.offset(this.uiPaneMargin, this.uiPaneMargin);
   this.uiButtons = btns.map(function(btn) {
-    var size = v(50, 20);
+    var size = v(100, 20);
     if (nextPos.y + size.y >= this.uiPanePos.y + this.uiPaneSize.y - this.uiPaneMargin) {
       nextPos.y = this.uiPanePos.y + this.uiPaneMargin;
       nextPos.x += size.x + 4;
@@ -1627,7 +1626,11 @@ ScatterSquad.prototype.command = function(queue) {
   for (var i = 0; i < this.squad.units.length; i += 1) {
     var ship = this.squad.units[i];
     var unit = this.shipToAi[ship.id];
-    unit.commandToMove(this.squad.positions[ship.id], queue, this.loose);
+    if (this.loose) {
+      unit.commandToEngage(this.squad.positions[ship.id], queue);
+    } else {
+      unit.commandToMove(this.squad.positions[ship.id], queue);
+    }
     if (! this.loose) unit.commandToPoint(this.squad.direction, true);
   }
   if (this.loose) {

@@ -7,12 +7,15 @@ function PhysicsObject(state, o) {
   o = o || {};
   this.state = state;
   this.canBeShot = false;
+  this.reflectBullets = false;
   this.vel = o.vel || v();
   this.pos = o.pos || v();
   this.rotation = o.rotation == null ? Math.PI / 2 : o.rotation;
   this.id = createId();
   this.selected = false;
   this.canBeSelected = false;
+  this.isAttackable = false;
+  this.isDefendable = false;
 
   this.canGoOffscreen = false;
   this.defense = 1;
@@ -80,12 +83,12 @@ PhysicsObject.prototype.checkOutOfBounds = function() {
 }
 
 PhysicsObject.prototype.update = function(dt, dx) {
+  if (this.deleted) throw new Error("update called on deleted physics object");
   this.pos.add(this.vel.scaled(dx));
   if (!this.canGoOffscreen) this.checkOutOfBounds();
 };
 
 PhysicsObject.prototype.damage = function(damage, explosionAnimationName) {}
-PhysicsObject.prototype.hitShield = function(shieldObject) {}
 
 PhysicsObject.prototype.collide = function(other) {
   // calculate normal
@@ -112,5 +115,9 @@ PhysicsObject.prototype.collide = function(other) {
 PhysicsObject.prototype.onTargeted = function(ship, action) {}
 
 PhysicsObject.prototype.delete = function() {
+  if (this.deleted) return;
   this.deleted = true;
+  this._delete();
 }
+
+PhysicsObject.prototype._delete = function() {};

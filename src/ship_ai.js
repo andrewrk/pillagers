@@ -40,7 +40,7 @@ ShipAi.prototype.update = function (dt, dx) {
     return;
   }
 
-  if (this.ship.hasShield) {
+  if (this.ship.shield) {
     if (! this.shieldNearbyFriendly()) this.decelerate();
   } else if (this.ship.hostile) {
     if (! this.attackNearbyEnemy()) this.decelerate();
@@ -92,8 +92,9 @@ ShipAi.prototype.shieldNearbyFriendly = function() {
   for (var i = 0; i < this.state.physicsObjects.length; i += 1) {
     var obj = this.state.physicsObjects[i];
     if (obj.deleted) continue;
-    if (obj.hasShield) continue;
+    if (obj.shield) continue;
     if (! obj.canBeShot) continue;
+    if (obj.isDefendable) continue;
     if (obj.team !== this.ship.team) continue;
     var dist = obj.pos.distanceSqrd(this.ship.pos);
     if (dist > sensorRangeSqrd) continue;
@@ -116,7 +117,7 @@ ShipAi.prototype.attackNearbyEnemy = function() {
   for (var i = 0; i < this.state.physicsObjects.length; i += 1) {
     var obj = this.state.physicsObjects[i];
     if (!obj.canBeShot) continue;
-    if (!obj.isShip) continue;
+    if (!obj.isAttackable) continue;
     if (obj.team == null || obj.team === this.ship.team) continue;
     var dist = obj.pos.distanceSqrd(this.ship.pos);
     if (dist > this.ship.sensorRange * this.ship.sensorRange) continue;
@@ -151,13 +152,14 @@ ShipAi.prototype.commandToPoint = function(dir, queue) {
   this.commands.push(new PointCommand(dir));
 };
 
-ShipAi.prototype.commandToMove = function(pt, queue, loose) {
+ShipAi.prototype.commandToEngage = function(pt, queue) {
   if (! queue) this.clearCommands();
-  if (loose) {
-    this.commands.push(new EngageCommand(this, pt));
-  } else {
-    this.commands.push(new MoveCommand(this, pt));
-  }
+  this.commands.push(new EngageCommand(this, pt));
+};
+
+ShipAi.prototype.commandToMove = function(pt, queue) {
+  if (! queue) this.clearCommands();
+  this.commands.push(new MoveCommand(this, pt));
 };
 
 ShipAi.prototype.commandToEnter = function(target, queue) {
@@ -180,7 +182,7 @@ ShipAi.prototype.commandToAttack = function(target, queue) {
 
 ShipAi.prototype.commandToDefend = function(target, queue) {
   if (! queue) this.clearCommands();
-  if (this.ship.hasShield) {
+  if (this.ship.shield) {
     this.commands.push(new ShieldCommand(this, target));
   } else {
     throw new Error("ship has no defense capabilities");

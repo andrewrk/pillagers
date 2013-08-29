@@ -1,5 +1,5 @@
 Next:
- * when telling a group to move, cap max thrust to lowest common
+ * shields should not be able to overlap
  * double click to select all of that class
  * ctrl click selected to unselect
  * more ship classes
@@ -11,6 +11,13 @@ Features:
  * Network Multiplayer
  * Gravity well gun. shoots "black holes" which temporarily create a large gravitational
    force toward it, but only for the enemy team.
+ * ability to create and save squads for quick access
+ * squad behaviors
+   - try to stay roughly near each other
+   - defend weaker members of your squad
+   - distribute targets intelligently
+ * ability to tell units to face a direction
+ * homing missiles
 
 Level ideas:
  * portals that enemies come out of
@@ -20,8 +27,6 @@ Level ideas:
    to destroy that ship to reactivate your army
 
 Nice-to-have:
- * Update level 1 with a civilian and use that to explain ctrl+right-click
-   vs right-click
  * pan sound effects and volume depending on scroll
  * Ability to change controls.
  * ability to retry level when you get game over

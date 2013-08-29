@@ -78,8 +78,6 @@ Meteor.prototype.update = function(dt, dx) {
   this.sprite.rotation += this.rotVel;
 };
 
-Meteor.prototype.delete = function() {
-  if (this.deleted) return;
-  this.deleted = true;
+Meteor.prototype._delete = function() {
   this.sprite.delete();
 }

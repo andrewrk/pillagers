@@ -1,4 +1,5 @@
 var PhysicsObject = require('./physics_object');
+var parasiticInherits = require('./parasitic_inherits');
 var util = require('util');
 var chem = require('chem');
 var EventEmitter = require('events').EventEmitter;
@@ -41,8 +42,9 @@ function Ship(state, o) {
   this.hasBullets = false;
   this.canBeStruck = true;
   this.hostile = true;
-  this.hasShield = false;
-  this.isShip = true;
+  this.shield = null;
+  this.isAttackable = true;
+  this.isDefendable = true;
 
   this.miniMapColor = this.team.color;
   this.uiAnimationName = this.animationNames.still;
@@ -191,9 +193,7 @@ Ship.prototype.tearDownResources = function() {
   this.sprite = null;
 };
 
-Ship.prototype.delete = function() {
-  if (this.deleted) return;
-  this.deleted = true;
+Ship.prototype._delete = function() {
   this.emit('deleted');
   this.removeAllListeners();
   this.clearInput();
@@ -207,10 +207,4 @@ Ship.prototype.undelete = function(state) {
 
 function assert(value) {
   if (!value) throw new Error("Assertion Failure: " + value);
-}
-
-function parasiticInherits(Base, Super) {
-  Object.keys(Super.prototype).forEach(function(method) {
-    if (!Base.prototype[method]) Base.prototype[method] = Super.prototype[method];
-  });
 }

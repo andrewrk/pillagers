@@ -28,10 +28,8 @@ function Bullet(state, o) {
   this.canGoOffscreen = true;
 }
 
-Bullet.prototype.delete = function() {
-  if (this.deleted) return;
+Bullet.prototype._delete = function() {
   this.sprite.delete();
-  this.deleted = true;
   this.state.deletePhysicsObject(this);
 };
 
@@ -55,6 +53,10 @@ Bullet.prototype.update = function (dt, dx) {
     if (obj.deleted) continue;
     if (! obj.canBeShot || obj.team === this.team) continue;
     if (obj.pos.distanceSqrd(this.pos) < obj.radius * obj.radius + this.radius * this.radius) {
+      if (obj.reflectBullets && obj.reflect(this)) {
+        if (!this.resistShieldTeamSwitch) this.team = obj.team;
+        return;
+      }
       if (!this.surviveHit) {
         this.delete();
         sfx.weakHit();
@@ -65,8 +67,3 @@ Bullet.prototype.update = function (dt, dx) {
     }
   }
 }
-
-Bullet.prototype.hitShield = function(shieldObject) {
-  if (!this.resistShieldTeamSwitch) this.team = shieldObject.team;
-};
-

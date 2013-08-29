@@ -74,7 +74,7 @@ Portal.prototype.update = function(dt, dx) {
   this.sprite.rotation = Math.random() * Math.PI * 2
 };
 
-Portal.prototype.delete = function() {
+Portal.prototype._delete = function() {
   this.sprite.delete();
 }
 

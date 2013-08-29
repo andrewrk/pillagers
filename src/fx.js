@@ -25,7 +25,6 @@ Fx.prototype.update = function(dt, dx) {
   }
 };
 
-Fx.prototype.delete = function() {
-  this.deleted = true;
+Fx.prototype._delete = function() {
   this.sprite.delete();
 }
