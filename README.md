@@ -6,7 +6,7 @@
 
 [Development Journal](http://andrewkelley.me/post/pillagers-7drts-game-dev-journal.html)
 
-Built using [chem rapid development game engine](https://github.com/superjoe30/chem/).
+Built using [chem rapid development game engine](https://github.com/andrewrk/chem/).
 
 ![](http://i.imgur.com/MVwDAeq.png)
 
