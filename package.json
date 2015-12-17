@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "description": "space-physics real time strategy game made for 7dRTS",
   "dependencies": {
-    "chem": "~4.1.0",
-    "chem-cli": "~1.3.0"
+    "chem": "~4.1.1",
+    "chem-cli": "~1.6.0"
   },
   "scripts": {
     "dev": "npm install && chem dev"
