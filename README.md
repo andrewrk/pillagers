@@ -15,3 +15,7 @@ Built using [chem rapid development game engine](https://github.com/andrewrk/che
  1. Install Node.js and libcairo-dev. Both are probably in your
     operating system's package manager.
  2. `npm run dev`
+
+## Copyright
+
+Code is licensed with MIT and all art and music is public domain.
